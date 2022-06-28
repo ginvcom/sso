@@ -1,58 +1,67 @@
 type UserListReq {
-	Name string `json:"name"`
-    Mobile string `json:"mobile"`
+	Name   string `json:"name"`
+	Mobile string `json:"mobile"`
+}
+
+type UserOption {
+	Label string `json:"label"`
+	Value string `json:"value"`
+	Extra string `json:"extra,optional"`
 }
 
 type User {
-    Name string `json:"name"`
-    Mobile string `json:"mobile"`
-    Avatar string `json:"avatar"`
-    Gender int64 `json:"gender"`
-    Roles []Option `json:"roles"`
+	Name   string       `json:"name"`
+	Mobile string       `json:"mobile"`
+	Avatar string       `json:"avatar"`
+	Gender int64        `json:"gender"`
+	Roles  []UserOption `json:"roles"`
 }
 
 type UserListReply {
-	Total int64 `json:"total"`
-    List  []User `json:"list"`
+	Total int64  `json:"total"`
+	List  []User `json:"list"`
 }
 
 type AddUserReq {
-	Name string `json:"name"`
-    Mobile string `json:"mobile"`
-    Password string `json:"password"`
-    Avatar string `json:"avatar"`
-    Gender int64 `json:"gender"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
 }
 
 type AddUserReply {
 	UUID string `json:"uuid"`
 }
 
-type UserDetailReq { 
+type UserDetailReq {
 	UUID string `json:"uuid"`
 }
 
 type UserDetailReply {
-	Name string `json:"name"`
-    Mobile string `json:"mobile"`
-    Avatar string `json:"avatar"`
-    Gender int64 `json:"gender"`
+	Name   string `json:"name"`
+	Mobile string `json:"mobile"`
+	Avatar string `json:"avatar"`
+	Gender int64  `json:"gender"`
+	Birth  string `json:"birth"`
 }
 
 type UpdateUserReq {
-	UUID string `json:"uuid"`
-    Name string `json:"name"`
-    Mobile string `json:"mobile"`
-    Password string `json:"password"`
-    Avatar string `json:"avatar"`
-    Gender int64 `json:"gender"`
+	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
 }
 
 type UpdateUserReply {
 	Success bool `json:"success"`
 }
 
-type DeleteUserReq { 
+type DeleteUserReq {
 	UUID string `json:"uuid"`
 }
 
@@ -65,12 +74,12 @@ type AssignedRolesReq {
 }
 
 type AssignedRolesReply {
-	Roles []Option `json:"roles"`
+	Roles []UserOption `json:"roles"`
 }
 
 type AssignRoleReq {
-	UUID string `json:"uuid"`
-    RoleUUIDArray []string `json:"roleUUIDArray"`
+	UUID          string   `json:"uuid"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
 }
 
 type AssignRoleReply {
@@ -78,49 +87,49 @@ type AssignRoleReply {
 }
 
 type UserPermissionsReq {
-    UUID string `json:"uuid"`
-    Typ int64 `json:"type"` // 类型: 角色
+	UUID string `json:"uuid"`
+	Typ  int64  `json:"type"` // 类型: 角色
 }
 
 type UserPermissionsReply {
-    Systems []Option `json:"system"`
+	Systems []UserOption `json:"system"`
 }
 
 @server(
 	group: user
-    prefix: user
+	prefix: user
 )
 
 service ssoms-api {
-    @doc "用户列表"
+	@doc "用户列表"
 	@handler userList
 	post /list (UserListReq) returns (UserListReply)
-
+	
 	@doc "新增用户"
 	@handler addUser
 	post /add (AddUserReq) returns (AddUserReply)
-
-    @doc "用户详情"
-    @handler userDetail
-    post /detail (UserDetailReq) returns (UserDetailReply)
-
-    @doc "修改用户"
-    @handler updateUser
+	
+	@doc "用户详情"
+	@handler userDetail
+	post /detail (UserDetailReq) returns (UserDetailReply)
+	
+	@doc "修改用户"
+	@handler updateUser
 	post /update (UpdateUserReq) returns (UpdateUserReply)
-
-    @doc "删除用户"
-    @handler deleteUser
+	
+	@doc "删除用户"
+	@handler deleteUser
 	post /delete (DeleteUserReq) returns (DeleteUserReply)
-
-    @doc "用户已分配的角色"
-    @handler assignedRoles
+	
+	@doc "用户已分配的角色"
+	@handler assignedRoles
 	post /assignedRoles (AssignedRolesReq) returns (AssignedRolesReply)
-
-    @doc "给用户分配角色"
-    @handler assignRole
+	
+	@doc "给用户分配角色"
+	@handler assignRole
 	post /assignRole (AssignRoleReq) returns (AssignRoleReply)
-    
-    @doc "用户通过其分配的角色获得的权限"
-    @handler userPermissions
+	
+	@doc "用户通过其分配的角色获得的权限"
+	@handler userPermissions
 	post /permissions (UserPermissionsReq) returns (UserPermissionsReply)
 }

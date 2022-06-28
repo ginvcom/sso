@@ -1,0 +1,21 @@
+CREATE TABLE `object` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `uuid` int NOT NULL,
+  `object_name` varchar(255) NOT NULL,
+  `domain` varchar(255) NOT NULL DEFAULT '',
+  `key` varchar(255) NOT NULL COMMENT '操作对象的systemCode, 菜单的path, 操作的uri',
+  `sort` int NOT NULL DEFAULT '0',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)',
+  `icon` varchar(255) NOT NULL DEFAULT '' COMMENT '图标',
+  `status` tinyint(1) NOT NULL COMMENT '状态',
+  `puuid` char(12) NOT NULL COMMENT '父级uuid',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `udx_uuid` (`uuid`),
+  KEY `idx_object_name` (`object_name`),
+  KEY `idx_key` (`key`),
+  KEY `idx_status` (`status`),
+  KEY `idx_type` (`type`),
+  KEY `idx_role_name` (`role_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

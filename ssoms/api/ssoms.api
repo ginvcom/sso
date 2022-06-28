@@ -5,9 +5,3 @@ import (
 	"apis/object.api"
 	"apis/permission.api"
 )
-
-type Option {
-    Label string `json:"label"`
-    Value string `json:"value"`
-    Extra string `json:"extra,optional"`
-}
