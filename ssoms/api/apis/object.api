@@ -4,7 +4,7 @@ type ObjectListReq {
 }
 
 type Object {
-    Id string `json:"id"`
+    UUID string `json:"UUID"`
     ObjectName string `json:"ObjectName"`
     Domain string `json:"domain"`
     Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -12,7 +12,7 @@ type Object {
     Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
     Icon string `json:"icon"` // 图标
     Status int64 `json:"status"`
-    PID int64 `json:"pid"`
+    PUUID string `json:"pUUID,optional"`
     Children []Object `json:"children,optional"`
 }
 
@@ -28,19 +28,19 @@ type AddObjectReq {
     Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
     Icon string `json:"icon"` // 图标
     Status int64 `json:"status"`
-    PID int64 `json:"pid"`
+    PUUID string `json:"pUUID,optional"`
 }
 
 type AddObjectReply {
-	ID int64 `json:"id"`
+	UUID string `json:"UUID"`
 }
 
 type ObjectDetailReq {
-	ID int64 `json:"id"`
+	UUID string `json:"UUID"`
 }
 
 type ObjectDetailReply {
-    ID int64 `json:"id"`
+    UUID string `json:"UUID"`
 	ObjectName string `json:"ObjectName"`
     Domain string `json:"domain"`
     Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -48,7 +48,7 @@ type ObjectDetailReply {
     Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
     Icon string `json:"icon"` // 图标
     Status int64 `json:"status"`
-    PID int64 `json:"pid"`
+    PUUID string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReq {
@@ -59,7 +59,7 @@ type UpdateObjectReq {
     Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
     Icon string `json:"icon"` // 图标
     Status int64 `json:"status"`
-    PID int64 `json:"pid"`
+    PUUID string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReply {
@@ -67,7 +67,7 @@ type UpdateObjectReply {
 }
 
 type DeleteObjectReq {
-	ID int64 `json:"id"`
+	UUID string `json:"UUID"`
 }
 
 type DeleteObjectReply {
@@ -76,7 +76,7 @@ type DeleteObjectReply {
 
 type RoleOperationsReq {
 	TypeName string `json:"typeName"` // system, others
-    PID  int64 `json:"pid"`
+    PUUID string `json:"pUUID,optional"`
 }
 
 type RoleOperationsReply {

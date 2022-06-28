@@ -2,6 +2,8 @@
 import (
 	"apis/user.api"
 	"apis/role.api"
+	"apis/object.api"
+	"apis/permission.api"
 )
 
 type Option {

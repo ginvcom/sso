@@ -1,3 +1,30 @@
+type RolePermissionsReq {
+    TypeName string `json:"typeName"` // system, others
+    PUUID string `json:"pUUID,optional"`
+}
+
+type ObjectOption {
+    Label string `json:"label"`
+    Value string `json:"value"`
+    Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+    Extra string `json:"extra"`
+    Children []ObjectOption `json:"children"`
+}
+
+type RolePermissionsReply {
+    List []ObjectOption `json:"list"`
+}
+
+type GrantReq {
+    TypeName string `json:"typeName"` // system, others
+    PUUID string `json:"pUUID,optional"`
+}
+
+type GrantReply {
+    UUIDArray []string `json:"uuidArray"`
+}
+
+
 @server(
 	group: permission
     prefix: permission
@@ -11,6 +38,4 @@ service ssoms-api {
     @doc "将对象执行操作的权限授予角色"
     @handler grant
 	post /grant (GrantReq) returns (GrantReply)
-
-    
 }
