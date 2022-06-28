@@ -1,0 +1,11 @@
+// import group
+import (
+	"apis/user.api"
+	"apis/role.api"
+)
+
+type Option {
+    Label string `json:"label"`
+    Value string `json:"value"`
+    Extra string `json:"extra,optional"`
+}

@@ -1,0 +1,16 @@
+@server(
+	group: permission
+    prefix: permission
+)
+
+service ssoms-api {
+    @doc "角色已分配的权限"
+    @handler rolePermissions
+    post /RolePermissions(RolePermissionsReq) returns (RolePermissionsReply)
+
+    @doc "将对象执行操作的权限授予角色"
+    @handler grant
+	post /grant (GrantReq) returns (GrantReply)
+
+    
+}

@@ -1,0 +1,132 @@
+type RoleListReq {
+	RoleName string `json:"roleName"`
+}
+
+type Role {
+	RoleUUID string `json:"roleUUID"` // 角色uuid
+    RoleName string `json:"roleName"` // 角色名称
+    Summary string `json:"summary"` // 角色概述
+	Inheritances []Option `json:"inheritances"` // 继承的角色
+    UsersAmount int64 `json:"usersAmount"` // 拥有的用户数量
+}
+
+type RoleListReply {
+	Total int64 `json:"total"`
+    List  []Role `json:"list"`
+}
+
+type AddRoleReq {
+	RoleName string `json:"roleName"`
+    Summary string `json:"summary"`
+}
+
+type AddRoleReply {
+	RoleUUID string `json:"roleUUID"`
+}
+
+type RoleDetailReq { 
+	RoleUUID string `json:"roleUUID"`
+}
+
+type RoleDetailReply {
+	RoleName string `json:"roleName"`
+    Summary string `json:"summary"`
+}
+
+type UpdateRoleReq {
+	UUID string `json:"uuid"`
+    Name string `json:"name"`
+    Mobile string `json:"mobile"`
+    Password string `json:"password"`
+    Avatar string `json:"avatar"`
+    Gender int64 `json:"gender"`
+}
+
+type UpdateRoleReply {
+	Success bool `json:"success"`
+}
+
+type DeleteRoleReq { 
+	UUID string `json:"uuid"`
+}
+
+type DeleteRoleReply {
+	Success bool `json:"success"`
+}
+
+type AssignedUsersReq {
+	UUID string `json:"uuid"`
+}
+
+type AssignedUsersReply {
+	Roles []Option `json:"roles"`
+}
+
+type AssignUserReq {
+	RoleUUID string `json:"roleUUID"`
+    UserUUIDArray []string `json:"userUUIDArray"`
+}
+
+type AssignUserReply {
+	Success bool `json:"success"`
+}
+
+type InheritancesReq {
+	RoleUUID string `json:"roleUUID"`
+}
+
+type InheritancesReply {
+	Roles []Option `json:"roles"`
+}
+
+type AddInheritanceReq {
+	RoleUUID string `json:"roleUUID"`
+	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
+}
+
+type AddInheritanceReply {
+	Success bool `json:"success"`
+}
+
+@server(
+	group: role
+    prefix: role
+)
+
+service ssoms-api {
+	@doc "角色列表"
+	@handler roleList
+	post /list (RoleListReq) returns (RoleListReply)
+
+	@doc "新增角色"
+	@handler addRole
+	post /add (AddRoleReq) returns (AddRoleReply)
+
+    @doc "角色详情"
+    @handler roleDetail
+    post /detail (RoleDetailReq) returns (RoleDetailReply)
+
+    @doc "修改角色"
+    @handler updateRole
+	post /update (UpdateRoleReq) returns (UpdateRoleReply)
+
+    @doc "删除角色"
+    @handler deleteRole
+	post /delete (DeleteRoleReq) returns (DeleteRoleReply)
+
+    @doc "角色已拥有的用户"
+    @handler assignedUsers
+	post /assignedUsers (AssignedUsersReq) returns (AssignedUsersReply)
+
+    @doc "给角色添加用户"
+    @handler assignUser
+	post /assignUser (AssignUserReq) returns (AssignUserReply)
+
+	@doc "角色已继承的角色"
+    @handler inheritances
+	post /inheritances (InheritancesReq) returns (InheritancesReply)
+	
+	@doc "角色继承另一个角色"
+    @handler extendRole
+	post /addInheritance (AddInheritanceReq) returns (AddInheritanceReply)
+}

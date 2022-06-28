@@ -1,0 +1,115 @@
+type ObjectListReq {
+	ObjectName string `json:"ObjectName"`
+    Key string `json:"key"`
+}
+
+type Object {
+    Id string `json:"id"`
+    ObjectName string `json:"ObjectName"`
+    Domain string `json:"domain"`
+    Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+    Sort int64 `json:"sort"`
+    Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+    Icon string `json:"icon"` // 图标
+    Status int64 `json:"status"`
+    PID int64 `json:"pid"`
+    Children []Object `json:"children,optional"`
+}
+
+type ObjectListReply {
+    List  []Object `json:"list"`
+}
+
+type AddObjectReq {
+    ObjectName string `json:"ObjectName"`
+    Domain string `json:"domain"`
+    Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+    Sort int64 `json:"sort"`
+    Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+    Icon string `json:"icon"` // 图标
+    Status int64 `json:"status"`
+    PID int64 `json:"pid"`
+}
+
+type AddObjectReply {
+	ID int64 `json:"id"`
+}
+
+type ObjectDetailReq {
+	ID int64 `json:"id"`
+}
+
+type ObjectDetailReply {
+    ID int64 `json:"id"`
+	ObjectName string `json:"ObjectName"`
+    Domain string `json:"domain"`
+    Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+    Sort int64 `json:"sort"`
+    Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+    Icon string `json:"icon"` // 图标
+    Status int64 `json:"status"`
+    PID int64 `json:"pid"`
+}
+
+type UpdateObjectReq {
+    ObjectName string `json:"ObjectName"`
+    Domain string `json:"domain"`
+    Key string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+    Sort int64 `json:"sort"`
+    Typ int64 `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+    Icon string `json:"icon"` // 图标
+    Status int64 `json:"status"`
+    PID int64 `json:"pid"`
+}
+
+type UpdateObjectReply {
+	Success bool `json:"success"`
+}
+
+type DeleteObjectReq {
+	ID int64 `json:"id"`
+}
+
+type DeleteObjectReply {
+	Success bool `json:"success"`
+}
+
+type RoleOperationsReq {
+	TypeName string `json:"typeName"` // system, others
+    PID  int64 `json:"pid"`
+}
+
+type RoleOperationsReply {
+	List []Object `json:"list,optional"`
+}
+
+@server(
+	group: object
+    prefix: object
+)
+
+service ssoms-api {
+    @doc "操作对象列表"
+	@handler objectList
+	post /list (ObjectListReq) returns (ObjectListReply)
+
+	@doc "新增操作对象"
+	@handler addObject
+	post /add (AddObjectReq) returns (AddObjectReply)
+
+    @doc "操作对象详情"
+    @handler objectDetail
+    post /detail (ObjectDetailReq) returns (ObjectDetailReply)
+
+    @doc "修改操作对象"
+    @handler updateObject
+	post /update (UpdateObjectReq) returns (UpdateObjectReply)
+
+    @doc "删除操作对象"
+    @handler deleteObject
+	post /delete (DeleteObjectReq) returns (DeleteObjectReply)
+
+    @doc "角色可以分配权限的对象"
+    @handler roleOperations
+    post /roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
+}

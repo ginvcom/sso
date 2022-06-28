@@ -1,0 +1,126 @@
+type UserListReq {
+	Name string `json:"name"`
+    Mobile string `json:"mobile"`
+}
+
+type User {
+    Name string `json:"name"`
+    Mobile string `json:"mobile"`
+    Avatar string `json:"avatar"`
+    Gender int64 `json:"gender"`
+    Roles []Option `json:"roles"`
+}
+
+type UserListReply {
+	Total int64 `json:"total"`
+    List  []User `json:"list"`
+}
+
+type AddUserReq {
+	Name string `json:"name"`
+    Mobile string `json:"mobile"`
+    Password string `json:"password"`
+    Avatar string `json:"avatar"`
+    Gender int64 `json:"gender"`
+}
+
+type AddUserReply {
+	UUID string `json:"uuid"`
+}
+
+type UserDetailReq { 
+	UUID string `json:"uuid"`
+}
+
+type UserDetailReply {
+	Name string `json:"name"`
+    Mobile string `json:"mobile"`
+    Avatar string `json:"avatar"`
+    Gender int64 `json:"gender"`
+}
+
+type UpdateUserReq {
+	UUID string `json:"uuid"`
+    Name string `json:"name"`
+    Mobile string `json:"mobile"`
+    Password string `json:"password"`
+    Avatar string `json:"avatar"`
+    Gender int64 `json:"gender"`
+}
+
+type UpdateUserReply {
+	Success bool `json:"success"`
+}
+
+type DeleteUserReq { 
+	UUID string `json:"uuid"`
+}
+
+type DeleteUserReply {
+	Success bool `json:"success"`
+}
+
+type AssignedRolesReq {
+	UUID string `json:"uuid"`
+}
+
+type AssignedRolesReply {
+	Roles []Option `json:"roles"`
+}
+
+type AssignRoleReq {
+	UUID string `json:"uuid"`
+    RoleUUIDArray []string `json:"roleUUIDArray"`
+}
+
+type AssignRoleReply {
+	Success bool `json:"success"`
+}
+
+type UserPermissionsReq {
+    UUID string `json:"uuid"`
+    Typ int64 `json:"type"` // 类型: 角色
+}
+
+type UserPermissionsReply {
+    Systems []Option `json:"system"`
+}
+
+@server(
+	group: user
+    prefix: user
+)
+
+service ssoms-api {
+    @doc "用户列表"
+	@handler userList
+	post /list (UserListReq) returns (UserListReply)
+
+	@doc "新增用户"
+	@handler addUser
+	post /add (AddUserReq) returns (AddUserReply)
+
+    @doc "用户详情"
+    @handler userDetail
+    post /detail (UserDetailReq) returns (UserDetailReply)
+
+    @doc "修改用户"
+    @handler updateUser
+	post /update (UpdateUserReq) returns (UpdateUserReply)
+
+    @doc "删除用户"
+    @handler deleteUser
+	post /delete (DeleteUserReq) returns (DeleteUserReply)
+
+    @doc "用户已分配的角色"
+    @handler assignedRoles
+	post /assignedRoles (AssignedRolesReq) returns (AssignedRolesReply)
+
+    @doc "给用户分配角色"
+    @handler assignRole
+	post /assignRole (AssignRoleReq) returns (AssignRoleReply)
+    
+    @doc "用户通过其分配的角色获得的权限"
+    @handler userPermissions
+	post /permissions (UserPermissionsReq) returns (UserPermissionsReply)
+}
