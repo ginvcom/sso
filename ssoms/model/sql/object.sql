@@ -5,10 +5,11 @@ CREATE TABLE `object` (
   `domain` varchar(255) NOT NULL DEFAULT '',
   `key` varchar(255) NOT NULL COMMENT '操作对象的systemCode, 菜单的path, 操作的uri',
   `sort` int NOT NULL DEFAULT '0',
-  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)',
+  `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '类型: 1操作对象, 2模块, 3菜单组, 4菜单, 5操作(接口)',
   `icon` varchar(255) NOT NULL DEFAULT '' COMMENT '图标',
   `status` tinyint(1) NOT NULL COMMENT '状态',
   `puuid` char(12) NOT NULL COMMENT '父级uuid',
+  `is_delete` tinyint NOT NULL DEFAULT '0' COMMENT '是否删除: 0正常, 1删除',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -17,5 +18,6 @@ CREATE TABLE `object` (
   KEY `idx_key` (`key`),
   KEY `idx_status` (`status`),
   KEY `idx_type` (`type`),
-  KEY `idx_role_name` (`role_name`)
+  KEY `idx_role_name` (`role_name`),
+  KEY `idx_is_delete` (`is_delete`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
