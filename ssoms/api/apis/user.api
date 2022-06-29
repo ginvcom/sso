@@ -1,6 +1,6 @@
 type UserListReq {
-	Name   string `json:"name"`
-	Mobile string `json:"mobile"`
+	Name   string `form:"name"`
+	Mobile string `form:"mobile"`
 }
 
 type UserOption {
@@ -23,12 +23,12 @@ type UserListReply {
 }
 
 type AddUserReq {
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
+	Name     string `form:"name"`
+	Mobile   string `form:"mobile"`
+	Password string `form:"password"`
+	Avatar   string `form:"avatar"`
+	Gender   int64  `form:"gender"`
+	Birth    string `form:"birth"`
 }
 
 type AddUserReply {
@@ -36,7 +36,7 @@ type AddUserReply {
 }
 
 type UserDetailReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type UserDetailReply {
@@ -48,13 +48,13 @@ type UserDetailReply {
 }
 
 type UpdateUserReq {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
+	UUID     string `form:"uuid"`
+	Name     string `form:"name"`
+	Mobile   string `form:"mobile"`
+	Password string `form:"password"`
+	Avatar   string `form:"avatar"`
+	Gender   int64  `form:"gender"`
+	Birth    string `form:"birth"`
 }
 
 type UpdateUserReply {
@@ -62,7 +62,7 @@ type UpdateUserReply {
 }
 
 type DeleteUserReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type DeleteUserReply {
@@ -70,7 +70,7 @@ type DeleteUserReply {
 }
 
 type AssignedRolesReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type AssignedRolesReply {
@@ -78,8 +78,8 @@ type AssignedRolesReply {
 }
 
 type AssignRoleReq {
-	UUID          string   `json:"uuid"`
-	RoleUUIDArray []string `json:"roleUUIDArray"`
+	UUID          string   `form:"uuid"`
+	RoleUUIDArray []string `form:"roleUUIDArray"`
 }
 
 type AssignRoleReply {
@@ -87,8 +87,8 @@ type AssignRoleReply {
 }
 
 type UserPermissionsReq {
-	UUID string `json:"uuid"`
-	Typ  int64  `json:"type"` // 类型: 角色
+	UUID string `form:"uuid"`
+	Typ  int64  `form:"type"` // 类型: 角色
 }
 
 type UserPermissionsReply {

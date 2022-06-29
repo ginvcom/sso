@@ -1,0 +1,8 @@
+Name: ssoms-api
+Host: 0.0.0.0
+Port: 8888
+Mysql:
+  DataSource: root:123456@tcp(localhost:13306)/ginv_user?loc=Asia%2FShanghai
+CacheRedis:
+  - Host: localhost:16379
+    Type: node

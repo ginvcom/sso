@@ -1,6 +1,6 @@
 type RolePermissionsReq {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	TypeName string `form:"typeName"` // system, others
+	PUUID    string `form:"pUUID,optional"`
 }
 
 type ObjectOption {
@@ -16,8 +16,8 @@ type RolePermissionsReply {
 }
 
 type GrantReq {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	TypeName string `form:"typeName"` // system, others
+	PUUID    string `form:"pUUID,optional"`
 }
 
 type GrantReply {

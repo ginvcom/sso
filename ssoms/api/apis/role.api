@@ -1,5 +1,5 @@
 type RoleListReq {
-	RoleName string `json:"roleName"`
+	RoleName string `form:"roleName"`
 }
 
 type RoleOption {
@@ -22,8 +22,8 @@ type RoleListReply {
 }
 
 type AddRoleReq {
-	RoleName string `json:"roleName"`
-	Summary  string `json:"summary"`
+	RoleName string `form:"roleName"`
+	Summary  string `form:"summary"`
 }
 
 type AddRoleReply {
@@ -31,7 +31,7 @@ type AddRoleReply {
 }
 
 type RoleDetailReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `form:"roleUUID"`
 }
 
 type RoleDetailReply {
@@ -40,12 +40,12 @@ type RoleDetailReply {
 }
 
 type UpdateRoleReq {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
+	UUID     string `form:"uuid"`
+	Name     string `form:"name"`
+	Mobile   string `form:"mobile"`
+	Password string `form:"password"`
+	Avatar   string `form:"avatar"`
+	Gender   int64  `form:"gender"`
 }
 
 type UpdateRoleReply {
@@ -53,7 +53,7 @@ type UpdateRoleReply {
 }
 
 type DeleteRoleReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type DeleteRoleReply {
@@ -61,7 +61,7 @@ type DeleteRoleReply {
 }
 
 type AssignedUsersReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type AssignedUsersReply {
@@ -69,8 +69,8 @@ type AssignedUsersReply {
 }
 
 type AssignUserReq {
-	RoleUUID      string   `json:"roleUUID"`
-	UserUUIDArray []string `json:"userUUIDArray"`
+	RoleUUID      string   `form:"roleUUID"`
+	UserUUIDArray []string `form:"userUUIDArray"`
 }
 
 type AssignUserReply {
@@ -78,7 +78,7 @@ type AssignUserReply {
 }
 
 type InheritancesReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `form:"roleUUID"`
 }
 
 type InheritancesReply {
@@ -86,8 +86,8 @@ type InheritancesReply {
 }
 
 type AddInheritanceReq {
-	RoleUUID                string   `json:"roleUUID"`
-	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
+	RoleUUID                string   `form:"roleUUID"`
+	AddInheritanceUUIDArray []string `form:"extendedRoleUUIDArray"`
 }
 
 type AddInheritanceReply {
