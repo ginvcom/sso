@@ -1,20 +1,26 @@
 type UserListReq {
-	Name   string `form:"name"`
-	Mobile string `form:"mobile"`
+	Name     string `form:"name,optional"`
+	Mobile   string `form:"mobile,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
 }
 
-type UserOption {
-	Label string `json:"label"`
-	Value string `json:"value"`
-	Extra string `json:"extra,optional"`
-}
+// goctl api format ssoms.api -dir .
+// goctl format时下面取消注释
+// type Option {
+// 	Label string `json:"label"`
+// 	Value string `json:"value"`
+// 	Extra string `json:"extra,optional"`
+// }
 
 type User {
-	Name   string       `json:"name"`
-	Mobile string       `json:"mobile"`
-	Avatar string       `json:"avatar"`
-	Gender int64        `json:"gender"`
-	Roles  []UserOption `json:"roles"`
+	UUID   string   `json:"uuid"`
+	Name   string   `json:"name"`
+	Mobile string   `json:"mobile"`
+	Avatar string   `json:"avatar"`
+	Gender int64    `json:"gender"`
+	Status int64    `json:"status"`
+	Roles  []Option `json:"roles"`
 }
 
 type UserListReply {
@@ -29,6 +35,7 @@ type AddUserReq {
 	Avatar   string `form:"avatar"`
 	Gender   int64  `form:"gender"`
 	Birth    string `form:"birth"`
+	Status   int64  `form:"status,default=1"`
 }
 
 type AddUserReply {
@@ -40,21 +47,25 @@ type UserDetailReq {
 }
 
 type UserDetailReply {
-	Name   string `json:"name"`
-	Mobile string `json:"mobile"`
-	Avatar string `json:"avatar"`
-	Gender int64  `json:"gender"`
-	Birth  string `json:"birth"`
+	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status"`
+	Password string `json:"password"`
 }
 
 type UpdateUserReq {
 	UUID     string `form:"uuid"`
 	Name     string `form:"name"`
 	Mobile   string `form:"mobile"`
-	Password string `form:"password"`
+	Password string `form:"password,optional"`
 	Avatar   string `form:"avatar"`
 	Gender   int64  `form:"gender"`
 	Birth    string `form:"birth"`
+	Status   int64  `form:"status,default=1"`
 }
 
 type UpdateUserReply {
@@ -69,12 +80,20 @@ type DeleteUserReply {
 	Success bool `json:"success"`
 }
 
+type UserFilterOptionsReq {
+	Name string `json:"name"`
+}
+
+type UserFilterOptionsReply {
+	Options []Option `json:"options"`
+}
+
 type AssignedRolesReq {
 	UUID string `form:"uuid"`
 }
 
 type AssignedRolesReply {
-	Roles []UserOption `json:"roles"`
+	Roles []Option `json:"roles"`
 }
 
 type AssignRoleReq {
@@ -92,7 +111,7 @@ type UserPermissionsReq {
 }
 
 type UserPermissionsReply {
-	Systems []UserOption `json:"system"`
+	Systems []Option `json:"system"`
 }
 
 @server(
@@ -120,6 +139,10 @@ service ssoms-api {
 	@doc "删除用户"
 	@handler deleteUser
 	post /delete (DeleteUserReq) returns (DeleteUserReply)
+	
+	@doc "用户搜索下拉选项"
+	@handler userFilterOptions
+	post /filterOptions (UserFilterOptionsReq) returns (UserFilterOptionsReply)
 	
 	@doc "用户已分配的角色"
 	@handler assignedRoles

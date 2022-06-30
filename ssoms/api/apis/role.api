@@ -1,19 +1,23 @@
 type RoleListReq {
-	RoleName string `form:"roleName"`
+	RoleName string `form:"roleName,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
 }
 
-type RoleOption {
-	Label string `json:"label"`
-	Value string `json:"value"`
-	Extra string `json:"extra,optional"`
-}
+// goctl api format ssoms.api -dir .
+// goctl format时下面取消注释
+// type Option {
+// 	Label string `json:"label"`
+// 	Value string `json:"value"`
+// 	Extra string `json:"extra,optional"`
+// }
 
 type Role {
-	RoleUUID     string       `json:"roleUUID"`     // 角色uuid
-	RoleName     string       `json:"roleName"`     // 角色名称
-	Summary      string       `json:"summary"`      // 角色概述
-	Inheritances []RoleOption `json:"inheritances"` // 继承的角色
-	UsersAmount  int64        `json:"usersAmount"`  // 拥有的用户数量
+	RoleUUID     string   `json:"roleUUID"`     // 角色uuid
+	RoleName     string   `json:"roleName"`     // 角色名称
+	Summary      string   `json:"summary"`      // 角色概述
+	Inheritances []Option `json:"inheritances"` // 继承的角色
+	UsersAmount  int64    `json:"usersAmount"`  // 拥有的用户数量
 }
 
 type RoleListReply {
@@ -35,17 +39,15 @@ type RoleDetailReq {
 }
 
 type RoleDetailReply {
+	RoleUUID string `json:"roleUUID"`
 	RoleName string `json:"roleName"`
 	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReq {
-	UUID     string `form:"uuid"`
-	Name     string `form:"name"`
-	Mobile   string `form:"mobile"`
-	Password string `form:"password"`
-	Avatar   string `form:"avatar"`
-	Gender   int64  `form:"gender"`
+	RoleUUID string `form:"roleUUID"`
+	RoleName string `form:"roleName"`
+	Summary  string `form:"summary"`
 }
 
 type UpdateRoleReply {
@@ -53,24 +55,28 @@ type UpdateRoleReply {
 }
 
 type DeleteRoleReq {
-	UUID string `form:"uuid"`
+	RoleUUID string `form:"roleUUID"`
 }
 
 type DeleteRoleReply {
 	Success bool `json:"success"`
 }
 
+type OptionsReply {
+	Options []Option `json:"options"`
+}
+
 type AssignedUsersReq {
-	UUID string `form:"uuid"`
+	RoleUUID string `form:"roleUUID"`
 }
 
 type AssignedUsersReply {
-	Roles []RoleOption `json:"roles"`
+	User []Option `json:"users"`
 }
 
 type AssignUserReq {
-	RoleUUID      string   `form:"roleUUID"`
-	UserUUIDArray []string `form:"userUUIDArray"`
+	RoleUUID string `form:"roleUUID"`
+	UserUUID string `form:"userUUID"`
 }
 
 type AssignUserReply {
@@ -82,7 +88,7 @@ type InheritancesReq {
 }
 
 type InheritancesReply {
-	Roles []RoleOption `json:"roles"`
+	Roles []Option `json:"roles"`
 }
 
 type AddInheritanceReq {
@@ -119,6 +125,10 @@ service ssoms-api {
 	@doc "删除角色"
 	@handler deleteRole
 	post /delete (DeleteRoleReq) returns (DeleteRoleReply)
+	
+	@doc "角色已拥有的用户"
+	@handler roleOptions
+	post /options () returns (OptionsReply)
 	
 	@doc "角色已拥有的用户"
 	@handler assignedUsers

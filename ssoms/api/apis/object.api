@@ -1,6 +1,6 @@
 type ObjectListReq {
-	ObjectName string `form:"objectName"`
-	Key        string `form:"key"`
+	ObjectName string `form:"objectName,optional"`
+	Key        string `form:"key,optional"`
 }
 
 type Object {
