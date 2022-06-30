@@ -7,7 +7,7 @@ import (
 )
 
 func TestTimeToString(t *testing.T) {
-	now := time.Now()
+	now := time.Now().Local()
 	fmt.Println(TimeToString(now, "YYYY"))
 	fmt.Println(TimeToString(now, "YY-MM-DD"))
 	fmt.Println(TimeToString(now, "YYYY-M-DD"))
@@ -15,7 +15,7 @@ func TestTimeToString(t *testing.T) {
 	fmt.Println(TimeToString(now, "YYYY-MM-DD hh:mm:ss a Z"))
 	fmt.Println(TimeToString(now, "YYYY-MM-DD h:mm:ss A ZZ"))
 	fmt.Println("-------------------------")
-	time2 := time.Now().Add(time.Hour * -12)
+	time2 := now.Add(time.Hour * -12)
 	fmt.Println(TimeToString(time2, "YYYY"))
 	fmt.Println(TimeToString(time2, "YYYY-MM-DD"))
 	fmt.Println(TimeToString(time2, "YYYY-MM-DD"))

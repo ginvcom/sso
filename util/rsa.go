@@ -67,7 +67,7 @@ func RSACheck(src, sign, publicKey string) (ok bool, err error) {
 	//4. 调用rsa包的VerifyPKCS1v15验证签名有效性
 	err = rsa.VerifyPKCS1v15(rsaPub, crypto.SHA256, digest, data)
 	if err != nil {
-		err = fmt.Errorf("Verify sig error, reason: %v", err)
+		err = fmt.Errorf("verify sig error, reason: %v", err)
 		return
 	}
 

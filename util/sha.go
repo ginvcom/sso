@@ -15,7 +15,7 @@ func SHA256(s []byte) (r []byte, err error) {
 		return
 	}
 	if n != len(s) {
-		err = errors.New("Write length error")
+		err = errors.New("write length error")
 		return
 	}
 	r = h.Sum(nil)
