@@ -32,18 +32,23 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserReq) (resp *types.Upda
 		return
 	}
 	user := &model.User{
+		Uuid:     req.UUID,
 		Name:     req.Name,
 		Mobile:   req.Mobile,
 		Avatar:   req.Avatar,
 		Birth:    birth,
+		Status:   req.Status,
 		Gender:   req.Gender,
 		Password: req.Password,
-		Uuid:     req.UUID,
 	}
 	logx.Info(user)
-	l.svcCtx.UserModel.Insert(l.ctx, user)
+	err = l.svcCtx.UserModel.Update(l.ctx, user)
+	if err != nil {
+		return
+	}
 	resp = &types.UpdateUserReply{
 		Success: true,
 	}
+
 	return
 }

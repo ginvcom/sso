@@ -43,9 +43,13 @@ func (l *AddUserLogic) AddUser(req *types.AddUserReq) (resp *types.AddUserReply,
 		Gender:   req.Gender,
 		Password: req.Password,
 		Uuid:     uuid,
+		Status:   req.Status,
 	}
 	logx.Info(user)
-	l.svcCtx.UserModel.Insert(l.ctx, user)
+	_, err = l.svcCtx.UserModel.Insert(l.ctx, user)
+	if err != nil {
+		return
+	}
 	resp = &types.AddUserReply{
 		UUID: uuid,
 	}
