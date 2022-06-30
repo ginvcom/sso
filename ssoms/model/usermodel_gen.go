@@ -32,6 +32,7 @@ type (
 		FindOneByUuid(ctx context.Context, uuid string) (*User, error)
 		Update(ctx context.Context, newData *User) error
 		Delete(ctx context.Context, uuid string) error
+		FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (*[]UserOption, error)
 	}
 
 	defaultUserModel struct {
@@ -39,11 +40,22 @@ type (
 		table string
 	}
 
+	UserOption struct{
+		UUID   string `db:"uuid"`
+		Name   string `db:"name"`
+		Avatar string `db:"avatar"`
+	}
+
 	UserListArgs struct {
 		Name string
 		Mobile string
 		Page int64
 		PageSize int64
+	}
+
+	UserFilterOptionsArgs struct {
+		Name string
+		Limit int64
 	}
 
 	User struct {
@@ -169,16 +181,13 @@ func (m *defaultUserModel) Insert(ctx context.Context, data *User) (res sql.Resu
 func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error) {
 	updateTime := time.Now().Local()
 	var placeholder []interface{}
-	var stmt sqlx.StmtSession
-	if newData.Password == "" {
-		query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
-		stmt, err = m.conn.PrepareCtx(ctx, query)
-		
-	} else {
-		query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
-		stmt, err = m.conn.PrepareCtx(ctx, query)
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Status, updateTime, newData.Uuid)
+	query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
+	if newData.Password != "" {
+		query = fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Status, updateTime)
 	}
+	placeholder = append(placeholder, newData.Uuid)
+	stmt, err := m.conn.PrepareCtx(ctx, query)
 	if err !=nil{
 		return
 	}
@@ -198,4 +207,23 @@ func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error
 	}
 
 	return err
+}
+
+func (m *defaultUserModel) FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (options *[]UserOption, err error) {
+	var placeholder []interface{}
+	query := fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 order by create_time desc limit ?", m.table)
+	if args.Name != "" {
+		placeholder = append(placeholder, args.Name + "%")
+		query = fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 and name like ? order by create_time desc limit ?", m.table)
+	}
+	
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+
+	placeholder = append(placeholder, args.Limit)
+	options = new([]UserOption)
+	err = stmt.QueryRowsCtx(ctx, options, placeholder...)
+	return
 }

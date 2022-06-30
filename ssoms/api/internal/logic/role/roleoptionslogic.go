@@ -24,13 +24,13 @@ func NewRoleOptionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleO
 }
 
 func (l *RoleOptionsLogic) RoleOptions() (resp *types.OptionsReply, err error) {
-	resp = &types.OptionsReply{
-		Options: make([]types.Option, 0, 1),
-	}
-
 	options, err := l.svcCtx.RoleModel.Options(l.ctx)
 	if err != nil {
 		return
+	}
+
+	resp = &types.OptionsReply{
+		Options: make([]types.Option, 0, 1),
 	}
 	for _, option := range *options {
 		item := types.Option{

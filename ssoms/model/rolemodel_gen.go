@@ -34,15 +34,15 @@ type (
 		Options(ctx context.Context) (*[]RoleOption, error)
 	}
 
+	defaultRoleModel struct {
+		conn  sqlx.SqlConn
+		table string
+	}
+
 	RoleOption struct{
 		RoleUUID string `db:"role_uuid"`
 		RoleName string `db:"role_name"`
 		Summary  string  `db:"summary"`
-	}
-
-	defaultRoleModel struct {
-		conn  sqlx.SqlConn
-		table string
 	}
 
 	RoleListArgs struct {

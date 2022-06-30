@@ -82,7 +82,7 @@ type DeleteUserReply struct {
 }
 
 type UserFilterOptionsReq struct {
-	Name string `json:"name"`
+	Name string `form:"name,optional"`
 }
 
 type UserFilterOptionsReply struct {
