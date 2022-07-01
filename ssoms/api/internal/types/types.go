@@ -8,10 +8,10 @@ type Option struct {
 }
 
 type UserListReq struct {
-	Name     string `form:"name,optional"`
-	Mobile   string `form:"mobile,optional"`
-	Page     int64  `form:"page"`
-	PageSize int64  `form:"pageSize,default=20"`
+	Name     string `json:"name,optional"`
+	Mobile   string `json:"mobile,optional"`
+	Page     int64  `json:"page"`
+	PageSize int64  `json:"pageSize,default=20"`
 }
 
 type User struct {
@@ -30,13 +30,13 @@ type UserListReply struct {
 }
 
 type AddUserReq struct {
-	Name     string `form:"name"`
-	Mobile   string `form:"mobile"`
-	Password string `form:"password"`
-	Avatar   string `form:"avatar"`
-	Gender   int64  `form:"gender"`
-	Birth    string `form:"birth"`
-	Status   int64  `form:"status,default=1"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status,default=1"`
 }
 
 type AddUserReply struct {
@@ -44,7 +44,7 @@ type AddUserReply struct {
 }
 
 type UserDetailReq struct {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type UserDetailReply struct {
@@ -59,14 +59,14 @@ type UserDetailReply struct {
 }
 
 type UpdateUserReq struct {
-	UUID     string `form:"uuid"`
-	Name     string `form:"name"`
-	Mobile   string `form:"mobile"`
-	Password string `form:"password,optional"`
-	Avatar   string `form:"avatar"`
-	Gender   int64  `form:"gender"`
-	Birth    string `form:"birth"`
-	Status   int64  `form:"status,default=1"`
+	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password,optional"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply struct {
@@ -74,7 +74,7 @@ type UpdateUserReply struct {
 }
 
 type DeleteUserReq struct {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type DeleteUserReply struct {
@@ -82,7 +82,7 @@ type DeleteUserReply struct {
 }
 
 type UserFilterOptionsReq struct {
-	Name string `form:"name,optional"`
+	Name string `json:"name,optional"`
 }
 
 type UserFilterOptionsReply struct {
@@ -90,16 +90,16 @@ type UserFilterOptionsReply struct {
 }
 
 type AssignedRolesReq struct {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type AssignedRolesReply struct {
-	Roles []Option `json:"roles"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
 }
 
 type AssignRoleReq struct {
-	UUID          string   `form:"uuid"`
-	RoleUUIDArray []string `form:"roleUUIDArray"`
+	UUID          string   `json:"uuid"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
 }
 
 type AssignRoleReply struct {
@@ -107,8 +107,8 @@ type AssignRoleReply struct {
 }
 
 type UserPermissionsReq struct {
-	UUID string `form:"uuid"`
-	Typ  int64  `form:"type"` // 类型: 角色
+	UUID string `json:"uuid"`
+	Typ  int64  `json:"type"` // 类型: 角色
 }
 
 type UserPermissionsReply struct {
@@ -116,9 +116,9 @@ type UserPermissionsReply struct {
 }
 
 type RoleListReq struct {
-	RoleName string `form:"roleName,optional"`
-	Page     int64  `form:"page"`
-	PageSize int64  `form:"pageSize,default=20"`
+	RoleName string `json:"roleName,optional"`
+	Page     int64  `json:"page"`
+	PageSize int64  `json:"pageSize,default=20"`
 }
 
 type Role struct {
@@ -135,8 +135,8 @@ type RoleListReply struct {
 }
 
 type AddRoleReq struct {
-	RoleName string `form:"roleName"`
-	Summary  string `form:"summary"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
 }
 
 type AddRoleReply struct {
@@ -144,7 +144,7 @@ type AddRoleReply struct {
 }
 
 type RoleDetailReq struct {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type RoleDetailReply struct {
@@ -154,9 +154,9 @@ type RoleDetailReply struct {
 }
 
 type UpdateRoleReq struct {
-	RoleUUID string `form:"roleUUID"`
-	RoleName string `form:"roleName"`
-	Summary  string `form:"summary"`
+	RoleUUID string `json:"roleUUID"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReply struct {
@@ -164,7 +164,7 @@ type UpdateRoleReply struct {
 }
 
 type DeleteRoleReq struct {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type DeleteRoleReply struct {
@@ -176,24 +176,33 @@ type OptionsReply struct {
 }
 
 type AssignedUsersReq struct {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type AssignedUsersReply struct {
-	User []Option `json:"users"`
+	Users []Option `json:"users"`
 }
 
 type AssignUserReq struct {
-	RoleUUID string `form:"roleUUID"`
-	UserUUID string `form:"userUUID"`
+	RoleUUID string `json:"roleUUID"`
+	UserUUID string `json:"userUUID"`
 }
 
 type AssignUserReply struct {
 	Success bool `json:"success"`
 }
 
+type DeassignUserReq struct {
+	RoleUUID string `json:"roleUUID"`
+	UserUUID string `json:"userUUID"`
+}
+
+type DeassignUserReply struct {
+	Success bool `json:"success"`
+}
+
 type InheritancesReq struct {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type InheritancesReply struct {
@@ -201,8 +210,8 @@ type InheritancesReply struct {
 }
 
 type AddInheritanceReq struct {
-	RoleUUID                string   `form:"roleUUID"`
-	AddInheritanceUUIDArray []string `form:"extendedRoleUUIDArray"`
+	RoleUUID                string   `json:"roleUUID"`
+	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
 }
 
 type AddInheritanceReply struct {
@@ -210,8 +219,8 @@ type AddInheritanceReply struct {
 }
 
 type ObjectListReq struct {
-	ObjectName string `form:"objectName,optional"`
-	Key        string `form:"key,optional"`
+	ObjectName string `json:"objectName,optional"`
+	Key        string `json:"key,optional"`
 }
 
 type Object struct {
@@ -232,14 +241,14 @@ type ObjectListReply struct {
 }
 
 type AddObjectReq struct {
-	ObjectName string `form:"objectName"`
-	Domain     string `form:"domain"`
-	Key        string `form:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `form:"sort"`
-	Typ        int64  `form:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `form:"icon"` // 图标
-	Status     int64  `form:"status"`
-	PUUID      string `form:"pUUID,optional"`
+	ObjectName string `json:"objectName"`
+	Domain     string `json:"domain"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	Icon       string `json:"icon"` // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
 }
 
 type AddObjectReply struct {
@@ -247,7 +256,7 @@ type AddObjectReply struct {
 }
 
 type ObjectDetailReq struct {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type ObjectDetailReply struct {
@@ -263,14 +272,14 @@ type ObjectDetailReply struct {
 }
 
 type UpdateObjectReq struct {
-	ObjectName string `form:"objectName"`
-	Domain     string `form:"domain"`
-	Key        string `form:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `form:"sort"`
-	Typ        int64  `form:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `form:"icon"` // 图标
-	Status     int64  `form:"status"`
-	PUUID      string `form:"pUUID,optional"`
+	ObjectName string `json:"objectName"`
+	Domain     string `json:"domain"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	Icon       string `json:"icon"` // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReply struct {
@@ -278,7 +287,7 @@ type UpdateObjectReply struct {
 }
 
 type DeleteObjectReq struct {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type DeleteObjectReply struct {
@@ -286,8 +295,8 @@ type DeleteObjectReply struct {
 }
 
 type RoleOperationsReq struct {
-	TypeName string `form:"typeName"` // system, others
-	PUUID    string `form:"pUUID,optional"`
+	TypeName string `json:"typeName"` // system, others
+	PUUID    string `json:"pUUID,optional"`
 }
 
 type RoleOperationsReply struct {
@@ -295,8 +304,8 @@ type RoleOperationsReply struct {
 }
 
 type RolePermissionsReq struct {
-	TypeName string `form:"typeName"` // system, others
-	PUUID    string `form:"pUUID,optional"`
+	TypeName string `json:"typeName"` // system, others
+	PUUID    string `json:"pUUID,optional"`
 }
 
 type ObjectOption struct {
@@ -312,8 +321,8 @@ type RolePermissionsReply struct {
 }
 
 type GrantReq struct {
-	TypeName string `form:"typeName"` // system, others
-	PUUID    string `form:"pUUID,optional"`
+	TypeName string `json:"typeName"` // system, others
+	PUUID    string `json:"pUUID,optional"`
 }
 
 type GrantReply struct {

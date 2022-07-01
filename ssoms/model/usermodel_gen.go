@@ -33,6 +33,7 @@ type (
 		Update(ctx context.Context, newData *User) error
 		Delete(ctx context.Context, uuid string) error
 		FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (*[]UserOption, error)
+		UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (*[]UserOption, error)
 	}
 
 	defaultUserModel struct {
@@ -224,6 +225,31 @@ func (m *defaultUserModel) FilterOptions(ctx context.Context, args *UserFilterOp
 
 	placeholder = append(placeholder, args.Limit)
 	options = new([]UserOption)
+	err = stmt.QueryRowsCtx(ctx, options, placeholder...)
+	return
+}
+
+func (m *defaultUserModel) UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (options *[]UserOption, err error) {
+	options = new([]UserOption)
+	if len(*userUUIDArray) == 0 {
+		return
+	}
+	uuids:= "("
+	var placeholder []interface{}
+	for i,userUUID := range *userUUIDArray {
+		if i >0 {
+			uuids += ", "
+		}
+		placeholder = append(placeholder, userUUID)
+		uuids += "?"
+	}
+	uuids += ")"
+	query := fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 and `status` = 1 and uuid in %s", m.table, uuids)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+
 	err = stmt.QueryRowsCtx(ctx, options, placeholder...)
 	return
 }

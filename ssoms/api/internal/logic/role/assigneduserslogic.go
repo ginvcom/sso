@@ -24,7 +24,31 @@ func NewAssignedUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 }
 
 func (l *AssignedUsersLogic) AssignedUsers(req *types.AssignedUsersReq) (resp *types.AssignedUsersReply, err error) {
-	// todo: add your logic here and delete this line
+	// TODO 用户是否删除及状态判断和角色是否删除判断
+	userUUIDArray, err := l.svcCtx.UserToRoleModel.FindUserUUIDArrByRoleUuid(l.ctx, req.RoleUUID)
+	if err != nil {
+		return
+	}
+
+	userOptions, err := l.svcCtx.UserModel.UserOptionsInUUIDArray(l.ctx, userUUIDArray)
+	if err != nil {
+		return
+	}
+
+	users := make([]types.Option, 0, 1)
+
+	for _, option := range *userOptions {
+		item := types.Option{
+			Label: option.Name,
+			Value: option.UUID,
+			Extra: option.Avatar,
+		}
+		users = append(users, item)
+	}
+
+	resp = &types.AssignedUsersReply{
+		Users: users,
+	}
 
 	return
 }

@@ -1,8 +1,8 @@
 type UserListReq {
-	Name     string `form:"name,optional"`
-	Mobile   string `form:"mobile,optional"`
-	Page     int64  `form:"page"`
-	PageSize int64  `form:"pageSize,default=20"`
+	Name     string `json:"name,optional"`
+	Mobile   string `json:"mobile,optional"`
+	Page     int64  `json:"page"`
+	PageSize int64  `json:"pageSize,default=20"`
 }
 
 // goctl api format ssoms.api -dir .
@@ -29,13 +29,13 @@ type UserListReply {
 }
 
 type AddUserReq {
-	Name     string `form:"name"`
-	Mobile   string `form:"mobile"`
-	Password string `form:"password"`
-	Avatar   string `form:"avatar"`
-	Gender   int64  `form:"gender"`
-	Birth    string `form:"birth"`
-	Status   int64  `form:"status,default=1"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status,default=1"`
 }
 
 type AddUserReply {
@@ -43,7 +43,7 @@ type AddUserReply {
 }
 
 type UserDetailReq {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type UserDetailReply {
@@ -58,14 +58,14 @@ type UserDetailReply {
 }
 
 type UpdateUserReq {
-	UUID     string `form:"uuid"`
-	Name     string `form:"name"`
-	Mobile   string `form:"mobile"`
-	Password string `form:"password,optional"`
-	Avatar   string `form:"avatar"`
-	Gender   int64  `form:"gender"`
-	Birth    string `form:"birth"`
-	Status   int64  `form:"status,default=1"`
+	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password,optional"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply {
@@ -73,7 +73,7 @@ type UpdateUserReply {
 }
 
 type DeleteUserReq {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type DeleteUserReply {
@@ -81,7 +81,7 @@ type DeleteUserReply {
 }
 
 type UserFilterOptionsReq {
-	Name string `form:"name,optional"`
+	Name string `json:"name,optional"`
 }
 
 type UserFilterOptionsReply {
@@ -89,16 +89,16 @@ type UserFilterOptionsReply {
 }
 
 type AssignedRolesReq {
-	UUID string `form:"uuid"`
+	UUID string `json:"uuid"`
 }
 
 type AssignedRolesReply {
-	Roles []Option `json:"roles"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
 }
 
 type AssignRoleReq {
-	UUID          string   `form:"uuid"`
-	RoleUUIDArray []string `form:"roleUUIDArray"`
+	UUID          string   `json:"uuid"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
 }
 
 type AssignRoleReply {
@@ -106,8 +106,8 @@ type AssignRoleReply {
 }
 
 type UserPermissionsReq {
-	UUID string `form:"uuid"`
-	Typ  int64  `form:"type"` // 类型: 角色
+	UUID string `json:"uuid"`
+	Typ  int64  `json:"type"` // 类型: 角色
 }
 
 type UserPermissionsReply {

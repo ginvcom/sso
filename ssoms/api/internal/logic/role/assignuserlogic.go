@@ -5,6 +5,7 @@ import (
 
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
+	"sso/ssoms/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,45 @@ func NewAssignUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Assign
 }
 
 func (l *AssignUserLogic) AssignUser(req *types.AssignUserReq) (resp *types.AssignUserReply, err error) {
-	// todo: add your logic here and delete this line
+	// TODO 静态职责分离约束判断
+	// TODO 用户是否删除及状态判断和角色是否删除判断
+	userToRole, err := l.svcCtx.UserToRoleModel.FindOne(l.ctx, req.UserUUID, req.RoleUUID)
+
+	if err != nil && err != model.ErrNotFound {
+		return
+	}
+	err = nil
+	if userToRole.UserUuid != "" && userToRole.RoleUuid != "" {
+		if userToRole.IsDelete == 1 {
+			args := &model.UserToRole{
+				UserUuid: req.UserUUID,
+				RoleUuid: req.RoleUUID,
+				IsDelete: 0,
+			}
+			err = l.svcCtx.UserToRoleModel.Update(l.ctx, args)
+			if err != nil {
+				return
+			}
+		}
+
+		resp = &types.AssignUserReply{
+			Success: true,
+		}
+		return
+	}
+	args := &model.UserToRole{
+		UserUuid: req.UserUUID,
+		RoleUuid: req.RoleUUID,
+		IsDelete: 0,
+	}
+	_, err = l.svcCtx.UserToRoleModel.Insert(l.ctx, args)
+	if err != nil {
+		return
+	}
+
+	resp = &types.AssignUserReply{
+		Success: true,
+	}
 
 	return
 }

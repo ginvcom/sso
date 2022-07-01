@@ -32,6 +32,7 @@ type (
 		Update(ctx context.Context, newData *Role) error
 		Delete(ctx context.Context, roleUuid string) error
 		Options(ctx context.Context) (*[]RoleOption, error)
+		RoleOptionsInRoleUUIDArray(ctx context.Context, roleUUIDArray *[]string) (*[]RoleOption, error)
 	}
 
 	defaultRoleModel struct {
@@ -196,5 +197,30 @@ func (m *defaultRoleModel) Options(ctx context.Context) (options *[]RoleOption, 
 
 	options = new([]RoleOption)
 	err = stmt.QueryRowsCtx(ctx, options)
+	return
+}
+
+func (m *defaultRoleModel) RoleOptionsInRoleUUIDArray(ctx context.Context, roleUUIDArray *[]string) (options *[]RoleOption, err error) {
+	options = new([]RoleOption)
+	if len(*roleUUIDArray) == 0 {
+		return
+	}
+	uuids:= "("
+	var placeholder []interface{}
+	for i,roleUUID := range *roleUUIDArray {
+		if i >0 {
+			uuids += ", "
+		}
+		placeholder = append(placeholder, roleUUID)
+		uuids += "?"
+	}
+	uuids += ")"
+	query := fmt.Sprintf("select role_uuid, role_name, summary from %s where `is_delete` = 0 and role_uuid in %s", m.table, uuids)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+
+	err = stmt.QueryRowsCtx(ctx, options, placeholder...)
 	return
 }

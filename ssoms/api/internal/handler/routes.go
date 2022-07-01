@@ -109,6 +109,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/deassignUser",
+				Handler: role.DeassignUserHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/inheritances",
 				Handler: role.InheritancesHandler(serverCtx),
 			},

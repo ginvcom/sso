@@ -1,7 +1,7 @@
 type RoleListReq {
-	RoleName string `form:"roleName,optional"`
-	Page     int64  `form:"page"`
-	PageSize int64  `form:"pageSize,default=20"`
+	RoleName string `json:"roleName,optional"`
+	Page     int64  `json:"page"`
+	PageSize int64  `json:"pageSize,default=20"`
 }
 
 // goctl api format ssoms.api -dir .
@@ -26,8 +26,8 @@ type RoleListReply {
 }
 
 type AddRoleReq {
-	RoleName string `form:"roleName"`
-	Summary  string `form:"summary"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
 }
 
 type AddRoleReply {
@@ -35,7 +35,7 @@ type AddRoleReply {
 }
 
 type RoleDetailReq {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type RoleDetailReply {
@@ -45,9 +45,9 @@ type RoleDetailReply {
 }
 
 type UpdateRoleReq {
-	RoleUUID string `form:"roleUUID"`
-	RoleName string `form:"roleName"`
-	Summary  string `form:"summary"`
+	RoleUUID string `json:"roleUUID"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReply {
@@ -55,7 +55,7 @@ type UpdateRoleReply {
 }
 
 type DeleteRoleReq {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type DeleteRoleReply {
@@ -67,24 +67,33 @@ type OptionsReply {
 }
 
 type AssignedUsersReq {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type AssignedUsersReply {
-	User []Option `json:"users"`
+	Users []Option `json:"users"`
 }
 
 type AssignUserReq {
-	RoleUUID string `form:"roleUUID"`
-	UserUUID string `form:"userUUID"`
+	RoleUUID string `json:"roleUUID"`
+	UserUUID string `json:"userUUID"`
 }
 
 type AssignUserReply {
 	Success bool `json:"success"`
 }
 
+type DeassignUserReq {
+	RoleUUID string `json:"roleUUID"`
+	UserUUID string `json:"userUUID"`
+}
+
+type DeassignUserReply {
+	Success bool `json:"success"`
+}
+
 type InheritancesReq {
-	RoleUUID string `form:"roleUUID"`
+	RoleUUID string `json:"roleUUID"`
 }
 
 type InheritancesReply {
@@ -92,8 +101,8 @@ type InheritancesReply {
 }
 
 type AddInheritanceReq {
-	RoleUUID                string   `form:"roleUUID"`
-	AddInheritanceUUIDArray []string `form:"extendedRoleUUIDArray"`
+	RoleUUID                string   `json:"roleUUID"`
+	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
 }
 
 type AddInheritanceReply {
@@ -137,6 +146,10 @@ service ssoms-api {
 	@doc "给角色添加用户"
 	@handler assignUser
 	post /assignUser (AssignUserReq) returns (AssignUserReply)
+
+	@doc "给角色移出用户"
+	@handler deassignUser
+	post /deassignUser (DeassignUserReq) returns (DeassignUserReply)
 	
 	@doc "角色已继承的角色"
 	@handler inheritances

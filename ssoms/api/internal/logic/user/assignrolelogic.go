@@ -26,27 +26,8 @@ func NewAssignRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Assign
 }
 
 func (l *AssignRoleLogic) AssignRole(req *types.AssignRoleReq) (resp *types.AssignRoleReply, err error) {
-
-	// 1. 现有user_uuid = req.UUID的记录全部更新为is_delete=1
-	// 2. 尝试使用 insert into user_to_role values(xx,xx), (ff, ff) on dumplicate key update `is_delete`=0
-	// ---- 第3步不行的话尝试以下：
-	// 3. 查询当前用户具有哪些记录currentRoleUUIDArray(包括已删除的)
-	// 4. currentRoleUUIDArray的在req.RoleUUIDArray 存在，更新为is_delete=0
-	// 5. req.RoleUUIDArray的在currentRoleUUIDArray不存在，插入记录
-
-	// roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindAllRoleUUIDArrByUserUuid(l.ctx, req.UUID)
-	// if err != nil {
-	// 	return
-	// }
-	// reqMap := make(map[string]struct{})
-	// for _, v := range req.RoleUUIDArray {
-	// 	reqMap[v] = struct{}{}
-	// }
-	// for _, v := range *roleUUIDArray {
-	// 	if _, ok := reqMap[v]; ok {
-
-	// 	}
-	// }
+	// TODO 静态职责分离约束判断
+	// TODO 用户是否删除及状态判断和角色是否删除判断
 	err = l.svcCtx.UserToRoleModel.TransCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
 		now := time.Now().Local()
 		// 1. 现有user_uuid = req.UUID的记录全部更新为is_delete=1
@@ -55,9 +36,14 @@ func (l *AssignRoleLogic) AssignRole(req *types.AssignRoleReq) (resp *types.Assi
 			return err
 		}
 
-		// 2. 尝试使用 insert into user_to_role values(xx,xx), (ff, ff) on dumplicate key update `is_delete`=0
+		if len(req.RoleUUIDArray) == 0 {
+			return nil
+		}
 
-		return nil
+		// 2. 插入或更新is_delete=0 insert into user_to_role values(xx,xx), (ff, ff) on dumplicate key update `is_delete`=0
+		err = l.svcCtx.UserToRoleModel.TransAddRoleUUIDArrayByUserUUID(ctx, session, req.UUID, req.RoleUUIDArray, now)
+
+		return err
 	})
 	if err != nil {
 		return

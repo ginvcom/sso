@@ -5,6 +5,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -19,19 +20,20 @@ var (
 	userToRoleFieldNames          = builder.RawFieldNames(&UserToRole{})
 	userToRoleRows                = strings.Join(userToRoleFieldNames, ",")
 	userToRoleRowsExpectAutoSet   = strings.Join(stringx.Remove(userToRoleFieldNames, "`id`", "`create_time`", "`update_time`", "`create_at`", "`update_at`"), ",")
-	userToRoleRowsWithPlaceHolder = strings.Join(stringx.Remove(userToRoleFieldNames, "`id`", "`create_time`", "`update_time`", "`create_at`", "`update_at`"), "=?,") + "=?"
+	userToRoleInsertFeilds   = strings.Join(stringx.Remove(userToRoleFieldNames, "`id`", "`create_time`", "`is_delete`"), ",")
 )
 
 type (
 	userToRoleModel interface {
 		TransCtx(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error
-		FindAllRoleUUIDArrByUserUuid(ctx context.Context, userUuid string) (*[]string, error)
+		FindRoleUUIDArrByUserUuid(ctx context.Context, userUuid string) (*[]string, error)
+		FindUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (*[]string, error)
 		Insert(ctx context.Context, data *UserToRole) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*UserToRole, error)
-		FindOneByUserUuidRoleUuid(ctx context.Context, userUuid int64, roleUuid int64) (*UserToRole, error)
+		FindOne(ctx context.Context, userUuid string, roleUuid string) (*UserToRole, error)
 		Update(ctx context.Context, newData *UserToRole) error
 		Delete(ctx context.Context, id int64) error
-		TransDeleteByUserUUID(ctx context.Context, session sqlx.Session, uuid string, updateTime time.Time) error
+		TransDeleteByUserUUID(ctx context.Context, session sqlx.Session, userUUID string, updateTime time.Time) error
+		TransAddRoleUUIDArrayByUserUUID(ctx context.Context, session sqlx.Session, userUUID string, roleUUIDArray []string, updateTime time.Time) error
 	}
 
 	defaultUserToRoleModel struct {
@@ -41,8 +43,8 @@ type (
 
 	UserToRole struct {
 		Id         int64     `db:"id"`
-		UserUuid   int64     `db:"user_uuid"`
-		RoleUuid   int64     `db:"role_uuid"`
+		UserUuid   string     `db:"user_uuid"`
+		RoleUuid   string     `db:"role_uuid"`
 		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
@@ -56,14 +58,26 @@ func newUserToRoleModel(conn sqlx.SqlConn) *defaultUserToRoleModel {
 	}
 }
 
-func (m *defaultUserToRoleModel) FindAllRoleUUIDArrByUserUuid(ctx context.Context, userUuid string) (roleUUIDArray *[]string, err error) {
-	query := fmt.Sprintf("select `role_uuid` from %s where `user_uuid` = ?", m.table)
+func (m *defaultUserToRoleModel)FindUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (userUUIDArray *[]string, err error) {
+	query := fmt.Sprintf("select `user_uuid` from %s where `is_delete` = 0 and `role_uuid` = ?", m.table)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
+	}
+	userUUIDArray = new([]string)
+	err = stmt.QueryRowsCtx(ctx, userUUIDArray, roleUUID)
+
+	return
+}
+
+func (m *defaultUserToRoleModel) FindRoleUUIDArrByUserUuid(ctx context.Context, userUuid string) (roleUUIDArray *[]string, err error) {
+	query := fmt.Sprintf("select `role_uuid` from %s where `is_delete` = 0 and `user_uuid` = ?", m.table)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err!=nil {
 		return
 	}
 	roleUUIDArray = new([]string)
-	err = stmt.QueryRowCtx(ctx, &roleUUIDArray, userUuid)
+	err = stmt.QueryRowsCtx(ctx, roleUUIDArray, userUuid)
 
 	return
 }
@@ -74,44 +88,53 @@ func (m *defaultUserToRoleModel) Delete(ctx context.Context, id int64) error {
 	return err
 }
 
-func (m *defaultUserToRoleModel) FindOne(ctx context.Context, id int64) (*UserToRole, error) {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userToRoleRows, m.table)
-	var resp UserToRole
-	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
-
-func (m *defaultUserToRoleModel) FindOneByUserUuidRoleUuid(ctx context.Context, userUuid int64, roleUuid int64) (*UserToRole, error) {
-	var resp UserToRole
+func (m *defaultUserToRoleModel) FindOne(ctx context.Context, userUuid string, roleUuid string) (resp *UserToRole, err error) {
 	query := fmt.Sprintf("select %s from %s where `user_uuid` = ? and `role_uuid` = ? limit 1", userToRoleRows, m.table)
-	err := m.conn.QueryRowCtx(ctx, &resp, query, userUuid, roleUuid)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
+	stmt, err := m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
 	}
+	resp = new(UserToRole)
+	err = stmt.QueryRowCtx(ctx, resp, userUuid, roleUuid)
+	fmt.Println(err, err == sqlc.ErrNotFound)
+	if err == sqlc.ErrNotFound {
+		err = ErrNotFound
+	}
+
+	return
 }
 
-func (m *defaultUserToRoleModel) Insert(ctx context.Context, data *UserToRole) (sql.Result, error) {
+func (m *defaultUserToRoleModel) Insert(ctx context.Context, data *UserToRole) (res sql.Result, err error) {
 	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, userToRoleRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.UserUuid, data.RoleUuid, data.IsDelete)
-	return ret, err
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err !=nil {
+		return
+	}
+	res, err = stmt.ExecCtx(ctx, data.UserUuid, data.RoleUuid, data.IsDelete)
+	return
 }
 
-func (m *defaultUserToRoleModel) Update(ctx context.Context, newData *UserToRole) error {
-	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userToRoleRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, newData.UserUuid, newData.RoleUuid, newData.IsDelete, newData.Id)
-	return err
+func (m *defaultUserToRoleModel) Update(ctx context.Context, newData *UserToRole) (err error) {
+	query := fmt.Sprintf("update %s set `is_delete` = ? where `user_uuid` = ? and `role_uuid` = ?", m.table)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err !=nil {
+		return
+	}
+	res, err := stmt.ExecCtx(ctx, newData.IsDelete, newData.UserUuid, newData.RoleUuid)
+	if err !=nil {
+		return
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err !=nil{
+		return
+	}
+
+	if rowsAffected == 0 {
+		err = errors.New("no rows affected")
+	}
+
+	return
 }
 
 // 提供给logic开启事务用
@@ -121,12 +144,33 @@ func (m *defaultUserToRoleModel) TransCtx(ctx context.Context, fn func(ctx conte
 	})
 }
 
-func (m *defaultUserToRoleModel) TransDeleteByUserUUID(ctx context.Context, session sqlx.Session, uuid string, updateTime time.Time) (err error) {
+func (m *defaultUserToRoleModel) TransDeleteByUserUUID(ctx context.Context, session sqlx.Session, userUUID string, updateTime time.Time) (err error) {
 	query := fmt.Sprintf("update %s set `is_delete`=1, `update_time`= ? where `user_uuid` = ?", m.table)
 	stmt, err:= session.PrepareCtx(ctx, query)
 	if err != nil{
 		return
 	}
-	_, err = stmt.ExecCtx(ctx, updateTime, uuid)
+	_, err = stmt.ExecCtx(ctx, updateTime, userUUID)
+	return
+}
+
+func (m *defaultUserToRoleModel) TransAddRoleUUIDArrayByUserUUID(ctx context.Context, session sqlx.Session, userUUID string, roleUUIDArray []string, updateTime time.Time) (err error) {
+	fields := ""
+	var placeholder []interface{}
+	for i, roleUUID:= range roleUUIDArray {
+		if i > 0 {
+			fields += ", "
+		}
+		fields += "(?, ?, ?)"
+ 		placeholder = append(placeholder, userUUID, roleUUID, updateTime)
+	}
+	
+	query := fmt.Sprintf("insert into %s(%s) values %s on duplicate key update `is_delete`= 0", m.table, userToRoleInsertFeilds, fields)
+	fmt.Println(query, placeholder)
+	stmt, err:= session.PrepareCtx(ctx, query)
+	if err != nil{
+		return
+	}
+	_, err = stmt.ExecCtx(ctx, placeholder...)
 	return
 }

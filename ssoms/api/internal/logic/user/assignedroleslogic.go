@@ -24,7 +24,14 @@ func NewAssignedRolesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 }
 
 func (l *AssignedRolesLogic) AssignedRoles(req *types.AssignedRolesReq) (resp *types.AssignedRolesReply, err error) {
-	// todo: add your logic here and delete this line
+	// TODO 用户是否删除及状态判断和角色是否删除判断
+	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, req.UUID)
+	if err != nil {
+		return
+	}
+	resp = &types.AssignedRolesReply{
+		RoleUUIDArray: *roleUUIDArray,
+	}
 
 	return
 }
