@@ -24,7 +24,21 @@ func NewObjectDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Obje
 }
 
 func (l *ObjectDetailLogic) ObjectDetail(req *types.ObjectDetailReq) (resp *types.ObjectDetailReply, err error) {
-	// todo: add your logic here and delete this line
+	obj, err := l.svcCtx.ObjectModel.FindOneByUuid(l.ctx, req.UUID)
+	if err != nil {
+		return
+	}
+	resp = &types.ObjectDetailReply{
+		UUID:       obj.Uuid,
+		ObjectName: obj.ObjectName,
+		Domain:     obj.Domain,
+		Key:        obj.Key,
+		Sort:       obj.Sort,
+		Typ:        obj.Type,
+		Icon:       obj.Icon,
+		Status:     obj.Status,
+		PUUID:      obj.Puuid,
+	}
 
 	return
 }

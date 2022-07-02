@@ -24,7 +24,15 @@ func NewDeleteObjectLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Dele
 }
 
 func (l *DeleteObjectLogic) DeleteObject(req *types.DeleteObjectReq) (resp *types.DeleteObjectReply, err error) {
-	// todo: add your logic here and delete this line
+	// TODO 存在子对象, 不可以被删除
+	// TODO key=ssoms系统的不可以被删
+	err = l.svcCtx.ObjectModel.Delete(l.ctx, req.UUID)
+	if err != nil {
+		return
+	}
+	resp = &types.DeleteObjectReply{
+		Success: true,
+	}
 
 	return
 }

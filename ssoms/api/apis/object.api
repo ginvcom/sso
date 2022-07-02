@@ -1,4 +1,5 @@
 type ObjectListReq {
+	TopKey     string `json:"topKey,optional"` // 传systemCode
 	ObjectName string `json:"objectName,optional"`
 	Key        string `json:"key,optional"`
 }
@@ -29,6 +30,7 @@ type AddObjectReq {
 	Icon       string `json:"icon"` // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey"` // 传systemCode
 }
 
 type AddObjectReply {
@@ -52,6 +54,7 @@ type ObjectDetailReply {
 }
 
 type UpdateObjectReq {
+	UUID       string `json:"uuid"`
 	ObjectName string `json:"objectName"`
 	Domain     string `json:"domain"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -75,7 +78,7 @@ type DeleteObjectReply {
 }
 
 type RoleOperationsReq {
-	TypeName string `json:"typeName"` // system, others
+	TopKey     string `json:"topKey,optional"` // 传systemCode
 	PUUID    string `json:"pUUID,optional"`
 }
 

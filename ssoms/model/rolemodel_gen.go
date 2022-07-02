@@ -20,7 +20,7 @@ var (
 	roleFieldNames          = builder.RawFieldNames(&Role{})
 	roleRows                = strings.Join(roleFieldNames, ",")
 	roleInsertFieds   = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
-	roleUpdateFields = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`create_time`", "`is_delete`"), "=?,") + "=?"
+	roleUpdateFields = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`role_uuid`", "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
@@ -172,15 +172,16 @@ func (m *defaultRoleModel) Update(ctx context.Context, newData *Role) (err error
 		return
 	}
 
-	updateTime := time.Now().Local()
-	req, err :=stmt.ExecCtx(ctx, newData.RoleUuid, newData.RoleName, newData.Summary, updateTime, newData.RoleUuid)
+	req, err :=stmt.ExecCtx(ctx, newData.RoleName, newData.Summary, newData.RoleUuid)
 	if err !=nil{
 		return 
 	}
+
 	rowsAffected, err := req.RowsAffected()
 	if err !=nil{
 		return
 	}
+
 	if rowsAffected == 0 {
 		err = errors.New("no rows affected")
 	}

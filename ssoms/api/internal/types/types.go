@@ -219,6 +219,7 @@ type AddInheritanceReply struct {
 }
 
 type ObjectListReq struct {
+	TopKey     string `json:"topKey,optional"` // 传systemCode
 	ObjectName string `json:"objectName,optional"`
 	Key        string `json:"key,optional"`
 }
@@ -249,6 +250,7 @@ type AddObjectReq struct {
 	Icon       string `json:"icon"` // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey"` // 传systemCode
 }
 
 type AddObjectReply struct {
@@ -272,6 +274,7 @@ type ObjectDetailReply struct {
 }
 
 type UpdateObjectReq struct {
+	UUID       string `json:"uuid"`
 	ObjectName string `json:"objectName"`
 	Domain     string `json:"domain"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -295,8 +298,8 @@ type DeleteObjectReply struct {
 }
 
 type RoleOperationsReq struct {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	TopKey string `json:"topKey,optional"` // 传systemCode
+	PUUID  string `json:"pUUID,optional"`
 }
 
 type RoleOperationsReply struct {
