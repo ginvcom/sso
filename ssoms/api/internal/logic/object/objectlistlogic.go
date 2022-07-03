@@ -36,6 +36,10 @@ func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.Obje
 		return
 	}
 
+	resp = &types.ObjectListReply{
+		List: make([]types.Object, 0, 1),
+	}
+
 	for _, obj := range *listData {
 		item := types.Object{
 			UUID:       obj.Uuid,
