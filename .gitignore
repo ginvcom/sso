@@ -1,16 +1,14 @@
 # Logs
 logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+ssoms/vue/npm-debug.log*
+ssoms/vue/yarn-debug.log*
+ssoms/vue/yarn-error.log*、
 
-*/node_modules
-dist
-dist-ssr
-*.local
+ssoms/vue/node_modules
+ssoms/vue/dist
+ssoms/vue/dist-ssr
+ssoms/vue/*.local
 
 # Editor directories and files
 .vscode/*
