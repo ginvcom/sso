@@ -1,10 +1,6 @@
 <template>
   <div class="content-header">
     <div>
-      <a-breadcrumb>
-        <a-breadcrumb-item>首页</a-breadcrumb-item>
-        <a-breadcrumb-item>用户</a-breadcrumb-item>
-      </a-breadcrumb>
       <h1>用户</h1>
     </div>
     <div class="content-header__actions">

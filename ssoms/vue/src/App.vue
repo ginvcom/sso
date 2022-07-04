@@ -38,7 +38,6 @@
         <router-view />
       </a-layout-content>
     </a-layout>
-    <a-layout-footer>Footer</a-layout-footer>
   </a-layout>
 </template>
 <script setup lang="ts">
@@ -96,6 +95,10 @@ const state = reactive({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
+}
+.content-header h1{
+  font-size: 24px;
+  margin: 0;
 }
 </style>

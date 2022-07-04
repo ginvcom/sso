@@ -137,7 +137,7 @@ service ssoms-api {
 	
 	@doc "角色已拥有的用户"
 	@handler roleOptions
-	post /options () returns (OptionsReply)
+	post /options returns (OptionsReply)
 	
 	@doc "角色已拥有的用户"
 	@handler assignedUsers
