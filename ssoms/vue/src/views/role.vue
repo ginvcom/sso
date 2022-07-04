@@ -3,12 +3,12 @@
     <div>
       <a-breadcrumb>
         <a-breadcrumb-item>首页</a-breadcrumb-item>
-        <a-breadcrumb-item>用户</a-breadcrumb-item>
+        <a-breadcrumb-item>角色</a-breadcrumb-item>
       </a-breadcrumb>
-      <h1>用户</h1>
+      <h1>角色</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary">添加用户</a-button>
+      <a-button type="primary">添加角色</a-button>
     </div>
   </div>
   <a-table :dataSource="dataSource" :columns="columns">
@@ -31,19 +31,19 @@
 import { reactive, ref } from 'vue'
 const columns = [
   {
-    title: '用户',
-    dataIndex: 'name',
-    key: 'name'
+    title: '角色',
+    dataIndex: 'roleName',
+    key: 'roleName'
   },
   {
-    title: '性别',
-    dataIndex: 'gender',
-    key: 'gender'
+    title: '概述',
+    dataIndex: 'summary',
+    key: 'summary'
   },
   {
-    title: '手机号',
-    dataIndex: 'mobile',
-    key: 'mobile'
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status'
   },
   {
     title: '操作',
@@ -55,15 +55,15 @@ const columns = [
 const dataSource = reactive( [
   {
     key: '1',
-    name: '胡彦斌',
-    gender: 1,
-    address: '西湖区湖底公园1号'
+    roleName: '胡彦斌',
+    status: 1,
+    summary: '西湖区湖底公园1号'
   },
   {
     key: '2',
-    name: '胡彦祖',
-    gender: 2,
-    address: '西湖区湖底公园1号'
+    roleName: '胡彦祖',
+    status: 2,
+    summary: '西湖区湖底公园1号'
   }
 ])
 const count = ref(0)

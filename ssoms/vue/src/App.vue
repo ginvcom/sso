@@ -34,7 +34,9 @@
         </a-menu-item>
         </a-menu>
       </a-layout-sider>
-      <a-layout-content class="main__bar">Content</a-layout-content>
+      <a-layout-content class="main__bar">
+        <router-view />
+      </a-layout-content>
     </a-layout>
     <a-layout-footer>Footer</a-layout-footer>
   </a-layout>
@@ -89,5 +91,11 @@ const state = reactive({
 .main__bar{
   background-color: #fff;
   padding: 30px;
+}
+.content-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
 }
 </style>
