@@ -12,9 +12,9 @@ export default defineConfig({
       { find: '@', replacement: srcPath },
     ]
   },
-  // server: {
-  //   proxy: {
-  //     '/user': 'http://localhost:8888',
-  //   }
-  // }
+  server: {
+    proxy: {
+      '/user/list': 'http://localhost:8888',
+    }
+  }
 })

@@ -7,7 +7,7 @@
       <a-button type="primary">添加用户</a-button>
     </div>
   </div>
-  <a-table :dataSource="dataSource" :columns="columns">
+  <a-table :dataSource="respState.list" :columns="columns">
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'actions'">
         <a>编辑</a>
@@ -24,7 +24,8 @@
   </a-table>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { userList, UserListReply } from '../api/ssoms'
 const columns = [
   {
     title: '用户',
@@ -48,6 +49,31 @@ const columns = [
   }
 ]
 
+const state = reactive({
+  params: {
+    name: undefined,
+    mobile: undefined,
+    page: 1,
+    pageSize: 20
+  }
+})
+
+const respState = reactive<UserListReply>({
+  total: 0,
+  list: []
+})
+
+onMounted(() => {
+  getList()
+})
+
+const getList = () => {
+  userList(state.params).then((data: UserListReply) => {
+    respState.total = data.total
+    respState.list = data.list
+  })
+}
+
 const dataSource = reactive( [
   {
     key: '1',
@@ -63,6 +89,7 @@ const dataSource = reactive( [
   }
 ])
 const count = ref(0)
+
 
 const confirm = () => {
   console.log('on delete')
