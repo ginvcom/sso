@@ -1,6 +1,6 @@
 import * as components from "./ssomsComponents"
-import ajax from "@/utils/ajax"
 export * from "./ssomsComponents"
+import ajax from "@/utils/ajax"
 
 /**
  * @description "用户列表"
@@ -14,7 +14,7 @@ export function userList(req: components.UserListReq) {
  * @description "新增用户"
  * @param req
  */
-export function addUser(req: components.AddUserReq) {
+export function addUser(req: components.UserForm) {
 	return ajax<components.AddUserReply>("/user/add", req)
 }
 
@@ -23,14 +23,14 @@ export function addUser(req: components.AddUserReq) {
  * @param req
  */
 export function userDetail(req: components.UserDetailReq) {
-	return ajax<components.UserDetailReply>("/user/detail", req)
+	return ajax<components.UserForm>("/user/detail", req)
 }
 
 /**
  * @description "修改用户"
  * @param req
  */
-export function updateUser(req: components.UpdateUserReq) {
+export function updateUser(req: components.UserForm) {
 	return ajax<components.UpdateUserReply>("/user/update", req)
 }
 
@@ -86,7 +86,7 @@ export function roleList(req: components.RoleListReq) {
  * @description "新增角色"
  * @param req
  */
-export function addRole(req: components.AddRoleReq) {
+export function addRole(req: components.RoleForm) {
 	return ajax<components.AddRoleReply>("/role/add", req)
 }
 
@@ -95,14 +95,14 @@ export function addRole(req: components.AddRoleReq) {
  * @param req
  */
 export function roleDetail(req: components.RoleDetailReq) {
-	return ajax<components.RoleDetailReply>("/role/detail", req)
+	return ajax<components.RoleForm>("/role/detail", req)
 }
 
 /**
  * @description "修改角色"
  * @param req
  */
-export function updateRole(req: components.UpdateRoleReq) {
+export function updateRole(req: components.RoleForm) {
 	return ajax<components.UpdateRoleReply>("/role/update", req)
 }
 
@@ -173,7 +173,7 @@ export function objectList(req: components.ObjectListReq) {
  * @description "新增操作对象"
  * @param req
  */
-export function addObject(req: components.AddObjectReq) {
+export function addObject(req: components.ObjectForm) {
 	return ajax<components.AddObjectReply>("/object/add", req)
 }
 
@@ -182,14 +182,14 @@ export function addObject(req: components.AddObjectReq) {
  * @param req
  */
 export function objectDetail(req: components.ObjectDetailReq) {
-	return ajax<components.ObjectDetailReply>("/object/detail", req)
+	return ajax<components.ObjectForm>("/object/detail", req)
 }
 
 /**
  * @description "修改操作对象"
  * @param req
  */
-export function updateObject(req: components.UpdateObjectReq) {
+export function updateObject(req: components.ObjectForm) {
 	return ajax<components.UpdateObjectReply>("/object/update", req)
 }
 

@@ -28,10 +28,11 @@ export interface UserListReply {
 	list: Array<User>
 }
 
-export interface AddUserReq {
+export interface UserForm {
+	uuid?: string
 	name: string
 	mobile: string
-	password: string
+	password?: string
 	avatar: string
 	gender: number
 	birth: string
@@ -44,28 +45,6 @@ export interface AddUserReply {
 
 export interface UserDetailReq {
 	uuid: string
-}
-
-export interface UserDetailReply {
-	uuid: string
-	name: string
-	mobile: string
-	avatar: string
-	gender: number
-	birth: string
-	status: number
-	password: string
-}
-
-export interface UpdateUserReq {
-	uuid: string
-	name: string
-	mobile: string
-	password?: string
-	avatar: string
-	gender: number
-	birth: string
-	status: number
 }
 
 export interface UpdateUserReply {
@@ -133,7 +112,8 @@ export interface RoleListReply {
 	list: Array<Role>
 }
 
-export interface AddRoleReq {
+export interface RoleForm {
+	roleUUID?: string
 	roleName: string
 	summary: string
 }
@@ -144,18 +124,6 @@ export interface AddRoleReply {
 
 export interface RoleDetailReq {
 	roleUUID: string
-}
-
-export interface RoleDetailReply {
-	roleUUID: string
-	roleName: string
-	summary: string
-}
-
-export interface UpdateRoleReq {
-	roleUUID: string
-	roleName: string
-	summary: string
 }
 
 export interface UpdateRoleReply {
@@ -240,7 +208,8 @@ export interface ObjectListReply {
 	list: Array<Object>
 }
 
-export interface AddObjectReq {
+export interface ObjectForm {
+	uuid?: string
 	objectName: string
 	domain: string
 	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -249,7 +218,7 @@ export interface AddObjectReq {
 	icon: string // 图标
 	status: number
 	pUUID?: string
-	topKey: string // 传systemCode
+	topKey?: string // 传systemCode, 更新的时候不传(更新时无法修改该值)
 }
 
 export interface AddObjectReply {
@@ -258,30 +227,6 @@ export interface AddObjectReply {
 
 export interface ObjectDetailReq {
 	uuid: string
-}
-
-export interface ObjectDetailReply {
-	uuid: string
-	objectName: string
-	domain: string
-	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
-	sort: number
-	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	icon: string // 图标
-	status: number
-	pUUID?: string
-}
-
-export interface UpdateObjectReq {
-	uuid: string
-	objectName: string
-	domain: string
-	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
-	sort: number
-	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	icon: string // 图标
-	status: number
-	pUUID?: string
 }
 
 export interface UpdateObjectReply {

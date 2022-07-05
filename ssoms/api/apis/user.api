@@ -28,10 +28,11 @@ type UserListReply {
 	List  []User `json:"list"`
 }
 
-type AddUserReq {
+type UserForm {
+	UUID     string `json:"uuid,optional"`
 	Name     string `json:"name"`
 	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
+	Password string `json:"password,optional"`
 	Avatar   string `json:"avatar"`
 	Gender   int64  `json:"gender"`
 	Birth    string `json:"birth"`
@@ -44,28 +45,6 @@ type AddUserReply {
 
 type UserDetailReq {
 	UUID string `json:"uuid"`
-}
-
-type UserDetailReply {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status"`
-	Password string `json:"password"`
-}
-
-type UpdateUserReq {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password,optional"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply {
@@ -126,15 +105,15 @@ service ssoms-api {
 	
 	@doc "新增用户"
 	@handler addUser
-	post /add (AddUserReq) returns (AddUserReply)
+	post /add (UserForm) returns (AddUserReply)
 	
 	@doc "用户详情"
 	@handler userDetail
-	post /detail (UserDetailReq) returns (UserDetailReply)
+	post /detail (UserDetailReq) returns (UserForm)
 	
 	@doc "修改用户"
 	@handler updateUser
-	post /update (UpdateUserReq) returns (UpdateUserReply)
+	post /update (UserForm) returns (UpdateUserReply)
 	
 	@doc "删除用户"
 	@handler deleteUser

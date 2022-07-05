@@ -21,7 +21,8 @@ type ObjectListReply {
 	List []Object `json:"list"`
 }
 
-type AddObjectReq {
+type ObjectForm {
+	UUID       string `json:"uuid,optional"`
 	ObjectName string `json:"objectName"`
 	Domain     string `json:"domain"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -30,7 +31,7 @@ type AddObjectReq {
 	Icon       string `json:"icon"` // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
-	TopKey     string `json:"topKey"` // 传systemCode
+	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
 }
 
 type AddObjectReply {
@@ -39,30 +40,6 @@ type AddObjectReply {
 
 type ObjectDetailReq {
 	UUID string `json:"uuid"`
-}
-
-type ObjectDetailReply {
-	UUID       string `json:"uuid"`
-	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
-	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
-	Status     int64  `json:"status"`
-	PUUID      string `json:"pUUID,optional"`
-}
-
-type UpdateObjectReq {
-	UUID       string `json:"uuid"`
-	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
-	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
-	Status     int64  `json:"status"`
-	PUUID      string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReply {
@@ -98,15 +75,15 @@ service ssoms-api {
 	
 	@doc "新增操作对象"
 	@handler addObject
-	post /add (AddObjectReq) returns (AddObjectReply)
+	post /add (ObjectForm) returns (AddObjectReply)
 	
 	@doc "操作对象详情"
 	@handler objectDetail
-	post /detail (ObjectDetailReq) returns (ObjectDetailReply)
+	post /detail (ObjectDetailReq) returns (ObjectForm)
 	
 	@doc "修改操作对象"
 	@handler updateObject
-	post /update (UpdateObjectReq) returns (UpdateObjectReply)
+	post /update (ObjectForm) returns (UpdateObjectReply)
 	
 	@doc "删除操作对象"
 	@handler deleteObject

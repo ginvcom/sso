@@ -1,48 +1,50 @@
 <template>
-  <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
-  <!-- <HelloWorld msg="Hello Vue 3 + Vite" /> -->
-  <a-layout>
-    <a-layout-header class="header__bar">
-      <div class="header__logo">
-        <img alt="Vue logo" src="./assets/logo.png" />
-        <h1>单点管理系统</h1>
-      </div>
-    </a-layout-header>
+  <a-config-provider :locale="zhCN">
     <a-layout>
-      <a-layout-sider theme="light" class="sider__bar">
-        <a-menu
-          v-model:selectedKeys="state.selectedKeys"
-          v-model:openKeys="state.openKeys"
-          mode="inline"
-          :style="{ height: '100%', borderRight: 0 }"
-        >
-        <a-menu-item key="1">
-          <bars-outlined />
-          <router-link to="/menu">对象管理</router-link>
-        </a-menu-item>
-        <a-menu-item key="2">
-          <audit-outlined />
-          <router-link to="/user">用户管理</router-link>
-        </a-menu-item>
-        <a-menu-item key="5">
-          <appstore-outlined />
-          <router-link to="/user">角色管理</router-link>
-        </a-menu-item>
-        <a-menu-item key="6">
-          <audit-outlined />
-          <router-link to="/user">授权管理</router-link>
-        </a-menu-item>
-        </a-menu>
-      </a-layout-sider>
-      <a-layout-content class="main__bar">
-        <router-view />
-      </a-layout-content>
+      <a-layout-header class="header__bar">
+        <div class="header__logo">
+          <img alt="Vue logo" src="./assets/logo.png" />
+          <h1>单点管理系统</h1>
+        </div>
+      </a-layout-header>
+      <a-layout>
+        <a-layout-sider theme="light" class="sider__bar">
+          <a-menu
+            v-model:selectedKeys="state.selectedKeys"
+            v-model:openKeys="state.openKeys"
+            mode="inline"
+            :style="{ height: '100%', borderRight: 0 }"
+          >
+          <a-menu-item key="1">
+            <bars-outlined />
+            <router-link to="/menu">对象管理</router-link>
+          </a-menu-item>
+          <a-menu-item key="2">
+            <audit-outlined />
+            <router-link to="/user">用户管理</router-link>
+          </a-menu-item>
+          <a-menu-item key="5">
+            <appstore-outlined />
+            <router-link to="/user">角色管理</router-link>
+          </a-menu-item>
+          <a-menu-item key="6">
+            <audit-outlined />
+            <router-link to="/user">授权管理</router-link>
+          </a-menu-item>
+          </a-menu>
+        </a-layout-sider>
+        <a-layout-content class="main__bar">
+          <router-view />
+        </a-layout-content>
+      </a-layout>
     </a-layout>
-  </a-layout>
+  </a-config-provider>
 </template>
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
 import { reactive } from 'vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import {
   HomeOutlined,
   BarsOutlined,
@@ -50,6 +52,8 @@ import {
   AppstoreOutlined,
   LoadingOutlined,
 } from '@ant-design/icons-vue'
+
+dayjs.locale('zh-cn')
 
 const state = reactive({
   selectedKeys: [],

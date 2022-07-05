@@ -29,10 +29,11 @@ type UserListReply struct {
 	List  []User `json:"list"`
 }
 
-type AddUserReq struct {
+type UserForm struct {
+	UUID     string `json:"uuid,optional"`
 	Name     string `json:"name"`
 	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
+	Password string `json:"password,optional"`
 	Avatar   string `json:"avatar"`
 	Gender   int64  `json:"gender"`
 	Birth    string `json:"birth"`
@@ -45,28 +46,6 @@ type AddUserReply struct {
 
 type UserDetailReq struct {
 	UUID string `json:"uuid"`
-}
-
-type UserDetailReply struct {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status"`
-	Password string `json:"password"`
-}
-
-type UpdateUserReq struct {
-	UUID     string `json:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password,optional"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply struct {
@@ -134,7 +113,8 @@ type RoleListReply struct {
 	List  []Role `json:"list"`
 }
 
-type AddRoleReq struct {
+type RoleForm struct {
+	RoleUUID string `json:"roleUUID,optional"`
 	RoleName string `json:"roleName"`
 	Summary  string `json:"summary"`
 }
@@ -145,18 +125,6 @@ type AddRoleReply struct {
 
 type RoleDetailReq struct {
 	RoleUUID string `json:"roleUUID"`
-}
-
-type RoleDetailReply struct {
-	RoleUUID string `json:"roleUUID"`
-	RoleName string `json:"roleName"`
-	Summary  string `json:"summary"`
-}
-
-type UpdateRoleReq struct {
-	RoleUUID string `json:"roleUUID"`
-	RoleName string `json:"roleName"`
-	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReply struct {
@@ -241,7 +209,8 @@ type ObjectListReply struct {
 	List []Object `json:"list"`
 }
 
-type AddObjectReq struct {
+type ObjectForm struct {
+	UUID       string `json:"uuid,optional"`
 	ObjectName string `json:"objectName"`
 	Domain     string `json:"domain"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
@@ -250,7 +219,7 @@ type AddObjectReq struct {
 	Icon       string `json:"icon"` // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
-	TopKey     string `json:"topKey"` // 传systemCode
+	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
 }
 
 type AddObjectReply struct {
@@ -259,30 +228,6 @@ type AddObjectReply struct {
 
 type ObjectDetailReq struct {
 	UUID string `json:"uuid"`
-}
-
-type ObjectDetailReply struct {
-	UUID       string `json:"uuid"`
-	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
-	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
-	Status     int64  `json:"status"`
-	PUUID      string `json:"pUUID,optional"`
-}
-
-type UpdateObjectReq struct {
-	UUID       string `json:"uuid"`
-	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
-	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
-	Status     int64  `json:"status"`
-	PUUID      string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReply struct {

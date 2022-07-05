@@ -14,7 +14,9 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/user/list': 'http://localhost:8888',
+      '^/user/.+': 'http://localhost:8888',
+      '^/role/.+': 'http://localhost:8888',
+      '^/object/.+': 'http://localhost:8888'
     }
   }
 })

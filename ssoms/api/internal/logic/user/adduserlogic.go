@@ -25,7 +25,7 @@ func NewAddUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddUserLo
 	}
 }
 
-func (l *AddUserLogic) AddUser(req *types.AddUserReq) (resp *types.AddUserReply, err error) {
+func (l *AddUserLogic) AddUser(req *types.UserForm) (resp *types.AddUserReply, err error) {
 	uuid, err := util.UUID()
 	if err != nil {
 		return

@@ -25,7 +25,8 @@ type RoleListReply {
 	List  []Role `json:"list"`
 }
 
-type AddRoleReq {
+type RoleForm {
+	RoleUUID string `json:"roleUUID,optional"`
 	RoleName string `json:"roleName"`
 	Summary  string `json:"summary"`
 }
@@ -36,18 +37,6 @@ type AddRoleReply {
 
 type RoleDetailReq {
 	RoleUUID string `json:"roleUUID"`
-}
-
-type RoleDetailReply {
-	RoleUUID string `json:"roleUUID"`
-	RoleName string `json:"roleName"`
-	Summary  string `json:"summary"`
-}
-
-type UpdateRoleReq {
-	RoleUUID string `json:"roleUUID"`
-	RoleName string `json:"roleName"`
-	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReply {
@@ -121,15 +110,15 @@ service ssoms-api {
 	
 	@doc "新增角色"
 	@handler addRole
-	post /add (AddRoleReq) returns (AddRoleReply)
+	post /add (RoleForm) returns (AddRoleReply)
 	
 	@doc "角色详情"
 	@handler roleDetail
-	post /detail (RoleDetailReq) returns (RoleDetailReply)
+	post /detail (RoleDetailReq) returns (RoleForm)
 	
 	@doc "修改角色"
 	@handler updateRole
-	post /update (UpdateRoleReq) returns (UpdateRoleReply)
+	post /update (RoleForm) returns (UpdateRoleReply)
 	
 	@doc "删除角色"
 	@handler deleteRole

@@ -23,12 +23,12 @@ func NewObjectDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Obje
 	}
 }
 
-func (l *ObjectDetailLogic) ObjectDetail(req *types.ObjectDetailReq) (resp *types.ObjectDetailReply, err error) {
+func (l *ObjectDetailLogic) ObjectDetail(req *types.ObjectDetailReq) (resp *types.ObjectForm, err error) {
 	obj, err := l.svcCtx.ObjectModel.FindOneByUuid(l.ctx, req.UUID)
 	if err != nil {
 		return
 	}
-	resp = &types.ObjectDetailReply{
+	resp = &types.ObjectForm{
 		UUID:       obj.Uuid,
 		ObjectName: obj.ObjectName,
 		Domain:     obj.Domain,

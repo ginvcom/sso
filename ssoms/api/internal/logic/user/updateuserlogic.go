@@ -25,7 +25,7 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 	}
 }
 
-func (l *UpdateUserLogic) UpdateUser(req *types.UpdateUserReq) (resp *types.UpdateUserReply, err error) {
+func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUserReply, err error) {
 	// TODO 增加校验
 	birth, err := util.StringToTime(req.Birth, "YYYY-MM-DD")
 	if err != nil {

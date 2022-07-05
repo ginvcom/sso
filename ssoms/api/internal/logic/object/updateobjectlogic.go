@@ -24,7 +24,7 @@ func NewUpdateObjectLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upda
 	}
 }
 
-func (l *UpdateObjectLogic) UpdateObject(req *types.UpdateObjectReq) (resp *types.UpdateObjectReply, err error) {
+func (l *UpdateObjectLogic) UpdateObject(req *types.ObjectForm) (resp *types.UpdateObjectReply, err error) {
 	// TODO 增加校验
 	obj := &model.Object{
 		Uuid:       req.UUID,

@@ -26,7 +26,7 @@ func NewAddObjectLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddObje
 	}
 }
 
-func (l *AddObjectLogic) AddObject(req *types.AddObjectReq) (resp *types.AddObjectReply, err error) {
+func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObjectReply, err error) {
 	uuid, err := util.UUID()
 	if err != nil {
 		return

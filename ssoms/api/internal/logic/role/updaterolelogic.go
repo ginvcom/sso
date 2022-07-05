@@ -24,7 +24,7 @@ func NewUpdateRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 	}
 }
 
-func (l *UpdateRoleLogic) UpdateRole(req *types.UpdateRoleReq) (resp *types.UpdateRoleReply, err error) {
+func (l *UpdateRoleLogic) UpdateRole(req *types.RoleForm) (resp *types.UpdateRoleReply, err error) {
 	// TODO 增加校验
 	role := &model.Role{
 		RoleUuid: req.RoleUUID,

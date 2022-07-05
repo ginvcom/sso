@@ -23,12 +23,12 @@ func NewRoleDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleDe
 	}
 }
 
-func (l *RoleDetailLogic) RoleDetail(req *types.RoleDetailReq) (resp *types.RoleDetailReply, err error) {
+func (l *RoleDetailLogic) RoleDetail(req *types.RoleDetailReq) (resp *types.RoleForm, err error) {
 	role, err := l.svcCtx.RoleModel.FindOneByRoleUuid(l.ctx, req.RoleUUID)
 	if err != nil {
 		return
 	}
-	resp = &types.RoleDetailReply{
+	resp = &types.RoleForm{
 		RoleUUID: role.RoleUuid,
 		RoleName: role.RoleName,
 		Summary:  role.Summary,

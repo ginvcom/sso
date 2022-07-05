@@ -25,7 +25,7 @@ func NewAddRoleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddRoleLo
 	}
 }
 
-func (l *AddRoleLogic) AddRole(req *types.AddRoleReq) (resp *types.AddRoleReply, err error) {
+func (l *AddRoleLogic) AddRole(req *types.RoleForm) (resp *types.AddRoleReply, err error) {
 	uuid, err := util.UUID()
 	if err != nil {
 		return
