@@ -25,7 +25,7 @@
           </a-menu-item>
           <a-menu-item key="5">
             <appstore-outlined />
-            <router-link to="/user">角色管理</router-link>
+            <router-link to="/role">角色管理</router-link>
           </a-menu-item>
           <a-menu-item key="6">
             <audit-outlined />
@@ -99,7 +99,7 @@ const state = reactive({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 15px;
+  padding-bottom: 20px;
 }
 .content-header h1{
   font-size: 24px;

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import { createRouter, createWebHistory, RouteRecordRaw, RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 import User from '@/views/user.vue'
+import Role from '@/views/role.vue'
 import Menu from '@/views/menu.vue'
 
 // 1. 定义路由组件.
@@ -13,6 +14,7 @@ const Home = { template: '<div>Home</div>' }
 const routes = [
   { path: '/', component: Home },
   { path: '/user', component: User },
+  { path: '/role', component: Role },
   { path: '/menu', component: Menu },
 ]
 

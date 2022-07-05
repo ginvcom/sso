@@ -4,7 +4,7 @@
       <h1>用户</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary">添加用户</a-button>
+      <a-button type="primary" @click="initAdd">添加用户</a-button>
     </div>
   </div>
   <a-table
@@ -18,6 +18,17 @@
   }"
   @change="onTableChange">
     <template #bodyCell="{ column, record }">
+      <template v-if="column.key === 'name'">
+        <a-avatar style="color: #f56a00; background-color: #fde3cf">
+          <template #icon><UserOutlined /></template>
+        </a-avatar>
+        <span style="margin-left: 10px">{{record.name}}</span>
+      </template>
+      <template v-if="column.key === 'gender'">
+        <span v-if="record.gender == 1">男</span>
+        <span v-else-if="record.gender == 2">女</span>
+        <span v-else-if="record.gender == 3">未知</span>
+      </template>
       <template v-if="column.key === 'actions'">
         <a @click="initEdit(record.uuid)">编辑</a>
         <a-divider type="vertical" />
@@ -31,9 +42,12 @@
       </template>
     </template>
   </a-table>
-  <a-modal v-model:visible="formState.visible" title="Basic Modal" @ok="onSubmit">
+  <a-modal
+    v-model:visible="formState.visible"
+    :title="formState.type == 'add' ? '新增用户' : '修改用户'"
+    @ok="onSubmit">
     <a-form layout="vertical" :model="formState.form">
-      <a-row>
+      <a-row :gutter="24">
       <a-col :span="12">
         <a-form-item label="姓名">
           <a-input v-model:value="formState.form.name" placeholder="姓名" />
@@ -60,7 +74,12 @@
       </a-col>
       <a-col :span="12">
         <a-form-item label="生日">
-          <a-date-picker v-model:value="formState.form.birth" placeholder="出生日期"/>
+          <a-date-picker style="width: 100%" v-model:value="formState.form.birth" placeholder="出生日期"/>
+        </a-form-item>
+      </a-col>
+      <a-col :span="12">
+        <a-form-item label="状态">
+          <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
         </a-form-item>
       </a-col>
     </a-row>
@@ -80,6 +99,7 @@ import {
 } from '../api/ssoms'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
+import { UserOutlined } from '@ant-design/icons-vue'
 
 /**
  * 这是表格的列定义
@@ -104,6 +124,7 @@ const columns = [
   {
     title: '操作',
     key: 'actions',
+    align: 'center',
     width: '120px'
   }
 ]
