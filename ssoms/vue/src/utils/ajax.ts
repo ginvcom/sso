@@ -97,13 +97,13 @@ function getUrl (url: string): string {
 // }
 
 // eslint-disable-next-line
-export async function request<T = any, _R = CustomSuccessData<T>> (url: string, data: any) {
+export async function request<T = any, _R = CustomSuccessData<T>> (url: string, data?: any) {
   const postURL = getUrl(url)
   const res = await instance.post(postURL, data).then(res => {
-    if (res.data.success) {
+    if (res.data.code >= 0) {
       return Promise.resolve(res.data.data)
     } else {
-      if (res.data.code === 'ticketExpire') {
+      if (res.data.code === -99999) {
         // signOutForward()
       } else {
         return Promise.reject(new Error(res.data.msg))
@@ -116,21 +116,11 @@ export async function request<T = any, _R = CustomSuccessData<T>> (url: string, 
 }
 
 // eslint-disable-next-line
-export default async function ajax<T = any, _R = CustomSuccessData<T>> (url: string, data: any) {
-  const res = request(url ,data).then(res => {
-    if (res.data.success) {
-      return Promise.resolve(res.data.data)
-    } else {
-      if (res.data.code === 'ticketExpire') {
-        // signOutForward()
-      } else {
-        alert(res.data.msg)
-        // message.error({ content: res.data.msg, key: 'golbal' })
-        return Promise.reject(new Error(res.data.msg))
-      }
-    }
+export default async function ajax<T = any, _R = CustomSuccessData<T>> (url: string, data?: any) {
+  const res = request(url ,data).then(data => {
+    return Promise.resolve(data)
   }).catch((err: Error) => {
-    alert(err.message)
+    // alert(err.message)
     // message.error({ content: err.message, key: 'golbal' })
     return Promise.reject(err)
   })
