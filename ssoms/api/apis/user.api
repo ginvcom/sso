@@ -1,8 +1,8 @@
 type UserListReq {
-	Name     string `json:"name,optional"`
-	Mobile   string `json:"mobile,optional"`
-	Page     int64  `json:"page"`
-	PageSize int64  `json:"pageSize,default=20"`
+	Name     string `form:"name,optional"`
+	Mobile   string `form:"mobile,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
 }
 
 // goctl api format ssoms.api -dir .
@@ -44,7 +44,18 @@ type AddUserReply {
 }
 
 type UserDetailReq {
-	UUID string `json:"uuid"`
+	UUID string `path:"uuid"`
+}
+
+type UpdateUserReq {
+	UUID     string `path:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password,optional"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Status   int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply {
@@ -52,7 +63,7 @@ type UpdateUserReply {
 }
 
 type DeleteUserReq {
-	UUID string `json:"uuid"`
+	UUID string `path:"uuid"`
 }
 
 type DeleteUserReply {
@@ -95,43 +106,42 @@ type UserPermissionsReply {
 
 @server(
 	group: user
-	prefix: user
 )
 
 service ssoms-api {
 	@doc "用户列表"
 	@handler userList
-	post /list (UserListReq) returns (UserListReply)
+	get /user (UserListReq) returns (UserListReply)
 	
 	@doc "新增用户"
 	@handler addUser
-	post /add (UserForm) returns (AddUserReply)
+	post /user (UserForm) returns (AddUserReply)
 	
 	@doc "用户详情"
 	@handler userDetail
-	post /detail (UserDetailReq) returns (UserForm)
+	get /user/:uuid (UserDetailReq) returns (UserForm)
 	
 	@doc "修改用户"
 	@handler updateUser
-	post /update (UserForm) returns (UpdateUserReply)
+	put /user/:uuid (UpdateUserReq) returns (UpdateUserReply)
 	
 	@doc "删除用户"
 	@handler deleteUser
-	post /delete (DeleteUserReq) returns (DeleteUserReply)
+	delete /user/:uuid (DeleteUserReq) returns (DeleteUserReply)
 	
 	@doc "用户搜索下拉选项"
 	@handler userFilterOptions
-	post /filterOptions (UserFilterOptionsReq) returns (UserFilterOptionsReply)
+	get /filterOptions (UserFilterOptionsReq) returns (UserFilterOptionsReply)
 	
 	@doc "用户已分配的角色"
 	@handler assignedRoles
-	post /assignedRoles (AssignedRolesReq) returns (AssignedRolesReply)
+	get /assignedRoles (AssignedRolesReq) returns (AssignedRolesReply)
 	
 	@doc "给用户分配角色"
 	@handler assignRole
-	post /assignRole (AssignRoleReq) returns (AssignRoleReply)
+	patch /assignRole (AssignRoleReq) returns (AssignRoleReply)
 	
 	@doc "用户通过其分配的角色获得的权限"
 	@handler userPermissions
-	post /permissions (UserPermissionsReq) returns (UserPermissionsReply)
+	get /permissions (UserPermissionsReq) returns (UserPermissionsReply)
 }

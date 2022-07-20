@@ -5,7 +5,7 @@ ssoms/vue/npm-debug.log*
 ssoms/vue/yarn-debug.log*
 ssoms/vue/yarn-error.log*、
 
-ssoms/vue/node_modules
+*/vue/node_modules
 ssoms/vue/dist
 ssoms/vue/dist-ssr
 ssoms/vue/*.local

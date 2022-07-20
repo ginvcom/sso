@@ -11,12 +11,5 @@ export default defineConfig({
     alias: [
       { find: '@', replacement: srcPath },
     ]
-  },
-  server: {
-    proxy: {
-      '^/user/.+': 'http://localhost:8888',
-      '^/role/.+': 'http://localhost:8888',
-      '^/object/.+': 'http://localhost:8888'
-    }
   }
 })

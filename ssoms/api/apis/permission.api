@@ -1,6 +1,7 @@
 type RolePermissionsReq {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	RoleUUID string `path:"roleUUID"`
+	TypeName string `form:"typeName"` // system, others
+	PUUID    string `form:"pUUID,optional"`
 }
 
 type ObjectOption {
@@ -32,7 +33,7 @@ type GrantReply {
 service ssoms-api {
 	@doc "角色已分配的权限"
 	@handler rolePermissions
-	post /RolePermissions(RolePermissionsReq) returns (RolePermissionsReply)
+	get /role/:roleUUID/Permissions(RolePermissionsReq) returns (RolePermissionsReply)
 	
 	@doc "将对象执行操作的权限授予角色"
 	@handler grant

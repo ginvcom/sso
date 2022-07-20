@@ -7,8 +7,11 @@ export interface Option {
 }
 
 export interface UserListReq {
-	name?: string
-	mobile?: string
+}
+
+export interface UserListReqParams {
+	name: string
+	mobile: string
 	page: number
 	pageSize: number
 }
@@ -44,6 +47,23 @@ export interface AddUserReply {
 }
 
 export interface UserDetailReq {
+}
+
+export interface UserDetailReqParams {
+	uuid: string
+}
+
+export interface UpdateUserReq {
+	name: string
+	mobile: string
+	password?: string
+	avatar: string
+	gender: number
+	birth: string
+	status: number
+}
+
+export interface UpdateUserReqParams {
 	uuid: string
 }
 
@@ -52,6 +72,9 @@ export interface UpdateUserReply {
 }
 
 export interface DeleteUserReq {
+}
+
+export interface DeleteUserReqParams {
 	uuid: string
 }
 
@@ -94,7 +117,10 @@ export interface UserPermissionsReply {
 }
 
 export interface RoleListReq {
-	roleName?: string
+}
+
+export interface RoleListReqParams {
+	roleName: string
 	page: number
 	pageSize: number
 }
@@ -123,6 +149,18 @@ export interface AddRoleReply {
 }
 
 export interface RoleDetailReq {
+}
+
+export interface RoleDetailReqParams {
+	roleUUID: string
+}
+
+export interface UpdateRoleReq {
+	roleName: string
+	summary: string
+}
+
+export interface UpdateRoleReqParams {
 	roleUUID: string
 }
 
@@ -131,6 +169,9 @@ export interface UpdateRoleReply {
 }
 
 export interface DeleteRoleReq {
+}
+
+export interface DeleteRoleReqParams {
 	roleUUID: string
 }
 
@@ -151,8 +192,11 @@ export interface AssignedUsersReply {
 }
 
 export interface AssignUserReq {
-	roleUUID: string
 	userUUID: string
+}
+
+export interface AssignUserReqParams {
+	roleUUID: string
 }
 
 export interface AssignUserReply {
@@ -160,8 +204,11 @@ export interface AssignUserReply {
 }
 
 export interface DeassignUserReq {
-	roleUUID: string
 	userUUID: string
+}
+
+export interface DeassignUserReqParams {
+	roleUUID: string
 }
 
 export interface DeassignUserReply {
@@ -169,6 +216,9 @@ export interface DeassignUserReply {
 }
 
 export interface InheritancesReq {
+}
+
+export interface InheritancesReqParams {
 	roleUUID: string
 }
 
@@ -177,8 +227,11 @@ export interface InheritancesReply {
 }
 
 export interface AddInheritanceReq {
-	roleUUID: string
 	extendedRoleUUIDArray: Array<string>
+}
+
+export interface AddInheritanceReqParams {
+	roleUUID: string
 }
 
 export interface AddInheritanceReply {
@@ -186,9 +239,12 @@ export interface AddInheritanceReply {
 }
 
 export interface ObjectListReq {
-	topKey?: string // 传systemCode
-	objectName?: string
-	key?: string
+}
+
+export interface ObjectListReqParams {
+	topKey: string // 传systemCode
+	objectName: string
+	key: string
 }
 
 export interface Object {
@@ -226,6 +282,24 @@ export interface AddObjectReply {
 }
 
 export interface ObjectDetailReq {
+}
+
+export interface ObjectDetailReqParams {
+	uuid: string
+}
+
+export interface UpdateObjectReq {
+	objectName: string
+	domain: string
+	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
+	sort: number
+	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	icon: string // 图标
+	status: number
+	pUUID?: string
+}
+
+export interface UpdateObjectReqParams {
 	uuid: string
 }
 
@@ -234,6 +308,9 @@ export interface UpdateObjectReply {
 }
 
 export interface DeleteObjectReq {
+}
+
+export interface DeleteObjectReqParams {
 	uuid: string
 }
 
@@ -242,8 +319,11 @@ export interface DeleteObjectReply {
 }
 
 export interface RoleOperationsReq {
-	topKey?: string // 传systemCode
-	pUUID?: string
+}
+
+export interface RoleOperationsReqParams {
+	topKey: string // 传systemCode
+	pUUID: string
 }
 
 export interface RoleOperationsReply {
@@ -251,8 +331,12 @@ export interface RoleOperationsReply {
 }
 
 export interface RolePermissionsReq {
+}
+
+export interface RolePermissionsReqParams {
+	roleUUID: string
 	typeName: string // system, others
-	pUUID?: string
+	pUUID: string
 }
 
 export interface ObjectOption {

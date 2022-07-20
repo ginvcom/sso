@@ -6,6 +6,8 @@ import (
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
 
+	"github.com/ginvcom/util"
+
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -35,6 +37,7 @@ func (l *UserDetailLogic) UserDetail(req *types.UserDetailReq) (resp *types.User
 		Mobile:   user.Mobile,
 		Status:   user.Status,
 		Gender:   user.Gender,
+		Birth:    util.TimeToString(user.Birth, "YYYY-MM-DD"),
 		Password: user.Password,
 	}
 
