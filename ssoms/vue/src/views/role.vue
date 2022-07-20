@@ -40,9 +40,9 @@
   </a-table>
   <a-modal
     v-model:visible="formState.visible"
-    :title="formState.type == 'add' ? '新增角色' : '修改角色'"
+    :title="formState.type == 'add' ? '添加角色' : '修改角色'"
     @ok="onSubmit">
-    <a-form layout="vertical" :model="formState.form">
+    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
       <a-row :gutter="24">
       <a-col :span="24">
         <a-form-item label="角色名">
@@ -177,7 +177,12 @@ const formState = reactive<Form>({
 })
 
 const initAdd = () => {
-  modalFormRef.value?.resetFields()
+  formState.form = {
+    roleUUID: '',
+    roleName: '',
+    summary: ''
+  }
+  formState.type = 'add'
   formState.visible = true
 }
 
@@ -188,6 +193,7 @@ const initAdd = () => {
  */
 const initEdit = (roleUUID: string) => {
   roleDetail({ roleUUID }).then((data: RoleForm) => {
+    formState.type = 'edit'
     formState.form = data
     formState.visible = true
   })
@@ -197,22 +203,35 @@ const initEdit = (roleUUID: string) => {
  * 新增或修改角色
  */
 const onSubmit = () =>{
-  modalFormRef.value?.validateFields().then(() => {
+  modalFormRef.value?.validate().then(() => {
     formState.loading = true
     if (formState.type === 'add') {
       addRole(formState.form).then(() => {
         message.success('新增角色成功')
+        formState.visible = false
+        modalFormRef.value?.resetFields()
+        getList()
       }).finally(() => {
         formState.loading = false
       })
     } else {
       updateRole(formState.form).then(() => {
         message.success('修改角色成功')
+        formState.visible = false
+        modalFormRef.value?.resetFields()
+        getList()
       }).finally(() => {
         formState.loading = false
       })
     }
   })
+}
+
+/**
+ * 关闭modelForm，重置表单
+ */
+const onCancel = () => {
+  modalFormRef.value?.resetFields()
 }
 </script>
 

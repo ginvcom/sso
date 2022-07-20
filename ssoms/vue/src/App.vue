@@ -13,14 +13,14 @@
             v-model:selectedKeys="state.selectedKeys"
             v-model:openKeys="state.openKeys"
             mode="inline"
-            :style="{ height: '100%', borderRight: 0 }"
+            :style="{ borderRight: 0 }"
           >
           <a-menu-item key="1">
-            <bars-outlined />
-            <router-link to="/menu">对象管理</router-link>
+            <block-outlined />
+            <router-link to="/object">对象管理</router-link>
           </a-menu-item>
           <a-menu-item key="2">
-            <audit-outlined />
+            <UserOutlined />
             <router-link to="/user">用户管理</router-link>
           </a-menu-item>
           <a-menu-item key="5">
@@ -47,7 +47,8 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import {
   HomeOutlined,
-  BarsOutlined,
+  BlockOutlined,
+  UserOutlined,
   AuditOutlined,
   AppstoreOutlined,
   LoadingOutlined,
@@ -64,6 +65,8 @@ const state = reactive({
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
 }
 .header__bar.ant-layout-header{
   height: 48px;
@@ -86,14 +89,19 @@ const state = reactive({
   margin: 0 0 0 8px;
   color: #262626;
 }
-.sider__bar.ant-layout-sider-light, .sider__bar .ant-menu{
-  height: calc(100vh - 48px);
+.sider__bar.ant-layout-sider-light{
+}
+.sider__bar .ant-menu{
   background-color: #f8f8f8;
+  height: calc(100vh - 50px);
+  overflow: overlay;
 }
 
 .main__bar{
   background-color: #fff;
   padding: 30px;
+  height: calc(100vh - 50px);
+  overflow: overlay;
 }
 .content-header{
   display: flex;
