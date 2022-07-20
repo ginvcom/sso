@@ -74,7 +74,7 @@
       </a-col>
       <a-col :span="12">
         <a-form-item label="生日">
-          <a-date-picker style="width: 100%" v-model:value="formState.form.birth" placeholder="出生日期"/>
+          <a-date-picker style="width: 100%" valueFormat="YYYY-MM-DD" v-model:value="formState.form.birth" placeholder="出生日期"/>
         </a-form-item>
       </a-col>
       <a-col :span="12">
@@ -100,6 +100,7 @@ import {
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import { UserOutlined } from '@ant-design/icons-vue'
+import * as components from "../api/ssomsComponents"
 
 /**
  * 这是表格的列定义
@@ -129,16 +130,21 @@ const columns = [
   }
 ]
 
+interface State {
+  loading: boolean
+  params: components.UserListReqParams
+}
+
 
 /**
  * 这是列表的入参
  * 没有动态变化，所以不使用reactive
  */
-const state = reactive({
+const state = reactive<State>({
   loading: false, // 列表是否加载完成
   params: {
-    name: undefined,
-    mobile: undefined,
+    name: '',
+    mobile: '',
     page: 1,
     pageSize: 10
   }
@@ -161,7 +167,7 @@ onMounted(() => {
  */
 const getList = () => {
   state.loading = true
-  userList(state.params).then((data: UserListReply) => {
+  userList(state.params).then((data) => {
     respState.total = data.total
     respState.list = data.list
   }).finally(() => {
@@ -173,7 +179,7 @@ const onTableChange = ({ current, pageSize }) => {
   state.params.page = current
   state.params.pageSize = pageSize
   getList()
-} 
+}
 
 /**
  * 删除用户
@@ -221,7 +227,7 @@ const initAdd = () => {
  * @param uuid
  */
 const initEdit = (uuid: string) => {
-  userDetail({ uuid }).then((data: UserForm) => {
+  userDetail({ uuid }).then((data) => {
     formState.form = data
     formState.visible = true
   })
@@ -240,7 +246,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateUser(formState.form).then(() => {
+      updateUser({ uuid: formState.form.uuid! }, formState.form).then(() => {
         message.success('修改用户成功')
       }).finally(() => {
         formState.loading = false

@@ -7,7 +7,8 @@ import (
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
 	"sso/ssoms/model"
-	"sso/util"
+
+	"github.com/ginvcom/util"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

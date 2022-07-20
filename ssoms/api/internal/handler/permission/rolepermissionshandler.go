@@ -2,12 +2,14 @@ package permission
 
 import (
 	"net/http"
-	"sso/util"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/ginvcom/util"
+
 	"sso/ssoms/api/internal/logic/permission"
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func RolePermissionsHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

@@ -1,7 +1,7 @@
 type RoleListReq {
-	RoleName string `json:"roleName,optional"`
-	Page     int64  `json:"page"`
-	PageSize int64  `json:"pageSize,default=20"`
+	RoleName string `form:"roleName,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
 }
 
 // goctl api format ssoms.api -dir .
@@ -36,7 +36,13 @@ type AddRoleReply {
 }
 
 type RoleDetailReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `path:"roleUUID"`
+}
+
+type UpdateRoleReq {
+	RoleUUID string `path:"roleUUID"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
 }
 
 type UpdateRoleReply {
@@ -44,7 +50,7 @@ type UpdateRoleReply {
 }
 
 type DeleteRoleReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `path:"roleUUID"`
 }
 
 type DeleteRoleReply {
@@ -64,7 +70,7 @@ type AssignedUsersReply {
 }
 
 type AssignUserReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `path:"roleUUID"`
 	UserUUID string `json:"userUUID"`
 }
 
@@ -73,7 +79,7 @@ type AssignUserReply {
 }
 
 type DeassignUserReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `path:"roleUUID"`
 	UserUUID string `json:"userUUID"`
 }
 
@@ -82,7 +88,7 @@ type DeassignUserReply {
 }
 
 type InheritancesReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `path:"roleUUID"`
 }
 
 type InheritancesReply {
@@ -90,7 +96,7 @@ type InheritancesReply {
 }
 
 type AddInheritanceReq {
-	RoleUUID                string   `json:"roleUUID"`
+	RoleUUID                string   `path:"roleUUID"`
 	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
 }
 
@@ -100,33 +106,32 @@ type AddInheritanceReply {
 
 @server(
 	group: role
-	prefix: role
 )
 
 service ssoms-api {
 	@doc "角色列表"
 	@handler roleList
-	post /list (RoleListReq) returns (RoleListReply)
+	get /role (RoleListReq) returns (RoleListReply)
 	
 	@doc "新增角色"
 	@handler addRole
-	post /add (RoleForm) returns (AddRoleReply)
+	post /role (RoleForm) returns (AddRoleReply)
 	
 	@doc "角色详情"
 	@handler roleDetail
-	post /detail (RoleDetailReq) returns (RoleForm)
+	get /role/:roleUUID (RoleDetailReq) returns (RoleForm)
 	
 	@doc "修改角色"
 	@handler updateRole
-	post /update (RoleForm) returns (UpdateRoleReply)
+	put /role/:roleUUID (UpdateRoleReq) returns (UpdateRoleReply)
 	
 	@doc "删除角色"
 	@handler deleteRole
-	post /delete (DeleteRoleReq) returns (DeleteRoleReply)
+	delete /role/:roleUUID (DeleteRoleReq) returns (DeleteRoleReply)
 	
 	@doc "角色已拥有的用户"
 	@handler roleOptions
-	post /options returns (OptionsReply)
+	get /role/options returns (OptionsReply)
 	
 	@doc "角色已拥有的用户"
 	@handler assignedUsers
@@ -134,17 +139,17 @@ service ssoms-api {
 	
 	@doc "给角色添加用户"
 	@handler assignUser
-	post /assignUser (AssignUserReq) returns (AssignUserReply)
+	patch /role/:roleUUID/assignUser (AssignUserReq) returns (AssignUserReply)
 
 	@doc "给角色移出用户"
 	@handler deassignUser
-	post /deassignUser (DeassignUserReq) returns (DeassignUserReply)
+	patch /role/:roleUUID/deassignUser (DeassignUserReq) returns (DeassignUserReply)
 	
 	@doc "角色已继承的角色"
 	@handler inheritances
-	post /inheritances (InheritancesReq) returns (InheritancesReply)
+	get /role/:roleUUID/inheritances (InheritancesReq) returns (InheritancesReply)
 	
 	@doc "角色继承另一个角色"
 	@handler extendRole
-	post /addInheritance (AddInheritanceReq) returns (AddInheritanceReply)
+	patch /role/:roleUUID/addInheritance (AddInheritanceReq) returns (AddInheritanceReply)
 }

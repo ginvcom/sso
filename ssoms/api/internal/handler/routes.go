@@ -17,84 +17,83 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/list",
+				Method:  http.MethodGet,
+				Path:    "/user",
 				Handler: user.UserListHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/add",
+				Path:    "/user",
 				Handler: user.AddUserHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/detail",
+				Method:  http.MethodGet,
+				Path:    "/user/:uuid",
 				Handler: user.UserDetailHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/update",
+				Method:  http.MethodPut,
+				Path:    "/user/:uuid",
 				Handler: user.UpdateUserHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/delete",
+				Method:  http.MethodDelete,
+				Path:    "/user/:uuid",
 				Handler: user.DeleteUserHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodGet,
 				Path:    "/filterOptions",
 				Handler: user.UserFilterOptionsHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodGet,
 				Path:    "/assignedRoles",
 				Handler: user.AssignedRolesHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodPatch,
 				Path:    "/assignRole",
 				Handler: user.AssignRoleHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodGet,
 				Path:    "/permissions",
 				Handler: user.UserPermissionsHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/user"),
 	)
 
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/list",
+				Method:  http.MethodGet,
+				Path:    "/role",
 				Handler: role.RoleListHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/add",
+				Path:    "/role",
 				Handler: role.AddRoleHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/detail",
+				Method:  http.MethodGet,
+				Path:    "/role/:roleUUID",
 				Handler: role.RoleDetailHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/update",
+				Method:  http.MethodPut,
+				Path:    "/role/:roleUUID",
 				Handler: role.UpdateRoleHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/delete",
+				Method:  http.MethodDelete,
+				Path:    "/role/:roleUUID",
 				Handler: role.DeleteRoleHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/options",
+				Method:  http.MethodGet,
+				Path:    "/role/options",
 				Handler: role.RoleOptionsHandler(serverCtx),
 			},
 			{
@@ -103,70 +102,68 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: role.AssignedUsersHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/assignUser",
+				Method:  http.MethodPatch,
+				Path:    "/role/:roleUUID/assignUser",
 				Handler: role.AssignUserHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/deassignUser",
+				Method:  http.MethodPatch,
+				Path:    "/role/:roleUUID/deassignUser",
 				Handler: role.DeassignUserHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/inheritances",
+				Method:  http.MethodGet,
+				Path:    "/role/:roleUUID/inheritances",
 				Handler: role.InheritancesHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/addInheritance",
+				Method:  http.MethodPatch,
+				Path:    "/role/:roleUUID/addInheritance",
 				Handler: role.ExtendRoleHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/role"),
 	)
 
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/list",
+				Method:  http.MethodGet,
+				Path:    "/object",
 				Handler: object.ObjectListHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/add",
+				Path:    "/object",
 				Handler: object.AddObjectHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/detail",
+				Method:  http.MethodGet,
+				Path:    "/object/:uuid",
 				Handler: object.ObjectDetailHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/update",
+				Method:  http.MethodPut,
+				Path:    "/object/:uuid",
 				Handler: object.UpdateObjectHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/delete",
+				Method:  http.MethodDelete,
+				Path:    "/object/:uuid",
 				Handler: object.DeleteObjectHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodGet,
 				Path:    "/roleOperations",
 				Handler: object.RoleOperationsHandler(serverCtx),
 			},
 		},
-		rest.WithPrefix("/object"),
 	)
 
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodPost,
-				Path:    "/RolePermissions",
+				Method:  http.MethodGet,
+				Path:    "/role/:roleUUID/Permissions",
 				Handler: permission.RolePermissionsHandler(serverCtx),
 			},
 			{

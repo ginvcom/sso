@@ -1,7 +1,7 @@
 type ObjectListReq {
-	TopKey     string `json:"topKey,optional"` // 传systemCode
-	ObjectName string `json:"objectName,optional"`
-	Key        string `json:"key,optional"`
+	TopKey     string `form:"topKey,optional"` // 传systemCode
+	ObjectName string `form:"objectName,optional"`
+	Key        string `form:"key,optional"`
 }
 
 type Object {
@@ -39,7 +39,19 @@ type AddObjectReply {
 }
 
 type ObjectDetailReq {
-	UUID string `json:"uuid"`
+	UUID string `path:"uuid"`
+}
+
+type UpdateObjectReq{
+	UUID       string `path:"uuid"`
+	ObjectName string `json:"objectName"`
+	Domain     string `json:"domain"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	Icon       string `json:"icon"` // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
 }
 
 type UpdateObjectReply {
@@ -47,7 +59,7 @@ type UpdateObjectReply {
 }
 
 type DeleteObjectReq {
-	UUID string `json:"uuid"`
+	UUID string `path:"uuid"`
 }
 
 type DeleteObjectReply {
@@ -55,8 +67,8 @@ type DeleteObjectReply {
 }
 
 type RoleOperationsReq {
-	TopKey     string `json:"topKey,optional"` // 传systemCode
-	PUUID    string `json:"pUUID,optional"`
+	TopKey     string `form:"topKey,optional"` // 传systemCode
+	PUUID    string `form:"pUUID,optional"`
 }
 
 type RoleOperationsReply {
@@ -65,31 +77,30 @@ type RoleOperationsReply {
 
 @server(
 	group: object
-	prefix: object
 )
 
 service ssoms-api {
 	@doc "操作对象列表"
 	@handler objectList
-	post /list (ObjectListReq) returns (ObjectListReply)
+	get /object (ObjectListReq) returns (ObjectListReply)
 	
 	@doc "新增操作对象"
 	@handler addObject
-	post /add (ObjectForm) returns (AddObjectReply)
+	post /object (ObjectForm) returns (AddObjectReply)
 	
 	@doc "操作对象详情"
 	@handler objectDetail
-	post /detail (ObjectDetailReq) returns (ObjectForm)
+	get /object/:uuid (ObjectDetailReq) returns (ObjectForm)
 	
 	@doc "修改操作对象"
 	@handler updateObject
-	post /update (ObjectForm) returns (UpdateObjectReply)
+	put /object/:uuid (UpdateObjectReq) returns (UpdateObjectReply)
 	
 	@doc "删除操作对象"
 	@handler deleteObject
-	post /delete (DeleteObjectReq) returns (DeleteObjectReply)
+	delete /object/:uuid (DeleteObjectReq) returns (DeleteObjectReply)
 	
 	@doc "角色可以分配权限的对象"
 	@handler roleOperations
-	post /roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
+	get /roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
 }

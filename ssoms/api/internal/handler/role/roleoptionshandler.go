@@ -2,7 +2,8 @@ package role
 
 import (
 	"net/http"
-	"sso/util"
+
+	"github.com/ginvcom/util"
 
 	"sso/ssoms/api/internal/logic/role"
 	"sso/ssoms/api/internal/svc"
