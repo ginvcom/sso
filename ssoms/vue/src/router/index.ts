@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import User from '@/views/user.vue'
 import Role from '@/views/role.vue'
 import Object from '@/views/object.vue'
+import Permission from '@/views/permission.vue'
 
 // 1. 定义路由组件.
 // 也可以从其他文件导入
@@ -16,6 +17,7 @@ const routes = [
   { path: '/user', component: User },
   { path: '/role', component: Role },
   { path: '/object', component: Object },
+  { path: '/permission', component: Permission },
 ]
 
 // 3. 创建路由实例并传递 `routes` 配置

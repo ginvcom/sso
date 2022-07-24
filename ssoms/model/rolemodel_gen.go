@@ -20,7 +20,7 @@ var (
 	roleFieldNames          = builder.RawFieldNames(&Role{})
 	roleRows                = strings.Join(roleFieldNames, ",")
 	roleInsertFieds   = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
-	roleUpdateFields = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`role_uuid`", "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
+	roleUpdateFields = strings.Join(stringx.Remove(roleFieldNames, "`id`", "`role_uuid`", "`create_time`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
@@ -171,8 +171,8 @@ func (m *defaultRoleModel) Update(ctx context.Context, newData *Role) (err error
 	if err != nil {
 		return
 	}
-
-	req, err :=stmt.ExecCtx(ctx, newData.RoleName, newData.Summary, newData.RoleUuid)
+	now:= time.Now().Local()
+	req, err :=stmt.ExecCtx(ctx, newData.RoleName, newData.Summary, now, newData.RoleUuid)
 	if err !=nil{
 		return 
 	}

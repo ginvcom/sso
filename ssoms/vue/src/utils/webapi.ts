@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue'
-import { realpath } from 'fs'
 
 // import qs from 'qs'
 
@@ -60,11 +59,10 @@ instance.interceptors.response.use((res) => {
 
 export class Webapi {
   private setPath (url: string, params: any) {
-    const matches = url.match(/\/:[a-z]+/mg)
+    const matches = url.match(/\/:[a-zA-z0-9]+/mg)
     if (matches) {
       for (const match of matches) {
         const key = match.slice(2)
-        console.log(key)
         if (params && params[key]) {
           url = url.replace(match, '/' + params[key])
           delete params[key]
@@ -90,12 +88,12 @@ export class Webapi {
 
   public put<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.put(realpath, { params: realParams, headers: { 'X-ginv-uri' : url } }, data)
+    return instance.put(realpath, data, { params: realParams, headers: { 'X-ginv-uri' : url } })
   }
 
   public patch<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.patch(realpath, { params: realParams, headers: { 'X-ginv-uri' : url } }, data)
+    return instance.patch(realpath, data, { params: realParams, headers: { 'X-ginv-uri' : url } })
   }
 }
 

@@ -20,8 +20,8 @@ var (
 	userFieldNames          = builder.RawFieldNames(&User{})
 	userRows                = strings.Join(userFieldNames, ",")
 	userInsertFields   = strings.Join(stringx.Remove(userFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
-	userUpdateFields = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
-	userUpdateFieldsWithoutPassword = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`update_time`", "`password`", "`is_delete`"), "=?,") + "=?"
+	userUpdateFields = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`is_delete`"), "=?,") + "=?"
+	userUpdateFieldsWithoutPassword = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`password`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
@@ -181,10 +181,13 @@ func (m *defaultUserModel) Insert(ctx context.Context, data *User) (res sql.Resu
 
 func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error) {
 	var placeholder []interface{}
+	now := time.Now().Local()
 	query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
 	if newData.Password != "" {
 		query = fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Status)
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Status, now)
+	} else {
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Gender, newData.Birth, newData.Status, now)
 	}
 	placeholder = append(placeholder, newData.Uuid)
 	stmt, err := m.conn.PrepareCtx(ctx, query)

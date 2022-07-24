@@ -1,0 +1,166 @@
+#app {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    height: 100%;
+}
+
+.header__bar.ant-layout-header {
+    height: 48px;
+    background-color: #fff;
+    box-shadow: 0 0 8px 0 rgb(0 0 0 / 10%);
+    display: flex;
+    justify-content: space-between;
+    z-index: 999;
+}
+
+.header__logo {
+    display: flex;
+    align-items: center;
+}
+
+.header__logo img {
+    width: 24px;
+    height: 24px;
+}
+
+.header__logo h1 {
+    font-size: 15px;
+    margin: 0 0 0 8px;
+    color: #262626;
+}
+
+.sider__bar .ant-menu {
+    background-color: #f8f8f8;
+    height: calc(100vh - 50px);
+    overflow: overlay;
+}
+
+.main__bar {
+    background-color: #fff;
+    padding: 0 30px 30px;
+    height: calc(100vh - 50px);
+    overflow: overlay;
+}
+
+.content-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.content-header.is-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.content-header h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.avatar-uploader>.ant-upload {
+    width: 200px;
+    height: 200px;
+}
+
+.upload-btns {
+    display: flex;
+    justify-content: space-between;
+}
+
+.avatar-uploader>.ant-upload .ant-image {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 200px;
+    height: 200px;
+}
+
+.system-params {
+    margin-bottom: 20px;
+}
+
+.object__form {
+    display: flex;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+}
+
+.object__form-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.object__form-right .ant-row {
+    width: 100%;
+}
+
+.object__form-right .ant-form-item {
+    margin-bottom: 0;
+}
+
+.object__current-system {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+}
+
+.object__current-value {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.object__current-system-label {
+    margin: 0;
+}
+
+.object__current-system-name {
+    margin: 0 0 0 10px;
+}
+
+.object__select {
+    margin: 0 16px;
+}
+
+.object__option {
+    border: 1px solid #d9d9d9;
+    cursor: pointer;
+    margin: 16px 0;
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.object__option:hover {
+    color: #1890ff;
+    border-color: #1890ff;
+}
+
+.object__option.is-active {
+    color: #1890ff;
+    border-color: #1890ff;
+    background-color: #e6f7ff;
+    cursor: default;
+}
+
+.permission__left {
+    border-right: 1px solid #ddd;
+    height: calc(100vh - 170px);
+    overflow-y: auto;
+    position: sticky;
+    top: 80px;
+}
+
+.permission__left .object__option {
+    margin: 0;
+}
+
+.permission__left .object__item+.object__item {
+    margin-top: 16px;
+}

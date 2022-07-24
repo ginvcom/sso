@@ -1,5 +1,5 @@
 <template>
-  <div class="content-header">
+  <div class="content-header is-sticky">
     <div>
       <h1>角色</h1>
     </div>
@@ -8,6 +8,7 @@
     </div>
   </div>
   <a-table
+  :loading="state.loading"
   :dataSource="respState.list"
   :columns="columns"
   :pagination="{
@@ -41,6 +42,8 @@
   <a-modal
     v-model:visible="formState.visible"
     :title="formState.type == 'add' ? '添加角色' : '修改角色'"
+    :maskClosable="false"
+    @cancel="onCancel"
     @ok="onSubmit">
     <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
       <a-row :gutter="24">
@@ -71,7 +74,8 @@ import {
   updateRole,
   deleteRole,
   RoleListReply,
-  RoleForm
+  RoleForm,
+RoleListReqParams
 } from '../api/ssoms'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
@@ -100,6 +104,11 @@ const columns = [
   }
 ]
 
+interface State {
+  loading: boolean
+  params: RoleListReqParams
+}
+
 
 /**
  * 这是列表的入参
@@ -108,8 +117,7 @@ const columns = [
 const state = reactive({
   loading: false, // 列表是否加载完成
   params: {
-    name: undefined,
-    mobile: undefined,
+    roleName: '',
     page: 1,
     pageSize: 10
   }
@@ -215,7 +223,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateRole(formState.form).then(() => {
+      updateRole({ roleUUID: formState.form.roleUUID! }, formState.form).then(() => {
         message.success('修改角色成功')
         formState.visible = false
         modalFormRef.value?.resetFields()

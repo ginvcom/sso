@@ -29,7 +29,7 @@
           </a-menu-item>
           <a-menu-item key="6">
             <audit-outlined />
-            <router-link to="/user">授权管理</router-link>
+            <router-link to="/permission">授权管理</router-link>
           </a-menu-item>
           </a-menu>
         </a-layout-sider>
@@ -61,56 +61,3 @@ const state = reactive({
   openKeys: []
 })
 </script>
-<style>
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  width: 100%;
-  height: 100%;
-}
-.header__bar.ant-layout-header{
-  height: 48px;
-  background-color: #fff;
-  box-shadow: 0 0 8px 0 rgb(0 0 0 / 10%);
-  display: flex;
-  justify-content: space-between;
-  z-index: 999;
-}
-.header__logo{
-  display: flex;
-  align-items: center;
-}
-.header__logo img{
-  width: 24px;
-  height: 24px;
-}
-.header__logo h1{
-  font-size: 15px;
-  margin: 0 0 0 8px;
-  color: #262626;
-}
-.sider__bar.ant-layout-sider-light{
-}
-.sider__bar .ant-menu{
-  background-color: #f8f8f8;
-  height: calc(100vh - 50px);
-  overflow: overlay;
-}
-
-.main__bar{
-  background-color: #fff;
-  padding: 30px;
-  height: calc(100vh - 50px);
-  overflow: overlay;
-}
-.content-header{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 20px;
-}
-.content-header h1{
-  font-size: 24px;
-  margin: 0;
-}
-</style>
