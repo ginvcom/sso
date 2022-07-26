@@ -20,16 +20,15 @@ var (
 	objectFieldNames          = builder.RawFieldNames(&Object{})
 	objectRows                = strings.Join(objectFieldNames, ",")
 	objectInsertFields   = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
-	objectUpdateFields = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`uuid`", "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
+	objectUpdateFields = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`uuid`",  "`top_key`",  "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
 	objectModel interface {
 		ListData(ctx context.Context, args *ObjectListArgs) (*[]Object, error)
-		Insert(ctx context.Context, data *Object, topKey string) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*Object, error)
+		Insert(ctx context.Context, data *Object) (sql.Result, error)
 		FindOneByUuid(ctx context.Context, uuid string) (*Object, error)
-		Update(ctx context.Context, newData *Object) error
+		Update(ctx context.Context, data *Object) error
 		Delete(ctx context.Context, uuid string) error
 	}
 
@@ -42,19 +41,23 @@ type (
 		TopKey string
 		ObjectName string
 		Key string
+		Status int
 	}
 
 	Object struct {
 		Id         int64     `db:"id"`
-		Uuid       string     `db:"uuid"`
+		Uuid       string    `db:"uuid"`
 		ObjectName string    `db:"object_name"`
-		Domain     string    `db:"domain"`
+		Identifier     string    `db:"identifier"`
 		Key        string    `db:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 		Sort       int64     `db:"sort"`
-		Type       int64     `db:"type"`      // 类型: 1操作对象, 2模块, 3菜单组, 4菜单, 5操作(接口)
+		Type       int64     `db:"type"`      // 类型: 1操作对象, 2菜单, 3操作(接口)
+		SubType    int64     `db:"sub_type"`  // 子分类
+		Extra      string    `db:"extra"`     // 扩展字段，建议封装成 JSON 字符串
 		Icon       string    `db:"icon"`      // 图标
 		Status     int64     `db:"status"`    // 状态
 		Puuid      string    `db:"puuid"`     // 父级uuid
+		TopKey     string    `db:"top_key"`   // 操作对象的所属systemCode
 		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
@@ -70,9 +73,18 @@ func newObjectModel(conn sqlx.SqlConn) *defaultObjectModel {
 
 func (args *ObjectListArgs) getListConditions () (where string, placeholder []interface{}) {
 	where = "`is_delete` = 0"
+	if args.Status != 0 {
+		where +=" and status = ?"
+		if (args.Status == -1) {
+			args.Status = 0
+		}
+		placeholder = append(placeholder, args.Status)
+	}
 	if args.TopKey != "" {
-		where +=" and top_key = ?"
+		where +=" and top_key = ? and type != 1"
 		placeholder = append(placeholder, args.TopKey)
+	} else {
+		where +=" and type = 1"
 	}
 	if args.ObjectName != "" {
 		where +=" and object_name = ?"
@@ -88,7 +100,7 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 func (m *defaultObjectModel) ListData(ctx context.Context, args *ObjectListArgs) (resp *[]Object, err error) {
 	var placeholder []interface{}
 	where, placeholder := args.getListConditions()
-	query := fmt.Sprintf("select %s from %s where %s order by sort", objectRows, m.table, where)
+	query := fmt.Sprintf("select %s from %s where %s order by sort, create_time", objectRows, m.table, where)
 	fmt.Println(query)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err != nil {
@@ -122,14 +134,14 @@ func (m *defaultObjectModel) Delete(ctx context.Context, uuid string) (err error
 	if rowsAffected == 0 {
 		err = errors.New("no rows affected")
 	}
-
 	return
+
 }
 
-func (m *defaultObjectModel) FindOne(ctx context.Context, id int64) (*Object, error) {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", objectRows, m.table)
+func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (*Object, error) {
 	var resp Object
-	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
+	query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", objectRows, m.table)
+	err := m.conn.QueryRowCtx(ctx, &resp, query, uuid)
 	switch err {
 	case nil:
 		return &resp, nil
@@ -140,30 +152,27 @@ func (m *defaultObjectModel) FindOne(ctx context.Context, id int64) (*Object, er
 	}
 }
 
-func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (o *Object, err error) {
-	query := fmt.Sprintf("select %s from %s where `is_delete` = 0 and `uuid` = ? limit 1", objectRows, m.table)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
-	}
-
-	o = new(Object)
-	err = stmt.QueryRowCtx(ctx, o, uuid)
-	if err == sqlc.ErrNotFound {
-		err = ErrNotFound
-	}
-
-	return
-}
-
-func (m *defaultObjectModel) Insert(ctx context.Context, data *Object, topKey string) (res sql.Result, err error) {
-	query := fmt.Sprintf("insert into %s (%s, `top_key`) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, objectInsertFields)
+func (m *defaultObjectModel) Insert(ctx context.Context, data *Object) (res sql.Result, err error) {
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, objectInsertFields)
 	stmt, err := m.conn.PrepareCtx(ctx, query)
 	if err != nil {
 		return
 	}
-	
-	res, err= stmt.ExecCtx(ctx, data.Uuid, data.ObjectName, data.Domain, data.Key, data.Sort, data.Type, data.Icon, data.Status, data.Puuid, topKey)
+	res, err= stmt.ExecCtx(
+		ctx,
+		data.Uuid,
+		data.ObjectName,
+		data.Identifier,
+		data.Key, 
+		data.Sort,
+		data.Type,
+		data.SubType,
+		data.Extra,
+		data.Icon,
+		data.Status,
+		data.Puuid,
+		data.TopKey,
+	)
 	
 	return
 }
@@ -174,8 +183,9 @@ func (m *defaultObjectModel) Update(ctx context.Context, newData *Object) (err e
 	if err != nil {
 		return
 	}
+
 	fmt.Println(query)
-	req, err :=stmt.ExecCtx(ctx, newData.ObjectName, newData.Domain, newData.Key, newData.Sort, newData.Type, newData.Icon, newData.Status, newData.Puuid, newData.Uuid)
+	req, err :=stmt.ExecCtx(ctx, newData.ObjectName, newData.Identifier, newData.Key, newData.Sort, newData.Type, newData.SubType, newData.Extra, newData.Icon, newData.Status, newData.Puuid, newData.Uuid)
 	if err !=nil{
 		return 
 	}
@@ -188,5 +198,6 @@ func (m *defaultObjectModel) Update(ctx context.Context, newData *Object) (err e
 	if rowsAffected == 0 {
 		err = errors.New("no rows affected")
 	}
+
 	return err
 }

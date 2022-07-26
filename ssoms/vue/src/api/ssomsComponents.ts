@@ -250,14 +250,26 @@ export interface ObjectListReqParams {
 export interface Object {
 	uuid: string
 	objectName: string
-	domain: string
+	identifier: string
 	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
 	sort: number
-	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	type: number // 类型, 1操作对象, 2菜单，3操作(接口)
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	extra?: string // 扩展字段
 	icon: string // 图标
 	status: number
 	pUUID?: string
 	children?: Array<Object>
+}
+
+export interface ObjectOption {
+	value: string
+	label: string
+	pUUID?: string
+	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	children?: Array<ObjectOption> // 子菜单
+	apis: Array<ObjectOption> // 操作
 }
 
 export interface ObjectListReply {
@@ -267,10 +279,12 @@ export interface ObjectListReply {
 export interface ObjectForm {
 	uuid?: string
 	objectName: string
-	domain: string
+	identifier: string
 	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
 	sort: number
 	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	extra?: string // 扩展字段
 	icon: string // 图标
 	status: number
 	pUUID?: string
@@ -290,10 +304,12 @@ export interface ObjectDetailReqParams {
 
 export interface UpdateObjectReq {
 	objectName: string
-	domain: string
+	identifier: string
 	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
 	sort: number
-	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	type: number // 类型, 1系统, 2菜单, 3操作(接口)
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	extra?: string // 扩展字段
 	icon: string // 图标
 	status: number
 	pUUID?: string
@@ -327,7 +343,7 @@ export interface RoleOperationsReqParams {
 }
 
 export interface RoleOperationsReply {
-	list?: Array<Object>
+	list?: Array<ObjectOption>
 }
 
 export interface RolePermissionsReq {
@@ -339,16 +355,8 @@ export interface RolePermissionsReqParams {
 	pUUID: string
 }
 
-export interface ObjectOption {
-	label: string
-	value: string
-	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	extra: string
-	children: Array<ObjectOption>
-}
-
 export interface RolePermissionsReply {
-	list: Array<ObjectOption>
+	uuidArray: Array<string>
 }
 
 export interface GrantReq {

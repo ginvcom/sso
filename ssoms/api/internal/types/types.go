@@ -210,30 +210,44 @@ type ObjectListReq struct {
 }
 
 type Object struct {
-	UUID       string   `json:"uuid"`
-	ObjectName string   `json:"objectName"`
-	Domain     string   `json:"domain"`
-	Key        string   `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64    `json:"sort"`
-	Typ        int64    `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string   `json:"icon"` // 图标
-	Status     int64    `json:"status"`
-	PUUID      string   `json:"pUUID,optional"`
-	Children   []Object `json:"children,optional"`
+	UUID       string    `json:"uuid"`
+	ObjectName string    `json:"objectName"`
+	Identifier string    `json:"identifier"`
+	Key        string    `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64     `json:"sort"`
+	Typ        int64     `json:"type"`           // 类型, 1操作对象, 2菜单，3操作(接口)
+	SubType    int64     `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string    `json:"extra,optional"` // 扩展字段
+	Icon       string    `json:"icon"`           // 图标
+	Status     int64     `json:"status"`
+	PUUID      string    `json:"pUUID,optional"`
+	Children   []*Object `json:"children,optional"`
+}
+
+type ObjectOption struct {
+	Value    string          `json:"value"`
+	Label    string          `json:"label"`
+	PUUID    string          `json:"pUUID,optional"`
+	Typ      int64           `json:"type"`              // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType  int64           `json:"subType"`           // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Children []*ObjectOption `json:"children,optional"` // 子菜单
+	Apis     []*ObjectOption `json:"apis"`              // 操作
 }
 
 type ObjectListReply struct {
-	List []Object `json:"list"`
+	List []*Object `json:"list"`
 }
 
 type ObjectForm struct {
 	UUID       string `json:"uuid,optional"`
 	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
+	Identifier string `json:"identifier"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
+	Typ        int64  `json:"type"`           // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
 	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
@@ -250,11 +264,13 @@ type ObjectDetailReq struct {
 type UpdateObjectReq struct {
 	UUID       string `path:"uuid"`
 	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
+	Identifier string `json:"identifier"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
+	Typ        int64  `json:"type"`           // 类型, 1系统, 2菜单, 3操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
 }
@@ -277,7 +293,7 @@ type RoleOperationsReq struct {
 }
 
 type RoleOperationsReply struct {
-	List []Object `json:"list,optional"`
+	List []*ObjectOption `json:"list,optional"`
 }
 
 type RolePermissionsReq struct {
@@ -286,16 +302,8 @@ type RolePermissionsReq struct {
 	PUUID    string `form:"pUUID,optional"`
 }
 
-type ObjectOption struct {
-	Label    string         `json:"label"`
-	Value    string         `json:"value"`
-	Typ      int64          `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Extra    string         `json:"extra"`
-	Children []ObjectOption `json:"children"`
-}
-
 type RolePermissionsReply struct {
-	List []ObjectOption `json:"list"`
+	UUIDArray []string `json:"uuidArray"`
 }
 
 type GrantReq struct {

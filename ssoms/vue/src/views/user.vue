@@ -92,12 +92,12 @@
         <a-col :span="16">
           <a-row :gutter="40">
           <a-col :span="12">
-            <a-form-item label="姓名" name="form.name">
+            <a-form-item label="姓名" name="name" :rules="[{ required: true, message: '请输入用户姓名' }]">
               <a-input v-model:value="formState.form.name" placeholder="姓名" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="性别" name="form.gender">
+            <a-form-item label="性别" name="gender" :rules="[{ required: true, message: '请选择性别' }]">
               <a-radio-group v-model:value="formState.form.gender">
                 <a-radio :value="1">男</a-radio>
                 <a-radio :value="2">女</a-radio>
@@ -106,22 +106,22 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="手机号" name="form.mobile">
+            <a-form-item label="手机号" name="mobile" :rules="[{ required: true, message: '请输入用户手机号' }]">
               <a-input v-model:value="formState.form.mobile" placeholder="13位手机号" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="密码" name="form.password">
+            <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入6~8位密码用户登录' }]">
               <a-input v-model:value="formState.form.password" placeholder="6~8位密码" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="生日" name="form.birth">
+            <a-form-item label="生日" name="birth" :rules="[{ required: true, message: '请输入用户出生日期' }]">
               <a-date-picker style="width: 100%" valueFormat="YYYY-MM-DD" v-model:value="formState.form.birth" placeholder="出生日期"/>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="状态" name="form.status">
+            <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择用户状态' }]">
               <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
             </a-form-item>
           </a-col>

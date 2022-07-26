@@ -5,30 +5,44 @@ type ObjectListReq {
 }
 
 type Object {
-	UUID       string   `json:"uuid"`
-	ObjectName string   `json:"objectName"`
-	Domain     string   `json:"domain"`
-	Key        string   `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-	Sort       int64    `json:"sort"`
-	Typ        int64    `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string   `json:"icon"` // 图标
-	Status     int64    `json:"status"`
-	PUUID      string   `json:"pUUID,optional"`
-	Children   []Object `json:"children,optional"`
+	UUID       string    `json:"uuid"`
+	ObjectName string    `json:"objectName"`
+	Identifier string    `json:"identifier"`
+	Key        string    `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64     `json:"sort"`
+	Typ        int64     `json:"type"`           // 类型, 1操作对象, 2菜单，3操作(接口)
+	SubType    int64     `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string    `json:"extra,optional"` // 扩展字段
+	Icon       string    `json:"icon"`           // 图标
+	Status     int64     `json:"status"`
+	PUUID      string    `json:"pUUID,optional"`
+	Children   []*Object `json:"children,optional"`
+}
+
+type ObjectOption {
+	Value    string          `json:"value"`
+	Label    string          `json:"label"`
+	PUUID    string          `json:"pUUID,optional"`
+	Typ      int64           `json:"type"`    // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType  int64           `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Children []*ObjectOption `json:"children,optional"` // 子菜单
+	Apis     []*ObjectOption `json:"apis"` // 操作
 }
 
 type ObjectListReply {
-	List []Object `json:"list"`
+	List []*Object `json:"list"`
 }
 
 type ObjectForm {
 	UUID       string `json:"uuid,optional"`
 	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
+	Identifier string `json:"identifier"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
+	Typ        int64  `json:"type"`           // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
 	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
@@ -42,14 +56,16 @@ type ObjectDetailReq {
 	UUID string `path:"uuid"`
 }
 
-type UpdateObjectReq{
+type UpdateObjectReq {
 	UUID       string `path:"uuid"`
 	ObjectName string `json:"objectName"`
-	Domain     string `json:"domain"`
+	Identifier string `json:"identifier"`
 	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 	Sort       int64  `json:"sort"`
-	Typ        int64  `json:"type"` // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
-	Icon       string `json:"icon"` // 图标
+	Typ        int64  `json:"type"`           // 类型, 1系统, 2菜单, 3操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
 }
@@ -67,12 +83,12 @@ type DeleteObjectReply {
 }
 
 type RoleOperationsReq {
-	TopKey     string `form:"topKey,optional"` // 传systemCode
-	PUUID    string `form:"pUUID,optional"`
+	TopKey string `form:"topKey,optional"` // 传systemCode
+	PUUID  string `form:"pUUID,optional"`
 }
 
 type RoleOperationsReply {
-	List []Object `json:"list,optional"`
+	List []*ObjectOption `json:"list,optional"`
 }
 
 @server(
@@ -102,5 +118,5 @@ service ssoms-api {
 	
 	@doc "角色可以分配权限的对象"
 	@handler roleOperations
-	get /roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
+	get /object/roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
 }

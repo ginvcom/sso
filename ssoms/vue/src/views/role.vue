@@ -48,12 +48,12 @@
     <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
       <a-row :gutter="24">
       <a-col :span="24">
-        <a-form-item label="角色名">
+        <a-form-item label="角色名" name="roleName" :rules="[{ required: true, message: '请输入角色名称' }]">
           <a-input v-model:value="formState.form.roleName" placeholder="角色名称" />
         </a-form-item>
       </a-col>
       <a-col :span="24">
-        <a-form-item label="概述">
+        <a-form-item label="概述" name="summary" :rules="[{ required: true, message: '请简单描述一下角色' }]">
           <a-textarea
             v-model:value="formState.form.summary"
             placeholder="简单描述一下角色"

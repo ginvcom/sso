@@ -29,10 +29,12 @@ func (l *UpdateObjectLogic) UpdateObject(req *types.ObjectForm) (resp *types.Upd
 	obj := &model.Object{
 		Uuid:       req.UUID,
 		ObjectName: req.ObjectName,
-		Domain:     req.Domain,
+		Identifier: req.Identifier,
 		Key:        req.Key,
 		Sort:       req.Sort,
 		Type:       req.Typ,
+		SubType:    req.SubType,
+		Extra:      req.Extra,
 		Icon:       req.Icon,
 		Status:     req.Status,
 		Puuid:      req.PUUID,

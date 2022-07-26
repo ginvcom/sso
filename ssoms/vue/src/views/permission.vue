@@ -12,7 +12,7 @@
     <div v-for="obj in state.systems" :key="obj.uuid" class="object__item">
       <div
         class="object__current-value object__option"
-        :class="{ 'is-active': state.params.pUUID == obj.uuid }"
+        :class="{ 'is-active': state.params.topKey == obj.key }"
         @click="onChangeSystem(obj)"
       >
         <a-image
@@ -26,33 +26,30 @@
       </div>
     </div>
   </a-col>
-  <a-col flex="auto">
+  <a-col flex="1">
   <a-table
   :loading="state.loading"
+  class="apis-check__table"
+  bordered
+  rowKey="value"
+  size="small"
+  :row-selection="{ checkStrictly: false, onChange, onSelect, onSelectAll }"
   :dataSource="respState.list"
   :columns="columns"
-  :pagination="{
-    total: respState.total,
-    current: state.params.page,
-    pageSize: state.params.pageSize,
-    showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
-  }"
+  :pagination="false"
   @change="onTableChange">
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'name'">
-        <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
-          <template #icon><UserOutlined /></template>
-        </a-avatar>
-        <span style="margin-left: 10px">{{record.name}}</span>
-      </template>
-      <template v-if="column.key === 'gender'">
-        <span v-if="record.gender == 1">男</span>
-        <span v-else-if="record.gender == 2">女</span>
-        <span v-else-if="record.gender == 3">未知</span>
-      </template>
-      <template v-if="column.key === 'status'">
-        <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
-        <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
+      <template v-if="column.key === 'apis'">
+        <div class="apis-check__group">
+          <a-checkbox v-for="item in record.apis" :key="item.uuid" :value="item.uuid" v-model:value="formState.uuidArray">
+            <!-- <span style="color: red">{{ item.label }}</span> -->
+            <span v-if="item.subType == 1" class="method-get">{{ item.label }}</span>
+            <span v-else-if="item.subType == 2" class="method-post">{{ item.label }}</span>
+            <span v-else-if="item.subType == 3" class="method-put">{{ item.label }}</span>
+            <span v-else-if="item.subType == 4" class="method-patch">{{ item.label }}</span>
+            <span v-else-if="item.subType == 5" class="method-delete">{{ item.label }}</span>
+          </a-checkbox>
+        </div>
       </template>
     </template>
   </a-table>
@@ -64,14 +61,15 @@ import { onMounted, reactive, ref } from 'vue'
 import 'cropperjs/dist/cropper.css'
 // Object 是js的关键字, 别名处理一下
 import {
-  userList,
+  roleOperations,
   userDetail,
   addUser,
   updateUser,
   objectList,
   ObjectListReply,
-  UserListReqParams,
-  UserListReply,
+  RoleOperationsReqParams,
+  ObjectOption,
+  RoleOperationsReply,
   UserForm,
   Object as Obj
 } from '../api/ssoms'
@@ -79,6 +77,7 @@ import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { ossConfig } from '@/config'
+import { object } from 'vue-types'
 
 /**
  * 这是表格的列定义
@@ -86,30 +85,14 @@ import { ossConfig } from '@/config'
  */
 const columns = [
   {
-    title: '用户',
-    dataIndex: 'name',
-    key: 'name'
-  },
-  {
-    title: '性别',
-    dataIndex: 'gender',
-    key: 'gender'
-  },
-  {
-    title: '手机号',
-    dataIndex: 'mobile',
-    key: 'mobile'
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status'
+    title: '菜单',
+    dataIndex: 'label',
+    key: 'label',
+    width: '200px'
   },
   {
     title: '操作',
-    key: 'actions',
-    align: 'center',
-    width: '120px'
+    key: 'apis'
   }
 ]
 
@@ -148,9 +131,7 @@ const state = reactive<State>({
 /**
  * 这是列表响应
  */
-// //ginvdoc.oss-cn-shenzhen.aliyuncs.com/1165839836329658.png
-const respState = reactive<UserListReply>({
-  total: 0,
+const respState = reactive<RoleOperationsReply>({
   list: []
 })
 
@@ -163,8 +144,7 @@ onMounted(() => {
  */
 const getList = () => {
   state.loading = true
-  userList(state.params).then((data) => {
-    respState.total = data.total
+  roleOperations(state.params).then((data) => {
     respState.list = data.list
   }).finally(() => {
     state.loading = false
@@ -178,37 +158,24 @@ const onTableChange = ({ current, pageSize }) => {
 }
 
 const onChangeSystem = (obj: Obj) => {
-  if (state.params.pUUID === obj.uuid) {
+  if (state.params.topKey === obj.key) {
     return
   }
   state.currentSystem = { icon: obj.icon, name: obj.objectName }
-  state.params = { pUUID: obj.uuid, key: '', objectName: '' }
+  state.params = { pUUID: obj.uuid, topKey: obj.key, objectName: obj.objectName }
   // getList()
 }
 
 const modalFormRef = ref<FormInstance>()
 
 interface Form {
-  type: string
-  visible: boolean,
-  loading: boolean,
-  form: UserForm
+  loading: boolean
+  uuidArray: Array<string>
 }
 
 const formState = reactive<Form>({
-  visible: false,
   loading: false,
-  type: 'add',
-  form: {
-    uuid: '',
-    name: '',
-    mobile: '',
-    password: '',
-    avatar: '',
-    gender: 1,
-    birth: '',
-    status: 1,
-  }
+  uuidArray: []
 })
 
 const getSystemOptions = () => {
@@ -226,17 +193,27 @@ const getSystemOptions = () => {
 }
 
 
+const onChange = (selectedRowKeys: (string | number)[], selectedRows: ObjectOption[]) => {
+  console.log(selectedRowKeys, selectedRows)
+}
+
+const onSelect = (record: ObjectOption, selected: boolean, selectedRows: ObjectOption[]) => {
+  console.log(record, selected, selectedRows)
+}
+
+const onSelectAll  = (selected: boolean) => {
+  console.log(selected)
+}
+
 /**
  * 获取用户详情, 用于编辑
  * @param uuid
  */
-const initEdit = (uuid: string) => {
-  userDetail({ uuid }).then((data) => {
-    formState.form = data
-    formState.type = 'edit'
-    formState.visible = true
-  })
-}
+// const initEdit = (uuid: string) => {
+//   userDetail({ uuid }).then((data) => {
+//     formState.form = data
+//   })
+// }
 
 /**
  * 新增或修改用户
@@ -244,25 +221,13 @@ const initEdit = (uuid: string) => {
 const onSubmit = () =>{
   modalFormRef.value?.validate().then(() => {
     formState.loading = true
-    if (formState.type === 'add') {
-      addUser(formState.form).then(() => {
-        message.success('新增用户成功')
-        formState.visible = false
-        modalFormRef.value?.resetFields()
-        getList()
-      }).finally(() => {
-        formState.loading = false
-      })
-    } else {
-      updateUser({ uuid: formState.form.uuid! }, formState.form).then(() => {
-        message.success('修改用户成功')
-        formState.visible = false
-        modalFormRef.value?.resetFields()
-        getList()
-      }).finally(() => {
-        formState.loading = false
-      })
-    }
+    // updateUser({ uuid: formState.form.uuid! }, formState.form).then(() => {
+    //   message.success('修改用户成功')
+    //   modalFormRef.value?.resetFields()
+    //   getList()
+    // }).finally(() => {
+    //   formState.loading = false
+    // })
   }).catch((err) => {
     console.log(err)
   })
@@ -275,21 +240,3 @@ const onCancel = () => {
   modalFormRef.value?.resetFields()
 }
 </script>
-
-<style scoped>
-.avatar-uploader:deep() > .ant-upload {
-  width: 200px;
-  height: 200px;
-}
-.upload-btns{
-  display: flex;
-  justify-content:space-between;
-}
-.avatar-uploader__img{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 200px;
-  height: 200px;
-}
-</style>

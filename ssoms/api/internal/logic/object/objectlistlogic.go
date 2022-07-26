@@ -25,7 +25,6 @@ func NewObjectListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Object
 }
 
 func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.ObjectListReply, err error) {
-
 	args := &model.ObjectListArgs{
 		TopKey:     req.TopKey,
 		ObjectName: req.ObjectName,
@@ -37,23 +36,41 @@ func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.Obje
 	}
 
 	resp = &types.ObjectListReply{
-		List: make([]types.Object, 0, 1),
+		List: make([]*types.Object, 0, 1),
 	}
 
 	for _, obj := range *listData {
 		item := types.Object{
 			UUID:       obj.Uuid,
 			ObjectName: obj.ObjectName,
-			Domain:     obj.Domain,
+			Identifier: obj.Identifier,
 			Key:        obj.Key,
 			Sort:       obj.Sort,
 			Typ:        obj.Type,
+			SubType:    obj.SubType,
 			Icon:       obj.Icon,
 			Status:     obj.Status,
 			PUUID:      obj.Puuid,
 		}
-		resp.List = append(resp.List, item)
+		resp.List = append(resp.List, &item)
 	}
 
+	if args.TopKey == "" {
+		return
+	}
+	newList := makeTree(resp.List, "")
+	resp.List = newList
 	return
+}
+
+func makeTree(obs []*types.Object, puuid string) []*types.Object {
+	var tree []*types.Object
+	for _, child := range obs {
+		if child.PUUID == puuid {
+			item := child
+			item.Children = makeTree(obs, item.UUID)
+			tree = append(tree, item)
+		}
+	}
+	return tree
 }

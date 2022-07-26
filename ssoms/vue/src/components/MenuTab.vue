@@ -4,7 +4,7 @@
       <h1>菜单 & 操作</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd">添加菜单</a-button>
+      <a-button type="primary" @click="initAddMenu()">添加菜单</a-button>
     </div>
   </div>
   <div class="system-params">
@@ -55,13 +55,39 @@
       <template v-if="column.key === 'objectName'">
         <span style="margin-left: 10px">{{record.objectName}}</span>
       </template>
-      <template v-if="column.key === 'gender'">
-        <span v-if="record.gender == 1">男</span>
-        <span v-else-if="record.gender == 2">女</span>
-        <span v-else-if="record.gender == 3">未知</span>
+      <template v-if="column.key === 'type'">
+        <template v-if="record.type == 2">
+        <span v-if="record.subType == 1">菜单</span>
+        <span v-else-if="record.subType == 2">菜单组</span>
+        <span v-else-if="record.subType == 3">隐藏菜单</span>
+        </template>
+        <template v-else-if="record.type == 3">
+          <span>操作</span>
+        </template>
+      </template>
+      <template v-if="column.key === 'key'">
+        <template v-if="record.type == 3">
+          <span v-if="record.subType == 1" class="method-get m-r-15">GET</span>
+          <span v-else-if="record.subType == 2" class="method-post m-r-5">POST</span>
+          <span v-else-if="record.subType == 3" class="method-put m-r-15">PUT</span>
+          <span v-else-if="record.subType == 4" class="method-patch m-r-15">PAT</span>
+          <span v-else-if="record.subType == 5" class="method-delete m-r-15">DEL</span>
+        </template>
+        <span>{{record.key}}</span>
+      </template>
+      <template v-if="column.key === 'status'">
+        <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
+        <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
       </template>
       <template v-if="column.key === 'actions'">
-        <a @click="initEdit(record.uuid)">编辑</a>
+        <a v-if="record.type == 3" disabled>+子菜单</a>
+        <a v-else @click="initAddMenu(record.uuid)">+子菜单</a>
+        <a-divider type="vertical" />
+        <a v-if="record.type == 3" disabled>+操作</a>
+        <a v-else  @click="initAddApi(record.uuid)">+操作</a>
+        <a-divider type="vertical" />
+        <a v-if="record.type == 2" @click="initEditMenu(record.uuid)">编辑</a>
+        <a v-else @click="initEditApi(record.uuid)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
           title="确定要删除该对象吗?"
@@ -103,38 +129,101 @@
   <a-modal
     width="720px"
     v-model:visible="formState.visible"
-    :title="formState.type == 'add' ? '新增对象' : '修改对象'"
     :loading="formState.loading"
     :maskClosable="false"
+    :title="formState.type == 'add' ? '添加菜单' : '修改菜单'"
     @cancel="onCancel"
     @ok="onSubmit">
     <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
       <a-row :gutter="24">
         <a-col :span="12">
-          <a-form-item label="菜单名" name="form.objectName">
-            <a-input v-model:value="formState.form.objectName" placeholder="姓名" />
+          <a-form-item label="菜单名" name="objectName" :rules="[{ required: true, message: '请输入菜单名' }]">
+            <a-input v-model:value="formState.form.objectName" placeholder="菜单名" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="菜单path" name="form.key">
-            <a-input v-model:value="formState.form.key" placeholder="菜单path" />
+          <a-form-item label="菜单路径" name="key" :rules="[{ required: true, message: '请输入菜单路径' }]">
+            <a-input v-model:value="formState.form.key" placeholder="菜单路径" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="菜单类型" name="form.type">
-            <a-radio-group v-model:value="formState.form.type">
+          <a-form-item label="父级菜单" name="pUUID">
+            <a-input v-model:value="formState.form.pUUID" placeholder="父级菜单" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="菜单类型" name="subType" :rules="[{ required: true, message: '请选择菜单类型' }]">
+            <a-radio-group v-model:value="formState.form.subType">
               <a-radio :value="1">菜单</a-radio>
               <a-radio :value="2">菜单组</a-radio>
+              <a-radio :value="3">隐藏菜单</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="域名" name="form.domain">
-            <a-input v-model:value="formState.form.domain" placeholder="13位手机号" />
+          <a-form-item label="标识符" name="identifier">
+            <a-input v-model:value="formState.form.identifier" placeholder="标识" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="状态" name="form.status">
+          <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
+            <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+  </a-modal>
+  <a-modal
+    width="720px"
+    v-model:visible="formState.apiVisible"
+    :loading="formState.loading"
+    :maskClosable="false"
+    :title="formState.type == 'add' ? '添加操作' : '修改操作'"
+    @cancel="onCancel"
+    @ok="onSubmit">
+    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+      <a-row :gutter="24">
+        <a-col :span="24">
+          <a-form-item label="操作请求" name="key" :rules="[{ required: true, message: '请输入操作请求' }]">
+            <a-input-group compact>
+            <a-select
+                v-model:value="formState.form.subType"
+                placeholder="select one country"
+                option-label-prop="children"
+                 style="width: 20%"
+              >
+                <a-select-option :value="1" label="China">
+                  <span class="method-get">GET</span>
+                </a-select-option>
+                <a-select-option :value="2" label="USA">
+                  <span class="method-post">POST</span>
+                </a-select-option>
+                <a-select-option :value="3" label="Japan">
+                  <span class="method-put">PUT</span>
+                </a-select-option>
+                <a-select-option :value="4" label="Japan">
+                  <span class="method-patch">PATCH</span>
+                </a-select-option>
+                <a-select-option :value="5" label="Korea">
+                  <span class="method-delete">DELETE</span>
+                </a-select-option>
+              </a-select>
+              <a-input v-model:value="formState.form.key" style="width: 80%" placeholder="接口路径，“/”起始" />
+            </a-input-group>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="操作名" name="objectName" :rules="[{ required: true, message: '请输入操作名' }]">
+            <a-input v-model:value="formState.form.objectName" placeholder="操作名" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="所属菜单" name="pUUID" :rules="[{ required: true, message: '请选择所属菜单' }]">
+            <a-input v-model:value="formState.form.pUUID" placeholder="所属菜单" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
             <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
           </a-form-item>
         </a-col>
@@ -187,6 +276,11 @@ const columns = [
     key: 'key'
   },
   {
+    title: '状态',
+    dataIndex: 'status',
+    key: 'status'
+  },
+  {
     title: '排序',
     dataIndex: 'sort',
     key: 'sort'
@@ -195,7 +289,7 @@ const columns = [
     title: '操作',
     key: 'actions',
     align: 'center',
-    width: '120px'
+    width: '230px'
   }
 ]
 
@@ -283,20 +377,25 @@ interface Form {
   type: string
   visible: boolean,
   loading: boolean,
+  apiVisible: boolean,
+  apiLoading: boolean,
   form: ObjectForm
 }
 
 const formState = reactive<Form>({
   visible: false,
   loading: false,
+  apiVisible: false,
+  apiLoading: false,
   type: 'add',
   form: {
     uuid: '',
     objectName: '',
-    domain: '',
+    identifier: '',
     key: '',
     icon: '',
-    type: 1,
+    type: 2,
+    subType: 1,
     pUUID: '',
     status: 1,
     sort: 0,
@@ -304,19 +403,19 @@ const formState = reactive<Form>({
   }
 })
 
-const initAdd = () => {
-  // resetFileds初始化无效，手动初始化
+const initAddMenu = (pUUID?: string) => {
   formState.form = {
     uuid: '',
     objectName: '',
-    domain: '',
+    identifier: '',
     key: '',
     icon: '',
-    type: 1,
-    pUUID: '',
+    type: 2,
+    subType: 1,
+    pUUID: pUUID || '',
     status: 1,
     sort: 0,
-    topKey: ''
+    topKey: state.params.topKey
   }
   formState.type = 'add'
   formState.visible = true
@@ -326,7 +425,7 @@ const initAdd = () => {
  * 获取对象详情, 用于编辑
  * @param uuid
  */
-const initEdit = (uuid: string) => {
+const initEditMenu = (uuid: string) => {
   objectDetail({ uuid }).then((data: ObjectForm) => {
     formState.form = data
     formState.type = 'edit'
@@ -334,28 +433,58 @@ const initEdit = (uuid: string) => {
   })
 }
 
+const initEditApi = (uuid: string) => {
+  objectDetail({ uuid }).then((data: ObjectForm) => {
+    formState.form = data
+    formState.type = 'edit'
+    formState.apiVisible = true
+  })
+}
+
+const initAddApi = (pUUID?: string) => {
+  formState.form = {
+    uuid: '',
+    objectName: '',
+    identifier: '',
+    key: '',
+    icon: '',
+    type: 3,
+    subType: 1,
+    pUUID: pUUID || '',
+    status: 1,
+    sort: 0,
+    topKey: state.params.topKey
+  }
+  formState.type = 'add'
+  formState.apiVisible = true
+}
+
 /**
- * 新增或修改对象
+ * 新增或修改菜单
  */
 const onSubmit = () =>{
   modalFormRef.value?.validate().then(() => {
     formState.loading = true
     if (formState.type === 'add') {
       addObject(formState.form).then(() => {
-        message.success('新增对象成功')
+        message.success('新增菜单成功')
         formState.visible = false
+        formState.apiVisible = false
         modalFormRef.value?.resetFields()
         getList()
       }).finally(() => {
+        formState.apiLoading = false
         formState.loading = false
       })
     } else {
       updateObject({ uuid: formState.form.uuid! }, formState.form).then(() => {
-        message.success('修改对象成功')
+        message.success('修改菜单成功')
         formState.visible = false
+        formState.apiVisible = false
         modalFormRef.value?.resetFields()
         getList()
       }).finally(() => {
+        formState.apiLoading = false
         formState.loading = false
       })
     }
@@ -393,3 +522,20 @@ const onChangeSystem = (obj: Obj) => {
   systemFormState.visible = false
 }
 </script>
+<style>
+.method-get{
+  color: #41ca9d;
+}
+.method-post{
+  color: #ed8936
+}
+.method-put{
+  color: #1890ff;
+}
+.method-patch{
+  color: #eb2f96;
+}
+.method-delete{
+  color: #fa541c;
+}
+</style>

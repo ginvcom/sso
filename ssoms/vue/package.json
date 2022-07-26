@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "ali-oss": "^6.17.1",
-    "ant-design-vue": "^3.2.9",
+    "ant-design-vue": "3.2.10",
     "axios": "^0.27.2",
     "qs": "^6.11.0",
     "vue": "^3.2.25",

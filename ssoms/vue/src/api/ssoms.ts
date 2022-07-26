@@ -212,7 +212,7 @@ export function deleteObject(params: components.DeleteObjectReqParams) {
  * @param params
  */
 export function roleOperations(params: components.RoleOperationsReqParams) {
-	return webapi.get<components.RoleOperationsReply>("/roleOperations", params)
+	return webapi.get<components.RoleOperationsReply>("/object/roleOperations", params)
 }
 
 /**

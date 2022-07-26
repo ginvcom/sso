@@ -49,17 +49,20 @@ func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObject
 	object := &model.Object{
 		Uuid:       uuid,
 		ObjectName: req.ObjectName,
-		Domain:     req.Domain,
+		Identifier: req.Identifier,
 		Key:        req.Key,
 		Sort:       req.Sort,
 		Type:       req.Typ,
+		SubType:    req.SubType,
+		Extra:      req.Extra,
 		Icon:       req.Icon,
 		Status:     req.Status,
 		Puuid:      req.PUUID,
+		TopKey:     req.TopKey,
 	}
 
 	logx.Info(object)
-	_, err = l.svcCtx.ObjectModel.Insert(l.ctx, object, req.TopKey)
+	_, err = l.svcCtx.ObjectModel.Insert(l.ctx, object)
 	if err != nil {
 		return
 	}

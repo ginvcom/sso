@@ -31,10 +31,12 @@ func (l *ObjectDetailLogic) ObjectDetail(req *types.ObjectDetailReq) (resp *type
 	resp = &types.ObjectForm{
 		UUID:       obj.Uuid,
 		ObjectName: obj.ObjectName,
-		Domain:     obj.Domain,
+		Identifier: obj.Identifier,
 		Key:        obj.Key,
 		Sort:       obj.Sort,
 		Typ:        obj.Type,
+		SubType:    obj.SubType,
+		Extra:      obj.Extra,
 		Icon:       obj.Icon,
 		Status:     obj.Status,
 		PUUID:      obj.Puuid,

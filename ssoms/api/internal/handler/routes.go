@@ -153,7 +153,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
-				Path:    "/roleOperations",
+				Path:    "/object/roleOperations",
 				Handler: object.RoleOperationsHandler(serverCtx),
 			},
 		},
