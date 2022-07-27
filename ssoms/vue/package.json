@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antv/g2plot": "^2.4.20",
     "ali-oss": "^6.17.1",
     "ant-design-vue": "3.2.10",
     "axios": "^0.27.2",
