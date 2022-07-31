@@ -37,14 +37,15 @@ func (l *AddUserLogic) AddUser(req *types.UserForm) (resp *types.AddUserReply, e
 	}
 	// TODO 增加校验
 	user := &model.User{
-		Name:     req.Name,
-		Mobile:   req.Mobile,
-		Avatar:   req.Avatar,
-		Birth:    birth,
-		Gender:   req.Gender,
-		Password: req.Password,
-		Uuid:     uuid,
-		Status:   req.Status,
+		Name:         req.Name,
+		Mobile:       req.Mobile,
+		Avatar:       req.Avatar,
+		Birth:        birth,
+		Gender:       req.Gender,
+		Password:     req.Password,
+		Uuid:         uuid,
+		Introduction: req.Introduction,
+		Status:       req.Status,
 	}
 	logx.Info(user)
 	_, err = l.svcCtx.UserModel.Insert(l.ctx, user)

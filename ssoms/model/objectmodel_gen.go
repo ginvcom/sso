@@ -20,13 +20,14 @@ var (
 	objectFieldNames          = builder.RawFieldNames(&Object{})
 	objectRows                = strings.Join(objectFieldNames, ",")
 	objectInsertFields   = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
-	objectUpdateFields = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`uuid`",  "`top_key`",  "`create_time`", "`update_time`", "`is_delete`"), "=?,") + "=?"
+	objectUpdateFields = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`uuid`",  "`top_key`",  "`create_time`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
 	objectModel interface {
 		ListData(ctx context.Context, args *ObjectListArgs) (*[]Object, error)
 		Insert(ctx context.Context, data *Object) (sql.Result, error)
+		IsExist(ctx context.Context, args *ObjectIsExistArgs) (bool, error) // 用于新增、更新前的校验
 		FindOneByUuid(ctx context.Context, uuid string) (*Object, error)
 		Update(ctx context.Context, data *Object) error
 		Delete(ctx context.Context, uuid string) error
@@ -41,7 +42,17 @@ type (
 		TopKey string
 		ObjectName string
 		Key string
-		Status int
+		Status int64
+		Typ int64
+		ExcludeHide bool
+	}
+
+	ObjectIsExistArgs struct {
+		TopKey string
+		Key string
+		Typ int64
+		SubType int64
+		ExcludeUUID string
 	}
 
 	Object struct {
@@ -80,11 +91,21 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 		}
 		placeholder = append(placeholder, args.Status)
 	}
-	if args.TopKey != "" {
-		where +=" and top_key = ? and type != 1"
-		placeholder = append(placeholder, args.TopKey)
+
+	// 有type的是menuOptions请求，不会有TopKey参数
+	if args.Typ != 0 {
+		where +=" and type = ?"
+		placeholder = append(placeholder, args.Typ)
+		if args.ExcludeHide {
+			where +=" and sub_type !=3"
+		}
 	} else {
-		where +=" and type = 1"
+		if args.TopKey != "" {
+			where +=" and top_key = ? and type != 1"
+			placeholder = append(placeholder, args.TopKey)
+		} else {
+			where +=" and type = 1"
+		}
 	}
 	if args.ObjectName != "" {
 		where +=" and object_name = ?"
@@ -138,6 +159,32 @@ func (m *defaultObjectModel) Delete(ctx context.Context, uuid string) (err error
 
 }
 
+func (m *defaultObjectModel) IsExist(ctx context.Context, args *ObjectIsExistArgs) (exist bool, err error) {
+	where := "`top_key` = ? and `key` = ? and `type` = ? and `sub_type` = ? and `is_delete` = 0"
+	placeholder :=[]interface{}{args.TopKey, args.Key, args.Typ, args.SubType}
+	if args.ExcludeUUID != "" {
+		where +=" and `uuid` != ?"
+		placeholder = append(placeholder, args.ExcludeUUID)
+	}
+	query := fmt.Sprintf("select count(*) as count from %s where %s limit 1", m.table, where)
+	stmt, err := m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+	var count int64
+	err = stmt.QueryRowCtx(ctx, &count, placeholder...)
+
+	if err !=nil{
+		return
+	}
+
+	if count > 0 {
+		exist = true
+	}
+	
+	return
+}
+
 func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (*Object, error) {
 	var resp Object
 	query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", objectRows, m.table)
@@ -184,8 +231,8 @@ func (m *defaultObjectModel) Update(ctx context.Context, newData *Object) (err e
 		return
 	}
 
-	fmt.Println(query)
-	req, err :=stmt.ExecCtx(ctx, newData.ObjectName, newData.Identifier, newData.Key, newData.Sort, newData.Type, newData.SubType, newData.Extra, newData.Icon, newData.Status, newData.Puuid, newData.Uuid)
+	now := time.Now().Local()
+	req, err :=stmt.ExecCtx(ctx, newData.ObjectName, newData.Identifier, newData.Key, newData.Sort, newData.Type, newData.SubType, newData.Extra, newData.Icon, newData.Status, newData.Puuid, now, newData.Uuid)
 	if err !=nil{
 		return 
 	}

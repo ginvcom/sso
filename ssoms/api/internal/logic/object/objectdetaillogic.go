@@ -40,6 +40,7 @@ func (l *ObjectDetailLogic) ObjectDetail(req *types.ObjectDetailReq) (resp *type
 		Icon:       obj.Icon,
 		Status:     obj.Status,
 		PUUID:      obj.Puuid,
+		TopKey:     obj.TopKey,
 	}
 
 	return

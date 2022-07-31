@@ -27,6 +27,7 @@
     </div>
   </a-col>
   <a-col flex="1">
+  <a-checkbox-group  v-model:value="formState.uuidArray" style="width: 100%">
   <a-table
   :loading="state.loading"
   class="apis-check__table"
@@ -40,19 +41,23 @@
   @change="onTableChange">
     <template #bodyCell="{ column, record }">
       <template v-if="column.key === 'apis'">
-        <div class="apis-check__group">
-          <a-checkbox v-for="item in record.apis" :key="item.uuid" :value="item.uuid" v-model:value="formState.uuidArray">
-            <!-- <span style="color: red">{{ item.label }}</span> -->
-            <span v-if="item.subType == 1" class="method-get">{{ item.label }}</span>
-            <span v-else-if="item.subType == 2" class="method-post">{{ item.label }}</span>
-            <span v-else-if="item.subType == 3" class="method-put">{{ item.label }}</span>
-            <span v-else-if="item.subType == 4" class="method-patch">{{ item.label }}</span>
-            <span v-else-if="item.subType == 5" class="method-delete">{{ item.label }}</span>
-          </a-checkbox>
+        <div class="apis-check__col">
+          <div class="apis-check__group">
+            <a-checkbox v-for="item in record.apis" :key="item.value" :value="item.value">
+              <!-- <span style="color: red">{{ item.label }}</span> -->
+              <span v-if="item.subType == 1" class="method-get">{{ item.label }}</span>
+              <span v-else-if="item.subType == 2" class="method-post">{{ item.label }}</span>
+              <span v-else-if="item.subType == 3" class="method-put">{{ item.label }}</span>
+              <span v-else-if="item.subType == 4" class="method-patch">{{ item.label }}</span>
+              <span v-else-if="item.subType == 5" class="method-delete">{{ item.label }}</span>
+            </a-checkbox>
+          </div>
+          <div class="apis-check__all" v-if="record.apis.length > 0 && !isAllApiChecked(record.apis)" @click="checkAllApis(record.apis)">全选</div>
         </div>
       </template>
     </template>
   </a-table>
+  </a-checkbox-group>
   </a-col>
   </a-row>
 </template>
@@ -77,7 +82,6 @@ import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { ossConfig } from '@/config'
-import { object } from 'vue-types'
 
 /**
  * 这是表格的列定义
@@ -201,8 +205,29 @@ const onSelect = (record: ObjectOption, selected: boolean, selectedRows: ObjectO
   console.log(record, selected, selectedRows)
 }
 
-const onSelectAll  = (selected: boolean) => {
+const onSelectAll = (selected: boolean) => {
   console.log(selected)
+}
+
+const checkAllApis = (record: ObjectOption[]) => {
+  console.log('checkAllApis', record)
+  record.forEach(obj => {
+    const index = formState.uuidArray.indexOf(obj.value)
+    if (index < 0) {
+      formState.uuidArray.push(obj.value)
+    }
+  })
+  console.log('checkAllApis', formState.uuidArray)
+}
+
+const isAllApiChecked = (record: ObjectOption[]) => {
+  for (const obj of record) {
+    const index = formState.uuidArray.indexOf(obj.value)
+    if (index < 0) {
+      return false
+    }
+  }
+  return true
 }
 
 /**

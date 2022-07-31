@@ -36,6 +36,7 @@ type UserForm {
 	Avatar   string `json:"avatar"`
 	Gender   int64  `json:"gender"`
 	Birth    string `json:"birth"`
+	Introduction    string `json:"introduction"`
 	Status   int64  `json:"status,default=1"`
 }
 
@@ -144,4 +145,7 @@ service ssoms-api {
 	@doc "用户通过其分配的角色获得的权限"
 	@handler userPermissions
 	get /permissions (UserPermissionsReq) returns (UserPermissionsReply)
+
+	@handler userPasswordReset
+	patch /user/userPasswordReset
 }

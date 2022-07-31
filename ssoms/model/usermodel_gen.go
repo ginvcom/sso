@@ -68,6 +68,7 @@ type (
 		Password   string    `db:"password"`  // 密码
 		Gender     int64     `db:"gender"`    // 性别: 1男, 2女, 3未知
 		Birth      time.Time `db:"birth"`     // 生日
+		Introduction string `db:"introduction"` // 简介
 		Status     int64     `db:"status"`    // 状态: 1正常
 		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
 		CreateTime time.Time `db:"create_time"`
@@ -168,13 +169,13 @@ func (m *defaultUserModel) FindOneByUuid(ctx context.Context, uuid string) (u *U
 }
 
 func (m *defaultUserModel) Insert(ctx context.Context, data *User) (res sql.Result, err error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, userInsertFields)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, userInsertFields)
 	stmt, err := m.conn.PrepareCtx(ctx, query)
 	if err !=nil{
 		return
 	}
 
-	res, err = stmt.ExecCtx(ctx, data.Uuid, data.Avatar, data.Name, data.Mobile, data.Password, data.Gender, data.Birth, data.Status)
+	res, err = stmt.ExecCtx(ctx, data.Uuid, data.Avatar, data.Name, data.Mobile, data.Password, data.Gender, data.Birth, data.Introduction, data.Status)
 
 	return
 }
@@ -185,9 +186,9 @@ func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error
 	query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
 	if newData.Password != "" {
 		query = fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Status, now)
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
 	} else {
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Gender, newData.Birth, newData.Status, now)
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
 	}
 	placeholder = append(placeholder, newData.Uuid)
 	stmt, err := m.conn.PrepareCtx(ctx, query)

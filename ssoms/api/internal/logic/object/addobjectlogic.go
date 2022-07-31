@@ -46,6 +46,25 @@ func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObject
 	}
 
 	// TODO 增加校验
+
+	// 防止重复添加的校验, 状态忽略，只看没有删除的
+	isExistArgs := &model.ObjectIsExistArgs{
+		Key:     req.Key,
+		Typ:     req.Typ,
+		SubType: req.SubType,
+		TopKey:  req.TopKey,
+	}
+
+	exist, err := l.svcCtx.ObjectModel.IsExist(l.ctx, isExistArgs)
+	if err != nil {
+		return
+	}
+
+	if exist {
+		err = errors.New("object already exists")
+		return
+	}
+
 	object := &model.Object{
 		Uuid:       uuid,
 		ObjectName: req.ObjectName,

@@ -19,20 +19,19 @@
   }"
   @change="onTableChange">
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'roleName'">
+      <template v-if="column.dataIndex === 'roleName'">
         <team-outlined />
         <span style="margin-left: 10px">{{record.roleName}}</span>
       </template>
-      <template v-if="column.key === 'summary'">
+      <template v-if="column.dataIndex === 'summary'">
         <div>{{record.summary}}</div>
       </template>
-      <template v-if="column.key === 'actions'">
+      <template v-if="column.dataIndex === 'actions'">
         <a @click="initEdit(record.roleUUID)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
           title="确定要删除该角色吗?"
-          ok-text="Yes"
-          cancel-text="No"
+          placement="topRight"
           @confirm="onDelete(record.roleUUID)">
           <a>删除</a>
         </a-popconfirm>
@@ -88,17 +87,15 @@ import { TeamOutlined } from '@ant-design/icons-vue'
 const columns = [
   {
     title: '角色',
-    dataIndex: 'roleName',
-    key: 'roleName'
+    dataIndex: 'roleName'
   },
   {
     title: '概述',
-    dataIndex: 'summary',
-    key: 'summary'
+    dataIndex: 'summary'
   },
   {
     title: '操作',
-    key: 'actions',
+    dataIndex: 'actions',
     align: 'center',
     width: '120px'
   }

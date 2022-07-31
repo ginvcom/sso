@@ -19,28 +19,27 @@
   }"
   @change="onTableChange">
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'name'">
+      <template v-if="column.dataIndex === 'name'">
         <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
           <template #icon><UserOutlined /></template>
         </a-avatar>
         <span style="margin-left: 10px">{{record.name}}</span>
       </template>
-      <template v-if="column.key === 'gender'">
+      <template v-if="column.dataIndex === 'gender'">
         <span v-if="record.gender == 1">男</span>
         <span v-else-if="record.gender == 2">女</span>
         <span v-else-if="record.gender == 3">未知</span>
       </template>
-      <template v-if="column.key === 'status'">
+      <template v-if="column.dataIndex === 'status'">
         <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
         <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
       </template>
-      <template v-if="column.key === 'actions'">
+      <template v-if="column.dataIndex === 'actions'">
         <a @click="initEdit(record.uuid)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
           title="确定要删除该用户吗?"
-          ok-text="Yes"
-          cancel-text="No"
+          placement="topRight"
           @confirm="onDelete(record.uuid)">
           <a>删除</a>
         </a-popconfirm>
@@ -48,7 +47,7 @@
     </template>
   </a-table>
   <a-modal
-    width="730px"
+    width="930px"
     v-model:visible="formState.visible"
     :title="formState.type == 'add' ? '添加用户' : '修改用户'"
     :loading="formState.loading"
@@ -56,8 +55,8 @@
     @cancel="onCancel"
     @ok="onSubmit">
     <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-row :gutter="40">
-        <a-col :span="8">
+      <a-row :gutter="24">
+        <a-col :span="6">
           <a-form-item label="头像">
             <template v-if="cropperState.visible">
               <vue-cropper
@@ -89,8 +88,8 @@
             </a-upload>
           </a-form-item>
         </a-col>
-        <a-col :span="16">
-          <a-row :gutter="40">
+        <a-col :span="12">
+          <a-row :gutter="24">
           <a-col :span="12">
             <a-form-item label="姓名" name="name" :rules="[{ required: true, message: '请输入用户姓名' }]">
               <a-input v-model:value="formState.form.name" placeholder="姓名" />
@@ -111,7 +110,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="密码" name="password" :rules="[{ required: true, message: '请输入6~8位密码用户登录' }]">
+            <a-form-item label="密码" name="password">
               <a-input v-model:value="formState.form.password" placeholder="6~8位密码" />
             </a-form-item>
           </a-col>
@@ -126,6 +125,11 @@
             </a-form-item>
           </a-col>
         </a-row>
+        </a-col>
+        <a-col :span="6">
+          <a-form-item label="用户简介" name="summary">
+            <a-textarea v-model:value="formState.form.introduction" placeholder="填写职业技能、擅长的事情、喜欢的事情等" :rows="9" show-count :maxlength="100" />
+          </a-form-item>
         </a-col>
       </a-row>
     </a-form>
@@ -160,27 +164,23 @@ import { ossConfig } from '@/config'
 const columns = [
   {
     title: '用户',
-    dataIndex: 'name',
-    key: 'name'
+    dataIndex: 'name'
   },
   {
     title: '性别',
-    dataIndex: 'gender',
-    key: 'gender'
+    dataIndex: 'gender'
   },
   {
     title: '手机号',
-    dataIndex: 'mobile',
-    key: 'mobile'
+    dataIndex: 'mobile'
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    key: 'status'
+    dataIndex: 'status'
   },
   {
     title: '操作',
-    key: 'actions',
+    dataIndex: 'actions',
     align: 'center',
     width: '120px'
   }
@@ -279,6 +279,7 @@ const formState = reactive<Form>({
     gender: 1,
     birth: '',
     status: 1,
+    introduction: ''
   }
 })
 
@@ -293,6 +294,7 @@ const initAdd = () => {
     gender: 1,
     birth: '',
     status: 1,
+    introduction: ''
   }
   uploadState.imageName = ''
   uploadState.imageUrl = ''
@@ -479,21 +481,3 @@ const doUpload = async (blob: Blob) => {
   }
 }
 </script>
-
-<style scoped>
-.avatar-uploader:deep() > .ant-upload {
-  width: 200px;
-  height: 200px;
-}
-.upload-btns{
-  display: flex;
-  justify-content:space-between;
-}
-.avatar-uploader__img{
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 200px;
-  height: 200px;
-}
-</style>

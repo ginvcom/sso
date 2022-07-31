@@ -48,14 +48,15 @@
   </div>
   <a-table
   :loading="state.loading"
+  rowKey="uuid"
   :dataSource="respState.list"
   :columns="columns"
   :pagination="false">
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'objectName'">
+      <template v-if="column.dataIndex === 'objectName'">
         <span style="margin-left: 10px">{{record.objectName}}</span>
       </template>
-      <template v-if="column.key === 'type'">
+      <template v-if="column.dataIndex === 'type'">
         <template v-if="record.type == 2">
         <span v-if="record.subType == 1">菜单</span>
         <span v-else-if="record.subType == 2">菜单组</span>
@@ -65,7 +66,7 @@
           <span>操作</span>
         </template>
       </template>
-      <template v-if="column.key === 'key'">
+      <template v-if="column.dataIndex === 'key'">
         <template v-if="record.type == 3">
           <span v-if="record.subType == 1" class="method-get m-r-15">GET</span>
           <span v-else-if="record.subType == 2" class="method-post m-r-5">POST</span>
@@ -75,11 +76,11 @@
         </template>
         <span>{{record.key}}</span>
       </template>
-      <template v-if="column.key === 'status'">
+      <template v-if="column.dataIndex === 'status'">
         <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
         <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
       </template>
-      <template v-if="column.key === 'actions'">
+      <template v-if="column.dataIndex === 'actions'">
         <a v-if="record.type == 3" disabled>+子菜单</a>
         <a v-else @click="initAddMenu(record.uuid)">+子菜单</a>
         <a-divider type="vertical" />
@@ -91,8 +92,7 @@
         <a-divider type="vertical" />
         <a-popconfirm
           title="确定要删除该对象吗?"
-          ok-text="Yes"
-          cancel-text="No"
+          placement="topRight"
           @confirm="onDelete(record.uuid)">
           <a>删除</a>
         </a-popconfirm>
@@ -106,7 +106,7 @@
     :footer="false"
     @cancel="onSystemFormCancel">
     <div class="object__select">
-      <a-row :gutter="32">
+      <a-row :gutter="24">
         <a-col v-for="obj in state.systems" :key="obj.uuid" :span="8">
           <div
            class="object__current-value object__option"
@@ -127,7 +127,7 @@
     </div>
   </a-modal>
   <a-modal
-    width="720px"
+    width="620px"
     v-model:visible="formState.visible"
     :loading="formState.loading"
     :maskClosable="false"
@@ -148,7 +148,18 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="父级菜单" name="pUUID">
-            <a-input v-model:value="formState.form.pUUID" placeholder="父级菜单" />
+            <a-tree-select
+              v-model:value="formState.form.pUUID"
+              show-search
+              style="width: 100%"
+              :height="400"
+              placeholder="请选择父级菜单"
+              allow-clear
+              :tree-line="{ showLeafIcon: false }"
+              tree-default-expand-all
+              :tree-data="state.menus"
+            >
+            </a-tree-select>
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -163,6 +174,11 @@
         <a-col :span="12">
           <a-form-item label="标识符" name="identifier">
             <a-input v-model:value="formState.form.identifier" placeholder="标识" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label="排序值" name="sort">
+            <a-input-number v-model:value="formState.form.sort" placeholder="排序值小的靠前" style="width: 100%" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -219,7 +235,18 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="所属菜单" name="pUUID" :rules="[{ required: true, message: '请选择所属菜单' }]">
-            <a-input v-model:value="formState.form.pUUID" placeholder="所属菜单" />
+            <a-tree-select
+              v-model:value="formState.form.pUUID"
+              show-search
+              style="width: 100%"
+              :height="400"
+              placeholder="请选择所属菜单"
+              allow-clear
+              :tree-line="{ showLeafIcon: false }"
+              tree-default-expand-all
+              :tree-data="state.apiParentMenus"
+            >
+            </a-tree-select>
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -238,6 +265,9 @@ import {
   objectList,
   objectDetail,
   addObject,
+  menuOptions,
+  MenuOptionsReply,
+  MenuOption,
   updateObject,
   deleteObject,
   ObjectListReqParams,
@@ -257,37 +287,31 @@ const columns = [
   {
     title: 'uuid',
     dataIndex: 'uuid',
-    key: 'uuid',
     width: '200px',
   },
   {
     title: '菜单名称 / 操作名称',
-    dataIndex: 'objectName',
-    key: 'objectName'
+    dataIndex: 'objectName'
   },
   {
     title: '类型',
-    dataIndex: 'type',
-    key: 'type'
+    dataIndex: 'type'
   },
   {
     title: '菜单路径 / 操作名称',
-    dataIndex: 'key',
-    key: 'key'
+    dataIndex: 'key'
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    key: 'status'
+    dataIndex: 'status'
   },
   {
     title: '排序',
-    dataIndex: 'sort',
-    key: 'sort'
+    dataIndex: 'sort'
   },
   {
     title: '操作',
-    key: 'actions',
+    dataIndex: 'actions',
     align: 'center',
     width: '230px'
   }
@@ -302,6 +326,8 @@ interface State {
   loading: boolean
   currentSystem: System
   systems: Array<Obj>
+  menus: Array<MenuOption>
+  apiParentMenus: Array<MenuOption>
   params: ObjectListReqParams
 }
 
@@ -317,6 +343,8 @@ const state = reactive<State>({
     name: ''
   },
   systems: [],
+  menus: [],
+  apiParentMenus: [],
   params: {
     topKey: '',
     objectName: '',
@@ -404,21 +432,24 @@ const formState = reactive<Form>({
 })
 
 const initAddMenu = (pUUID?: string) => {
-  formState.form = {
-    uuid: '',
-    objectName: '',
-    identifier: '',
-    key: '',
-    icon: '',
-    type: 2,
-    subType: 1,
-    pUUID: pUUID || '',
-    status: 1,
-    sort: 0,
-    topKey: state.params.topKey
-  }
-  formState.type = 'add'
-  formState.visible = true
+  menuOptions({ excludeHide: true }).then(data => {
+    state.menus = data.list
+    formState.form = {
+      uuid: '',
+      objectName: '',
+      identifier: '',
+      key: '',
+      icon: '',
+      type: 2,
+      subType: 1,
+      pUUID: pUUID || '',
+      status: 1,
+      sort: 0,
+      topKey: state.params.topKey
+    }
+    formState.type = 'add'
+    formState.visible = true
+  })
 }
 
 /**
@@ -426,37 +457,46 @@ const initAddMenu = (pUUID?: string) => {
  * @param uuid
  */
 const initEditMenu = (uuid: string) => {
-  objectDetail({ uuid }).then((data: ObjectForm) => {
-    formState.form = data
-    formState.type = 'edit'
-    formState.visible = true
+  objectDetail({ uuid }).then(data => {
+    menuOptions({ excludeHide: true }).then(menudata => {
+      state.menus = menudata.list
+      formState.form = data
+      formState.type = 'edit'
+      formState.visible = true
+    })
   })
 }
 
 const initEditApi = (uuid: string) => {
-  objectDetail({ uuid }).then((data: ObjectForm) => {
-    formState.form = data
-    formState.type = 'edit'
-    formState.apiVisible = true
+  objectDetail({ uuid }).then(data => {
+    menuOptions({ excludeHide: false }).then(menudata => {
+      state.apiParentMenus = menudata.list
+      formState.form = data
+      formState.type = 'edit'
+      formState.apiVisible = true
+    })
   })
 }
 
 const initAddApi = (pUUID?: string) => {
-  formState.form = {
-    uuid: '',
-    objectName: '',
-    identifier: '',
-    key: '',
-    icon: '',
-    type: 3,
-    subType: 1,
-    pUUID: pUUID || '',
-    status: 1,
-    sort: 0,
-    topKey: state.params.topKey
-  }
-  formState.type = 'add'
-  formState.apiVisible = true
+  menuOptions({ excludeHide: false }).then(data => {
+    state.apiParentMenus = data.list
+    formState.form = {
+      uuid: '',
+      objectName: '',
+      identifier: '',
+      key: '',
+      icon: '',
+      type: 3,
+      subType: 1,
+      pUUID: pUUID || '',
+      status: 1,
+      sort: 0,
+      topKey: state.params.topKey
+    }
+    formState.type = 'add'
+    formState.apiVisible = true
+  })
 }
 
 /**
@@ -522,20 +562,3 @@ const onChangeSystem = (obj: Obj) => {
   systemFormState.visible = false
 }
 </script>
-<style>
-.method-get{
-  color: #41ca9d;
-}
-.method-post{
-  color: #ed8936
-}
-.method-put{
-  color: #1890ff;
-}
-.method-patch{
-  color: #eb2f96;
-}
-.method-delete{
-  color: #fa541c;
-}
-</style>

@@ -39,6 +39,7 @@ export interface UserForm {
 	avatar: string
 	gender: number
 	birth: string
+	introduction: string
 	status: number
 }
 
@@ -272,6 +273,24 @@ export interface ObjectOption {
 	apis: Array<ObjectOption> // 操作
 }
 
+export interface MenuOptionsReq {
+}
+
+export interface MenuOptionsReqParams {
+	excludeHide: boolean // 是否排查隐藏菜单
+}
+
+export interface MenuOption {
+	value: string
+	label: string
+	pUUID?: string
+	children?: Array<MenuOption> // 子菜单
+}
+
+export interface MenuOptionsReply {
+	list: Array<MenuOption>
+}
+
 export interface ObjectListReply {
 	list: Array<Object>
 }
@@ -288,7 +307,7 @@ export interface ObjectForm {
 	icon: string // 图标
 	status: number
 	pUUID?: string
-	topKey?: string // 传systemCode, 更新的时候不传(更新时无法修改该值)
+	topKey?: string // 传systemCode
 }
 
 export interface AddObjectReply {
@@ -313,6 +332,7 @@ export interface UpdateObjectReq {
 	icon: string // 图标
 	status: number
 	pUUID?: string
+	topKey?: string // 更新时无法修改该值, 但是更新前需要使用该值校验对象是否已存在
 }
 
 export interface UpdateObjectReqParams {

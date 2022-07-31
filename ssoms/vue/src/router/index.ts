@@ -5,6 +5,7 @@ import User from '@/views/user.vue'
 import Role from '@/views/role.vue'
 import Object from '@/views/object.vue'
 import Permission from '@/views/permission.vue'
+import Profile from '@/views/profile.vue'
 
 // 1. 定义一些路由
 // 每个路由都需要映射到一个组件。
@@ -15,6 +16,7 @@ const routes = [
   { path: '/role', component: Role },
   { path: '/object', component: Object },
   { path: '/permission', component: Permission },
+  { path: '/profile', component: Profile },
 ]
 
 // 2. 创建路由实例并传递 `routes` 配置

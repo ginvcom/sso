@@ -153,6 +153,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodGet,
+				Path:    "/object/menuOptions",
+				Handler: object.MenuOptionsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
 				Path:    "/object/roleOperations",
 				Handler: object.RoleOperationsHandler(serverCtx),
 			},

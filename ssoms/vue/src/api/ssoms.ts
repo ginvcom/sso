@@ -208,6 +208,14 @@ export function deleteObject(params: components.DeleteObjectReqParams) {
 }
 
 /**
+ * @description "菜单选项，用于添加子菜单和操作时选择父级菜单"
+ * @param params
+ */
+export function menuOptions(params: components.MenuOptionsReqParams) {
+	return webapi.get<components.MenuOptionsReply>("/object/menuOptions", params)
+}
+
+/**
  * @description "角色可以分配权限的对象"
  * @param params
  */

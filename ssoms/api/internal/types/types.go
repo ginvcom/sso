@@ -30,14 +30,15 @@ type UserListReply struct {
 }
 
 type UserForm struct {
-	UUID     string `json:"uuid,optional"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password,optional"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status,default=1"`
+	UUID         string `json:"uuid,optional"`
+	Name         string `json:"name"`
+	Mobile       string `json:"mobile"`
+	Password     string `json:"password,optional"`
+	Avatar       string `json:"avatar"`
+	Gender       int64  `json:"gender"`
+	Birth        string `json:"birth"`
+	Introduction string `json:"introduction"`
+	Status       int64  `json:"status,default=1"`
 }
 
 type AddUserReply struct {
@@ -232,6 +233,21 @@ type ObjectOption struct {
 	SubType  int64           `json:"subType"`           // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
 	Children []*ObjectOption `json:"children,optional"` // 子菜单
 	Apis     []*ObjectOption `json:"apis"`              // 操作
+}
+
+type MenuOptionsReq struct {
+	ExcludeHide bool `form:"excludeHide"` // 是否排查隐藏菜单
+}
+
+type MenuOption struct {
+	Value    string        `json:"value"`
+	Label    string        `json:"label"`
+	PUUID    string        `json:"pUUID,optional"`
+	Children []*MenuOption `json:"children,optional"` // 子菜单
+}
+
+type MenuOptionsReply struct {
+	List []*MenuOption `json:"list"`
 }
 
 type ObjectListReply struct {

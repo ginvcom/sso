@@ -31,14 +31,14 @@ func (l *UserDetailLogic) UserDetail(req *types.UserDetailReq) (resp *types.User
 		return
 	}
 	resp = &types.UserForm{
-		UUID:     user.Uuid,
-		Name:     user.Name,
-		Avatar:   user.Avatar,
-		Mobile:   user.Mobile,
-		Status:   user.Status,
-		Gender:   user.Gender,
-		Birth:    util.TimeToString(user.Birth, "YYYY-MM-DD"),
-		Password: user.Password,
+		UUID:         user.Uuid,
+		Name:         user.Name,
+		Avatar:       user.Avatar,
+		Mobile:       user.Mobile,
+		Status:       user.Status,
+		Gender:       user.Gender,
+		Birth:        util.TimeToString(user.Birth, "YYYY-MM-DD"),
+		Introduction: user.Introduction,
 	}
 
 	return

@@ -17,7 +17,6 @@ CREATE TABLE `object` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `udx_uuid` (`uuid`),
-  UNIQUE KEY `udx_top_key` (`key`,`type`,`sub_type`,`top_key`),
   KEY `idx_object_name` (`object_name`),
   KEY `idx_key` (`key`),
   KEY `idx_status` (`status`),

@@ -29,6 +29,21 @@ type ObjectOption {
 	Apis     []*ObjectOption `json:"apis"` // 操作
 }
 
+type MenuOptionsReq {
+	ExcludeHide bool  `form:"excludeHide"` // 是否排查隐藏菜单
+}
+
+type MenuOption {
+	Value    string          `json:"value"`
+	Label    string          `json:"label"`
+	PUUID    string          `json:"pUUID,optional"`
+	Children []*MenuOption `json:"children,optional"` // 子菜单
+}
+
+type MenuOptionsReply {
+	List []*MenuOption `json:"list"`
+}
+
 type ObjectListReply {
 	List []*Object `json:"list"`
 }
@@ -45,7 +60,7 @@ type ObjectForm {
 	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
-	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
+	TopKey     string `json:"topKey,optional"` // 传systemCode
 }
 
 type AddObjectReply {
@@ -68,6 +83,7 @@ type UpdateObjectReq {
 	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey,optional"` // 更新时无法修改该值, 但是更新前需要使用该值校验对象是否已存在
 }
 
 type UpdateObjectReply {
@@ -115,6 +131,10 @@ service ssoms-api {
 	@doc "删除操作对象"
 	@handler deleteObject
 	delete /object/:uuid (DeleteObjectReq) returns (DeleteObjectReply)
+
+	@doc "菜单选项，用于添加子菜单和操作时选择父级菜单"
+	@handler menuOptions
+	get /object/menuOptions (MenuOptionsReq) returns (MenuOptionsReply)
 	
 	@doc "角色可以分配权限的对象"
 	@handler roleOperations

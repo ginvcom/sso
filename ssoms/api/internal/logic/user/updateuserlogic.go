@@ -33,14 +33,15 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUse
 		return
 	}
 	user := &model.User{
-		Uuid:     req.UUID,
-		Name:     req.Name,
-		Mobile:   req.Mobile,
-		Avatar:   req.Avatar,
-		Birth:    birth,
-		Status:   req.Status,
-		Gender:   req.Gender,
-		Password: req.Password,
+		Uuid:         req.UUID,
+		Name:         req.Name,
+		Mobile:       req.Mobile,
+		Avatar:       req.Avatar,
+		Birth:        birth,
+		Introduction: req.Introduction,
+		Status:       req.Status,
+		Gender:       req.Gender,
+		Password:     req.Password,
 	}
 	logx.Info(user)
 	err = l.svcCtx.UserModel.Update(l.ctx, user)
