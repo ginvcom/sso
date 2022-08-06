@@ -82,10 +82,15 @@ func (m *defaultUserToRoleModel) FindRoleUUIDArrByUserUuid(ctx context.Context, 
 	return
 }
 
-func (m *defaultUserToRoleModel) Delete(ctx context.Context, id int64) error {
+func (m *defaultUserToRoleModel) Delete(ctx context.Context, id int64)  (err error) {
 	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
-	_, err := m.conn.ExecCtx(ctx, query, id)
-	return err
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err !=nil {
+		return
+	}
+	
+	_, err = stmt.ExecCtx(ctx, id)
+	return
 }
 
 func (m *defaultUserToRoleModel) FindOne(ctx context.Context, userUuid string, roleUuid string) (resp *UserToRole, err error) {

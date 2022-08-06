@@ -185,18 +185,18 @@ func (m *defaultObjectModel) IsExist(ctx context.Context, args *ObjectIsExistArg
 	return
 }
 
-func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (*Object, error) {
-	var resp Object
+func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (resp *Object, err error) {
 	query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", objectRows, m.table)
-	err := m.conn.QueryRowCtx(ctx, &resp, query, uuid)
-	switch err {
-	case nil:
-		return &resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
 	}
+	resp = new(Object)
+	err = stmt.QueryRowCtx(ctx, resp, uuid)
+	if err == sqlc.ErrNotFound {
+		err = ErrNotFound
+	}
+	return
 }
 
 func (m *defaultObjectModel) Insert(ctx context.Context, data *Object) (res sql.Result, err error) {
