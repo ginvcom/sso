@@ -4,7 +4,18 @@
       <h1>菜单 & 操作</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAddMenu()">添加菜单</a-button>
+      <a-button type="primary" @click="initAddMenu()">
+        <template #icon><plus-outlined /></template>
+        添加菜单
+      </a-button>
+      <a-button>
+        <template #icon><download-outlined /></template>
+        导出菜单
+      </a-button>
+      <a-button>
+        <template #icon><upload-outlined /></template>
+        导入菜单
+      </a-button>
     </div>
   </div>
   <div class="system-params">
@@ -21,13 +32,16 @@
             />
             <p class="object__current-system-name">{{state.currentSystem.name}}</p>
           </div>
-          <a-button @click="initChangeSystem">切换系统</a-button>
+          <a-button @click="initChangeSystem">
+            <template #icon><number-outlined /></template>
+            切换系统
+          </a-button>
         </div>
         <a-divider type="vertical" style="height: 48px;margin: 0 48px;" />
         <div class="object__form-right">
           <a-row type="flex" :gutter="16">
             <a-col flex="1">
-              <a-form-item label="菜单路径 / 请求uri">
+              <a-form-item label="菜单路径 / 操作uri">
                 <a-input v-model:value="state.params.key" />
               </a-form-item>
             </a-col>
@@ -38,7 +52,10 @@
             </a-col>
             <a-col flex="80px">
               <a-form-item>
-                <a-button type="primary">搜索</a-button>
+                <a-button type="primary">
+                  <template #icon><SearchOutlined /></template>
+                  搜索
+                </a-button>
               </a-form-item>
             </a-col>
           </a-row>
@@ -260,6 +277,7 @@
 </template>
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref } from 'vue'
+import { DownloadOutlined, SearchOutlined, UploadOutlined, PlusOutlined, NumberOutlined } from '@ant-design/icons-vue'
 // Object 是js的关键字, 别名处理一下
 import {
   objectList,
@@ -298,7 +316,7 @@ const columns = [
     dataIndex: 'type'
   },
   {
-    title: '菜单路径 / 操作名称',
+    title: '菜单路径 / 操作uri',
     dataIndex: 'key'
   },
   {

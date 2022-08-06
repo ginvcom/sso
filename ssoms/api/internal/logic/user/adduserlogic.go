@@ -36,13 +36,17 @@ func (l *AddUserLogic) AddUser(req *types.UserForm) (resp *types.AddUserReply, e
 		return
 	}
 	// TODO 增加校验
+
+	salt := util.RandomStr(6)
+	password := util.MD5(req.Password + salt)
 	user := &model.User{
 		Name:         req.Name,
 		Mobile:       req.Mobile,
 		Avatar:       req.Avatar,
 		Birth:        birth,
 		Gender:       req.Gender,
-		Password:     req.Password,
+		Password:     password,
+		Salt:         salt,
 		Uuid:         uuid,
 		Introduction: req.Introduction,
 		Status:       req.Status,

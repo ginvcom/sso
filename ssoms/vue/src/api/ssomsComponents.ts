@@ -117,6 +117,16 @@ export interface UserPermissionsReply {
 	system: Array<Option>
 }
 
+export interface PasswordResetReq {
+	oldPassword: string
+	password: string
+	confirmPassword: string
+}
+
+export interface PasswordResetReply {
+	success: boolean
+}
+
 export interface RoleListReq {
 }
 

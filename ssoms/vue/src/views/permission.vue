@@ -4,7 +4,7 @@
       <h1>授权管理</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary">修改授权</a-button>
+      <a-button type="primary"><save-outlined />修改授权</a-button>
     </div>
   </div>
   <a-row type="flex" :gutter="32">
@@ -34,7 +34,7 @@
   bordered
   rowKey="value"
   size="small"
-  :row-selection="{ checkStrictly: false, onChange, onSelect, onSelectAll }"
+  :row-selection="{ checkStrictly: false, selectedRowKeys: formState.uuidArray, onChange, onSelect, onSelectAll }"
   :dataSource="respState.list"
   :columns="columns"
   :pagination="false"
@@ -67,20 +67,14 @@ import 'cropperjs/dist/cropper.css'
 // Object 是js的关键字, 别名处理一下
 import {
   roleOperations,
-  userDetail,
-  addUser,
-  updateUser,
   objectList,
   ObjectListReply,
-  RoleOperationsReqParams,
   ObjectOption,
   RoleOperationsReply,
-  UserForm,
   Object as Obj
 } from '../api/ssoms'
 import type { FormInstance } from 'ant-design-vue'
-import { message } from 'ant-design-vue'
-import { UserOutlined } from '@ant-design/icons-vue'
+import { SaveOutlined } from '@ant-design/icons-vue'
 import { ossConfig } from '@/config'
 
 /**
@@ -179,7 +173,7 @@ interface Form {
 
 const formState = reactive<Form>({
   loading: false,
-  uuidArray: []
+  uuidArray: ['8yzo4kzfucsb', 'k7vcb745vcsb']
 })
 
 const getSystemOptions = () => {

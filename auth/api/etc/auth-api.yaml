@@ -1,0 +1,9 @@
+Name: auth-api
+Host: 0.0.0.0
+Port: 8000
+Mysql:
+  DataSource: root:123456@tcp(localhost:13306)/ginv_user?parseTime=true&loc=Asia%2FShanghai
+Auth:
+  AccessSecret: ginv123456
+  AccessExpire: 86400
+  RememberAccessExpire: 604800

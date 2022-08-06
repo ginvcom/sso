@@ -32,6 +32,7 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUse
 	if err != nil {
 		return
 	}
+
 	user := &model.User{
 		Uuid:         req.UUID,
 		Name:         req.Name,
@@ -42,6 +43,11 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUse
 		Status:       req.Status,
 		Gender:       req.Gender,
 		Password:     req.Password,
+	}
+	if req.Password != "" {
+		salt := util.RandomStr(6)
+		user.Salt = salt
+		user.Password = util.MD5(req.Password + salt)
 	}
 	logx.Info(user)
 	err = l.svcCtx.UserModel.Update(l.ctx, user)

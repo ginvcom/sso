@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue'
+import { getCookie } from './cookie'
 
 // import qs from 'qs'
 
-let baseURL = 'http://localhost:8888'
+let baseURL = 'http://localhost:8081'
 // 线上灰度不同环境支持
 const env = window.location.origin.search('gray.') > -1 ? 'gray' : 'online'
 // test不同环境支持
@@ -30,9 +31,19 @@ function signOutForward () {
 
 // 请求拦截器
 instance.interceptors.request.use((config: AxiosRequestConfig) =>{
+  if (config.headers !== undefined) {
+    const userStr = getCookie('user')
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (config.url !== '/sign-in' && user) {
+        config.headers.Authorization = user.accessToken
+      }
+    }
+  }
   if (config.method === 'post' || config.method === 'put') {
     if (config.headers !== undefined) {
       config.headers['Content-Type'] = 'application/json;charset=utf-8'
+      
     }
     // config.withCredentials = true
   }
@@ -58,6 +69,10 @@ instance.interceptors.response.use((res) => {
 })
 
 export class Webapi {
+  private serviceCode: string
+  constructor (serviceCode: string) {
+    this.serviceCode = serviceCode
+  }
   private setPath (url: string, params: any) {
     const matches = url.match(/\/:[a-zA-z0-9]+/mg)
     if (matches) {
@@ -73,29 +88,29 @@ export class Webapi {
   }
   public get<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.get(realpath, { params: realParams, headers: { 'X-ginv-uri' : url } })
+    return instance.get(realpath, { params: realParams, headers: { 'Originuri' : url, 'Originservice': this.serviceCode } })
   }
 
   public delete<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.delete(realpath, { params: realParams, headers: { 'X-ginv-uri' : url } })
+    return instance.delete(realpath, { params: realParams, headers: { 'Originuri' : url, 'Originservice': this.serviceCode } })
   }
 
   public post<T = any, R = T, D = any>(url: string, data?: D, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.post(realpath, data, { params: realParams, headers: { 'X-ginv-uri' : url } })
+    return instance.post(realpath, data, { params: realParams, headers: { 'Originuri' : url, 'Originservice': this.serviceCode } })
   }
 
   public put<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.put(realpath, data, { params: realParams, headers: { 'X-ginv-uri' : url } })
+    return instance.put(realpath, data, { params: realParams, headers: { 'Originuri' : url, 'Originservice': this.serviceCode } })
   }
 
   public patch<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.patch(realpath, data, { params: realParams, headers: { 'X-ginv-uri' : url } })
+    return instance.patch(realpath, data, { params: realParams, headers: { 'Originuri' : url, 'Originservice': this.serviceCode } })
   }
 }
 
-const webapi = new Webapi()
-export default webapi
+const ssoms = new Webapi('ssoms')
+export default { ssoms }

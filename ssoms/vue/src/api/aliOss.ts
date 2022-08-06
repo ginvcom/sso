@@ -1,4 +1,4 @@
-import webapi from "../utils/webapi"
+import { ssoms } from "../config"
 
 interface StsParams {
     bucket: string
@@ -15,5 +15,5 @@ interface StsReply {
  * @param params
  */
  export function sts(params: StsParams) {
-	return webapi.get<StsReply>("/aliyun/sts", params)
+	return ssoms.get<StsReply>("/aliyun/sts", params)
 }

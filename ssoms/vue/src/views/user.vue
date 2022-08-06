@@ -4,7 +4,7 @@
       <h1>用户</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd">添加用户</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加用户</a-button>
     </div>
   </div>
   <a-table

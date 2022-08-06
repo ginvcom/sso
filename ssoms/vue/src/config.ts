@@ -1,3 +1,5 @@
+import Ajax from "./utils/ajax"
+
 export const ossConfig = {
   ginv: {
     bucket: 'ginv',
@@ -13,3 +15,5 @@ export const ossConfig = {
     endpoint: 'oss-cn-shenzhen.aliyuncs.com'
   }
 }
+
+export const ssoms = new Ajax('ssoms')

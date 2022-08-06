@@ -6,3 +6,6 @@ Mysql:
 CacheRedis:
   - Host: localhost:16379
     Type: node
+Auth:
+  AccessSecret: ginv123456
+  AccessExpire: 86400

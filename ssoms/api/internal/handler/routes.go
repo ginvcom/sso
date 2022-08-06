@@ -61,6 +61,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/permissions",
 				Handler: user.UserPermissionsHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPatch,
+				Path:    "/user/passwordReset",
+				Handler: user.PasswordResetHandler(serverCtx),
+			},
 		},
 	)
 

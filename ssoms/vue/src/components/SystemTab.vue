@@ -4,7 +4,7 @@
       <h1>后台系统</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd">添加系统</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加系统</a-button>
     </div>
   </div>
   <a-table

@@ -21,7 +21,7 @@ var (
 	userRows                = strings.Join(userFieldNames, ",")
 	userInsertFields   = strings.Join(stringx.Remove(userFieldNames, "`id`", "`create_time`", "`update_time`", "`is_delete`"), ",")
 	userUpdateFields = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`is_delete`"), "=?,") + "=?"
-	userUpdateFieldsWithoutPassword = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`password`", "`is_delete`"), "=?,") + "=?"
+	userUpdateFieldsWithoutPassword = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`password`", "`salt`", "`is_delete`"), "=?,") + "=?"
 )
 
 type (
@@ -29,6 +29,7 @@ type (
 		ListCount(ctx context.Context, args *UserListArgs) (int64, error)
 		ListData(ctx context.Context, args *UserListArgs) (*[]User, error)
 		Insert(ctx context.Context, data *User) (sql.Result, error)
+		FindOne(ctx context.Context, mobile string) (*User, error) // 用于登录匹配用户
 		FindOneByUuid(ctx context.Context, uuid string) (*User, error)
 		Update(ctx context.Context, newData *User) error
 		Delete(ctx context.Context, uuid string) error
@@ -66,6 +67,7 @@ type (
 		Name       string    `db:"name"`      // 姓名
 		Mobile     string    `db:"mobile"`    // 手机号
 		Password   string    `db:"password"`  // 密码
+		Salt       string    `db:"salt"`      // 密码盐
 		Gender     int64     `db:"gender"`    // 性别: 1男, 2女, 3未知
 		Birth      time.Time `db:"birth"`     // 生日
 		Introduction string `db:"introduction"` // 简介
@@ -153,6 +155,21 @@ func (m *defaultUserModel) Delete(ctx context.Context, uuid string) (err error) 
 	return err
 }
 
+func (m *defaultUserModel) FindOne(ctx context.Context, mobile string) (u *User, err error) {
+	query := fmt.Sprintf("select %s from %s where `mobile`= ? and `status`= 1 and `is_delete` = 0 limit 1", userRows, m.table)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
+	}
+	u = new(User)
+	err = stmt.QueryRowCtx(ctx, u, mobile)
+	if err == sqlc.ErrNotFound {
+		err = ErrNotFound
+	}
+
+	return
+}
+
 func (m *defaultUserModel) FindOneByUuid(ctx context.Context, uuid string) (u *User, err error) {
 	query := fmt.Sprintf("select %s from %s where `is_delete` = 0 and `uuid` = ? limit 1", userRows, m.table)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
@@ -169,13 +186,13 @@ func (m *defaultUserModel) FindOneByUuid(ctx context.Context, uuid string) (u *U
 }
 
 func (m *defaultUserModel) Insert(ctx context.Context, data *User) (res sql.Result, err error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, userInsertFields)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, userInsertFields)
 	stmt, err := m.conn.PrepareCtx(ctx, query)
 	if err !=nil{
 		return
 	}
 
-	res, err = stmt.ExecCtx(ctx, data.Uuid, data.Avatar, data.Name, data.Mobile, data.Password, data.Gender, data.Birth, data.Introduction, data.Status)
+	res, err = stmt.ExecCtx(ctx, data.Uuid, data.Avatar, data.Name, data.Mobile, data.Password, data.Salt, data.Gender, data.Birth, data.Introduction, data.Status)
 
 	return
 }
@@ -186,7 +203,7 @@ func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error
 	query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
 	if newData.Password != "" {
 		query = fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
+		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Salt,newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
 	} else {
 		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
 	}

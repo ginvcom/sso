@@ -1,4 +1,4 @@
-import webapi from "../utils/webapi"
+import { ssoms } from "../config"
 import * as components from "./ssomsComponents"
 export * from "./ssomsComponents"
 
@@ -7,7 +7,7 @@ export * from "./ssomsComponents"
  * @param params
  */
 export function userList(params: components.UserListReqParams) {
-	return webapi.get<components.UserListReply>("/user", params)
+	return ssoms.get<components.UserListReply>("/user", params)
 }
 
 /**
@@ -15,7 +15,7 @@ export function userList(params: components.UserListReqParams) {
  * @param req
  */
 export function addUser(req: components.UserForm) {
-	return webapi.post<components.AddUserReply>("/user", req)
+	return ssoms.post<components.AddUserReply>("/user", req)
 }
 
 /**
@@ -23,7 +23,7 @@ export function addUser(req: components.UserForm) {
  * @param params
  */
 export function userDetail(params: components.UserDetailReqParams) {
-	return webapi.get<components.UserForm>("/user/:uuid", params)
+	return ssoms.get<components.UserForm>("/user/:uuid", params)
 }
 
 /**
@@ -32,7 +32,7 @@ export function userDetail(params: components.UserDetailReqParams) {
  * @param req
  */
 export function updateUser(params: components.UpdateUserReqParams, req: components.UpdateUserReq) {
-	return webapi.put<components.UpdateUserReply>("/user/:uuid", params, req)
+	return ssoms.put<components.UpdateUserReply>("/user/:uuid", params, req)
 }
 
 /**
@@ -40,7 +40,7 @@ export function updateUser(params: components.UpdateUserReqParams, req: componen
  * @param params
  */
 export function deleteUser(params: components.DeleteUserReqParams) {
-	return webapi.delete<components.DeleteUserReply>("/user/:uuid", params)
+	return ssoms.delete<components.DeleteUserReply>("/user/:uuid", params)
 }
 
 /**
@@ -48,7 +48,7 @@ export function deleteUser(params: components.DeleteUserReqParams) {
  * @param req
  */
 export function userFilterOptions(req: components.UserFilterOptionsReq) {
-	return webapi.get<components.UserFilterOptionsReply>("/filterOptions", req)
+	return ssoms.get<components.UserFilterOptionsReply>("/filterOptions", req)
 }
 
 /**
@@ -56,7 +56,7 @@ export function userFilterOptions(req: components.UserFilterOptionsReq) {
  * @param req
  */
 export function assignedRoles(req: components.AssignedRolesReq) {
-	return webapi.get<components.AssignedRolesReply>("/assignedRoles", req)
+	return ssoms.get<components.AssignedRolesReply>("/assignedRoles", req)
 }
 
 /**
@@ -64,7 +64,7 @@ export function assignedRoles(req: components.AssignedRolesReq) {
  * @param req
  */
 export function assignRole(req: components.AssignRoleReq) {
-	return webapi.patch<components.AssignRoleReply>("/assignRole", req)
+	return ssoms.patch<components.AssignRoleReply>("/assignRole", req)
 }
 
 /**
@@ -72,7 +72,15 @@ export function assignRole(req: components.AssignRoleReq) {
  * @param req
  */
 export function userPermissions(req: components.UserPermissionsReq) {
-	return webapi.get<components.UserPermissionsReply>("/permissions", req)
+	return ssoms.get<components.UserPermissionsReply>("/permissions", req)
+}
+
+/**
+ * @description 
+ * @param req
+ */
+export function passwordReset(req: components.PasswordResetReq) {
+	return ssoms.patch<components.PasswordResetReply>("/user/passwordReset", req)
 }
 
 /**
@@ -80,7 +88,7 @@ export function userPermissions(req: components.UserPermissionsReq) {
  * @param params
  */
 export function roleList(params: components.RoleListReqParams) {
-	return webapi.get<components.RoleListReply>("/role", params)
+	return ssoms.get<components.RoleListReply>("/role", params)
 }
 
 /**
@@ -88,7 +96,7 @@ export function roleList(params: components.RoleListReqParams) {
  * @param req
  */
 export function addRole(req: components.RoleForm) {
-	return webapi.post<components.AddRoleReply>("/role", req)
+	return ssoms.post<components.AddRoleReply>("/role", req)
 }
 
 /**
@@ -96,7 +104,7 @@ export function addRole(req: components.RoleForm) {
  * @param params
  */
 export function roleDetail(params: components.RoleDetailReqParams) {
-	return webapi.get<components.RoleForm>("/role/:roleUUID", params)
+	return ssoms.get<components.RoleForm>("/role/:roleUUID", params)
 }
 
 /**
@@ -105,7 +113,7 @@ export function roleDetail(params: components.RoleDetailReqParams) {
  * @param req
  */
 export function updateRole(params: components.UpdateRoleReqParams, req: components.UpdateRoleReq) {
-	return webapi.put<components.UpdateRoleReply>("/role/:roleUUID", params, req)
+	return ssoms.put<components.UpdateRoleReply>("/role/:roleUUID", params, req)
 }
 
 /**
@@ -113,14 +121,14 @@ export function updateRole(params: components.UpdateRoleReqParams, req: componen
  * @param params
  */
 export function deleteRole(params: components.DeleteRoleReqParams) {
-	return webapi.delete<components.DeleteRoleReply>("/role/:roleUUID", params)
+	return ssoms.delete<components.DeleteRoleReply>("/role/:roleUUID", params)
 }
 
 /**
  * @description "角色已拥有的用户"
  */
 export function roleOptions() {
-	return webapi.get<components.OptionsReply>("/role/options")
+	return ssoms.get<components.OptionsReply>("/role/options")
 }
 
 /**
@@ -128,7 +136,7 @@ export function roleOptions() {
  * @param req
  */
 export function assignedUsers(req: components.AssignedUsersReq) {
-	return webapi.post<components.AssignedUsersReply>("/assignedUsers", req)
+	return ssoms.post<components.AssignedUsersReply>("/assignedUsers", req)
 }
 
 /**
@@ -137,7 +145,7 @@ export function assignedUsers(req: components.AssignedUsersReq) {
  * @param req
  */
 export function assignUser(params: components.AssignUserReqParams, req: components.AssignUserReq) {
-	return webapi.patch<components.AssignUserReply>("/role/:roleUUID/assignUser", params, req)
+	return ssoms.patch<components.AssignUserReply>("/role/:roleUUID/assignUser", params, req)
 }
 
 /**
@@ -146,7 +154,7 @@ export function assignUser(params: components.AssignUserReqParams, req: componen
  * @param req
  */
 export function deassignUser(params: components.DeassignUserReqParams, req: components.DeassignUserReq) {
-	return webapi.patch<components.DeassignUserReply>("/role/:roleUUID/deassignUser", params, req)
+	return ssoms.patch<components.DeassignUserReply>("/role/:roleUUID/deassignUser", params, req)
 }
 
 /**
@@ -154,7 +162,7 @@ export function deassignUser(params: components.DeassignUserReqParams, req: comp
  * @param params
  */
 export function inheritances(params: components.InheritancesReqParams) {
-	return webapi.get<components.InheritancesReply>("/role/:roleUUID/inheritances", params)
+	return ssoms.get<components.InheritancesReply>("/role/:roleUUID/inheritances", params)
 }
 
 /**
@@ -163,7 +171,7 @@ export function inheritances(params: components.InheritancesReqParams) {
  * @param req
  */
 export function extendRole(params: components.AddInheritanceReqParams, req: components.AddInheritanceReq) {
-	return webapi.patch<components.AddInheritanceReply>("/role/:roleUUID/addInheritance", params, req)
+	return ssoms.patch<components.AddInheritanceReply>("/role/:roleUUID/addInheritance", params, req)
 }
 
 /**
@@ -171,7 +179,7 @@ export function extendRole(params: components.AddInheritanceReqParams, req: comp
  * @param params
  */
 export function objectList(params: components.ObjectListReqParams) {
-	return webapi.get<components.ObjectListReply>("/object", params)
+	return ssoms.get<components.ObjectListReply>("/object", params)
 }
 
 /**
@@ -179,7 +187,7 @@ export function objectList(params: components.ObjectListReqParams) {
  * @param req
  */
 export function addObject(req: components.ObjectForm) {
-	return webapi.post<components.AddObjectReply>("/object", req)
+	return ssoms.post<components.AddObjectReply>("/object", req)
 }
 
 /**
@@ -187,7 +195,7 @@ export function addObject(req: components.ObjectForm) {
  * @param params
  */
 export function objectDetail(params: components.ObjectDetailReqParams) {
-	return webapi.get<components.ObjectForm>("/object/:uuid", params)
+	return ssoms.get<components.ObjectForm>("/object/:uuid", params)
 }
 
 /**
@@ -196,7 +204,7 @@ export function objectDetail(params: components.ObjectDetailReqParams) {
  * @param req
  */
 export function updateObject(params: components.UpdateObjectReqParams, req: components.UpdateObjectReq) {
-	return webapi.put<components.UpdateObjectReply>("/object/:uuid", params, req)
+	return ssoms.put<components.UpdateObjectReply>("/object/:uuid", params, req)
 }
 
 /**
@@ -204,7 +212,7 @@ export function updateObject(params: components.UpdateObjectReqParams, req: comp
  * @param params
  */
 export function deleteObject(params: components.DeleteObjectReqParams) {
-	return webapi.delete<components.DeleteObjectReply>("/object/:uuid", params)
+	return ssoms.delete<components.DeleteObjectReply>("/object/:uuid", params)
 }
 
 /**
@@ -212,7 +220,7 @@ export function deleteObject(params: components.DeleteObjectReqParams) {
  * @param params
  */
 export function menuOptions(params: components.MenuOptionsReqParams) {
-	return webapi.get<components.MenuOptionsReply>("/object/menuOptions", params)
+	return ssoms.get<components.MenuOptionsReply>("/object/menuOptions", params)
 }
 
 /**
@@ -220,7 +228,7 @@ export function menuOptions(params: components.MenuOptionsReqParams) {
  * @param params
  */
 export function roleOperations(params: components.RoleOperationsReqParams) {
-	return webapi.get<components.RoleOperationsReply>("/object/roleOperations", params)
+	return ssoms.get<components.RoleOperationsReply>("/object/roleOperations", params)
 }
 
 /**
@@ -228,7 +236,7 @@ export function roleOperations(params: components.RoleOperationsReqParams) {
  * @param params
  */
 export function rolePermissions(params: components.RolePermissionsReqParams) {
-	return webapi.get<components.RolePermissionsReply>("/permission/role/:roleUUID/Permissions", params)
+	return ssoms.get<components.RolePermissionsReply>("/permission/role/:roleUUID/Permissions", params)
 }
 
 /**
@@ -236,5 +244,5 @@ export function rolePermissions(params: components.RolePermissionsReqParams) {
  * @param req
  */
 export function grant(req: components.GrantReq) {
-	return webapi.post<components.GrantReply>("/permission/grant", req)
+	return ssoms.post<components.GrantReply>("/permission/grant", req)
 }

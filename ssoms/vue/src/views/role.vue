@@ -4,7 +4,7 @@
       <h1>角色</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd">添加角色</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加角色</a-button>
     </div>
   </div>
   <a-table
@@ -78,7 +78,7 @@ RoleListReqParams
 } from '../api/ssoms'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import { TeamOutlined } from '@ant-design/icons-vue'
+import { TeamOutlined, PlusOutlined } from '@ant-design/icons-vue'
 
 /**
  * 这是表格的列定义

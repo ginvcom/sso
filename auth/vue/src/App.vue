@@ -3,32 +3,48 @@
     <div class="sign-in__left">
       <div class="sign-in__logo">
         <a href="/" class="sign-in__link">
-          <img class="h-12 w-12" src="./assets/logo.svg" alt="logo">
+          <div class="logo">
+            <div class="logo-inner">
+              <div class="round"></div>
+              <div class="line">
+              </div>
+              <div class="line line2">
+              </div>
+            </div>
+          </div>
           <p>
             Single Sign On
           </p>
         </a>
       </div>
-      <HelloWorld msg="Vite + Vue" />
+      <div class="center-on-page">
+        <div class="logo">
+          <div class="logo-inner">
+            <div class="round"></div>
+            <div class="line">
+            </div>
+            <div class="line line2">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="sign-in__right">
       <div class="sign-in__form">
         <h2 class="sign-in__title">Welcome Back ✨</h2>
         <p class="sign-in__subtitle">Please sign in to continue</p>
-        <a-form
-          layout="vertical"
-          :model="formState"
-          name="basic"
-          autocomplete="off"
-          @finish="onFinish"
-          @finishFailed="onFinishFailed"
+        <form
+          class="ant-form ant-form-vertical"
+          :action="state.action"
+          enctype="application/x-www-form-urlencoded"
+          method="post"
         >
           <a-form-item
-            label="Username"
-            name="username"
+            label="Mobile"
+            name="mobile"
             :rules="[{ required: true, message: 'Please input your username!' }]"
           >
-            <a-input v-model:value="formState.username" />
+            <a-input name="mobile" v-model:value="formState.mobile" />
           </a-form-item>
 
           <a-form-item
@@ -36,59 +52,68 @@
             name="password"
             :rules="[{ required: true, message: 'Please input your password!' }]"
           >
-            <a-input-password v-model:value="formState.password" />
+            <a-input-password name="password" v-model:value="formState.password" />
           </a-form-item>
           <div class="sign-in__extra">
           <a-form-item name="remember">
-            <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
+            <a-checkbox name="remember" v-model:checked="formState.remember">Remember me</a-checkbox>
           </a-form-item>
-          <router-link to="/">forgot password?</router-link>
+          <!-- <router-link to="/">forgot password?</router-link> -->
           </div>
           <a-form-item>
             <a-button type="primary" block html-type="submit">Sign In</a-button>
           </a-form-item>
-        </a-form>
+        </form>
         <p class="sign-in__time">{{state.year}}年 <a-divider type="vertical" /> 第{{state.weekNumber}}周</p>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onBeforeMount } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
-interface FormState {
-  username: string
-  password: string
-  remember: boolean
-}
+import { reactive, onBeforeMount } from 'vue'
+import { SignInReq } from './api/auth'
+import { useRoute } from 'vue-router'
 
 interface State {
+  action: string
   year: number | null
   weekNumber: number | null
 }
 
 const state = reactive<State>({
+  action: '/sign-in',
   year: null,
   weekNumber: null
 })
 
+const route = useRoute()
+
 onBeforeMount(() => {
+  const baseRUL = import.meta.env.VITE_BASEURL
+  if (baseRUL) {
+    state.action = baseRUL + '/sign-in'
+  }
+  const serviceCode = route.query.serviceCode
+  if (serviceCode) {
+    state.action = state.action + '?serviceCode=' + serviceCode
+  }
   getWeekNumber()
 })
 
-const formState = reactive<FormState>({
-  username: '',
+const formState = reactive<SignInReq>({
+  mobile: '',
   password: '',
   remember: true
 })
 
-const onFinish = (values: any) => {
-  console.log('Success:', values)
-}
-
-const onFinishFailed = (errorInfo: any) => {
-  console.log('Failed:', errorInfo)
-}
+// const onFinish = (values: SignInReq) => {
+//   signIn(values).then(res => {
+//     console.log(res)
+//     if (res) {
+//       setCookie('user', JSON.stringify(res))
+//     }
+//   })
+// }
 
 const getWeekNumber = () => {
   /**
@@ -114,16 +139,9 @@ const getWeekNumber = () => {
 }
 </script>
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.sign-in__logo .logo {
+  float: left;
+  overflow: hidden;
 }
 .sign-in{
   display: flex;
@@ -146,14 +164,16 @@ const getWeekNumber = () => {
 .sign-in__logo p{
   font-weight: bold;
   color: #334155;
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  margin: 0 0 0 1rem;
+  font-size: 100px;
+  line-height: 200px;
+  margin: 0 0 0 20px;
 }
 .sign-in__link{
   display: flex;
   align-items: center;
-  padding: 2rem;
+  padding: 80px;
+  transform: scale(0.2);
+  transform-origin: 0 0;
 }
 .sign-in__right{
   width: 500px;

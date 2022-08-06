@@ -105,6 +105,16 @@ type UserPermissionsReply {
 	Systems []Option `json:"system"`
 }
 
+type PasswordResetReq {
+	OldPassword string `json:"oldPassword"`
+	Password string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
+}
+
+type PasswordResetReply {
+	Success bool `json:"success"`
+}
+
 @server(
 	group: user
 )
@@ -146,6 +156,6 @@ service ssoms-api {
 	@handler userPermissions
 	get /permissions (UserPermissionsReq) returns (UserPermissionsReply)
 
-	@handler userPasswordReset
-	patch /user/userPasswordReset
+	@handler passwordReset
+	patch /user/passwordReset (PasswordResetReq) returns (PasswordResetReply)
 }

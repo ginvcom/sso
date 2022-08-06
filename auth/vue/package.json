@@ -1,15 +1,16 @@
 {
-  "name": "signon",
+  "name": "auth",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "ant-design-vue": "^3.2.10",
+    "axios": "^0.27.2",
     "vue": "^3.2.37",
     "vue-router": "^4.1.2"
   },

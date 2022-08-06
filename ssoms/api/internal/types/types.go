@@ -106,6 +106,16 @@ type UserPermissionsReply struct {
 	Systems []Option `json:"system"`
 }
 
+type PasswordResetReq struct {
+	OldPassword     string `json:"oldPassword"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
+}
+
+type PasswordResetReply struct {
+	Success bool `json:"success"`
+}
+
 type RoleListReq struct {
 	RoleName string `form:"roleName,optional"`
 	Page     int64  `form:"page"`
@@ -266,7 +276,7 @@ type ObjectForm struct {
 	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
-	TopKey     string `json:"topKey,optional"` // 传systemCode, 更新的时候不传(更新时无法修改该值)
+	TopKey     string `json:"topKey,optional"` // 传systemCode
 }
 
 type AddObjectReply struct {
@@ -289,6 +299,7 @@ type UpdateObjectReq struct {
 	Icon       string `json:"icon"`           // 图标
 	Status     int64  `json:"status"`
 	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey,optional"` // 更新时无法修改该值, 但是更新前需要使用该值校验对象是否已存在
 }
 
 type UpdateObjectReply struct {

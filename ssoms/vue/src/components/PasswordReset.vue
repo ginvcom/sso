@@ -7,7 +7,7 @@
       autocomplete="off">
       <a-form-item
         label="原密码"
-        name="username"
+        name="oldPassword"
         :rules="[{ required: true, message: '请输入现在的密码!' }]"
       >
         <a-input-password v-model:value="formState.oldPassword" placeholder="请输入现在的密码" />

@@ -40,7 +40,6 @@
             v-model:openKeys="state.openKeys"
             mode="inline"
             :style="{ borderRight: 0 }"
-            inline-collapsed
           >
           <a-menu-item key="1">
             <block-outlined />
