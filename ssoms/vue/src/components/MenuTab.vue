@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="system-params">
-    <a-form>
+    <a-form :model="state.params" name="params" @finish="onSearch">
       <div class="object__form">
         <div class="object__current-system">
           <div class="object__current-value">
@@ -41,18 +41,18 @@
         <div class="object__form-right">
           <a-row type="flex" :gutter="16">
             <a-col flex="1">
-              <a-form-item label="菜单路径 / 操作uri">
-                <a-input v-model:value="state.params.key" />
+              <a-form-item name="key" label="菜单路径 / 操作uri">
+                <a-input v-model:value="state.params.key" allow-clear />
               </a-form-item>
             </a-col>
             <a-col flex="1">
-              <a-form-item label="菜单名称 / 操作名称">
-                <a-input v-model:value="state.params.objectName" />
+              <a-form-item name="objectName" label="菜单名称 / 操作名称">
+                <a-input v-model:value="state.params.objectName" allow-clear />
               </a-form-item>
             </a-col>
             <a-col flex="80px">
               <a-form-item>
-                <a-button type="primary">
+                <a-button type="primary" html-type="submit">
                   <template #icon><SearchOutlined /></template>
                   搜索
                 </a-button>
@@ -68,10 +68,24 @@
   rowKey="uuid"
   :dataSource="respState.list"
   :columns="columns"
+  v-model:expandedRowKeys="state.expandedRowKeys"
   :pagination="false">
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'objectName'">
-        <span style="margin-left: 10px">{{record.objectName}}</span>
+        <template
+          v-for="(fragment, i) in record.objectName
+            .toString()
+            .split(new RegExp(`(?<=${state.params.objectName})|(?=${state.params.objectName})`, 'i'))"
+        >
+          <b
+            v-if="fragment.toLowerCase() === state.params.objectName.toLowerCase()"
+            :key="i"
+            style="color: #f50"
+          >
+            {{ fragment }}
+          </b>
+          <template v-else>{{ fragment }}</template>
+        </template>
       </template>
       <template v-if="column.dataIndex === 'type'">
         <template v-if="record.type == 2">
@@ -91,7 +105,20 @@
           <span v-else-if="record.subType == 4" class="method-patch m-r-15">PAT</span>
           <span v-else-if="record.subType == 5" class="method-delete m-r-15">DEL</span>
         </template>
-        <span>{{record.key}}</span>
+        <template
+          v-for="(fragment, i) in record.key
+            .toString()
+            .split(new RegExp(`(?<=${state.params.key})|(?=${state.params.key})`, 'i'))"
+        >
+          <b
+            v-if="fragment.toLowerCase() === state.params.key.toLowerCase()"
+            :key="i"
+            style="color: #f50"
+          >
+            {{ fragment }}
+          </b>
+          <template v-else>{{ fragment }}</template>
+        </template>
       </template>
       <template v-if="column.dataIndex === 'status'">
         <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
@@ -343,6 +370,8 @@ interface System {
 interface State {
   loading: boolean
   currentSystem: System
+
+  expandedRowKeys: Array<string>
   systems: Array<Obj>
   menus: Array<MenuOption>
   apiParentMenus: Array<MenuOption>
@@ -360,6 +389,7 @@ const state = reactive<State>({
     icon: '',
     name: ''
   },
+  expandedRowKeys: [],
   systems: [],
   menus: [],
   apiParentMenus: [],
@@ -395,13 +425,17 @@ const getSystemOptions = () => {
   })
 }
 
+let srcList:Array<Obj> = []
+
 /**
  * 获取列表
  */
 const getList = () => {
   state.loading = true
   objectList(state.params).then((data: ObjectListReply) => {
+    srcList = data.list
     respState.list = data.list
+    state.expandedRowKeys = getAllChildrenKeys(srcList, [])
   }).finally(() => {
     state.loading = false
   })
@@ -578,5 +612,99 @@ const onChangeSystem = (obj: Obj) => {
   state.params = { topKey: obj.key, key: '', objectName: '' }
   getList()
   systemFormState.visible = false
+}
+
+const onSearch = (values: any) => {
+  if (!values && !values.objectName) {
+    respState.list = srcList
+    state.expandedRowKeys = getAllChildrenKeys(srcList, [])
+    return
+  }
+  
+  const { matches, expandedRowKeys } = serchOnSrcList(srcList, values.key, values.objectName, [], [], [])
+  respState.list = []
+  if (!srcList) {
+    state.expandedRowKeys = []
+    return
+  }
+  const respList: Array<Obj> = []
+  for (const child of srcList) {
+    if (matches.includes(child.uuid)) {
+      const { uuid, objectName, identifier, key, sort, type, subType, extra, icon, status, pUUID } = child
+      const item = { uuid, objectName, identifier, key, sort, type, subType, extra, icon, status, pUUID }
+      respList.push(item)
+      getNewTree(matches, item, child.children)
+    }
+  }
+  respState.list = respList
+  state.expandedRowKeys = expandedRowKeys
+}
+
+const serchOnSrcList = (objectList: Array<Obj>, key: string, objectName: string, parents: Array<string>, matches: Array<string>, expandedRowKeys: Array<string>) => {
+  for (const child of objectList) {
+    let keyMatched = true
+    if (key) {
+      keyMatched = child.key.toLowerCase().includes(key.toLowerCase())
+    }
+
+    let nameMatched = true
+    if (objectName) {
+      nameMatched = child.objectName.toLowerCase().includes(objectName.toLowerCase())
+    }
+    if (keyMatched && nameMatched) {
+      if (!matches.includes(child.uuid)) {
+        matches.push(child.uuid)
+      }
+      parents.forEach(uuid => {
+        if (!expandedRowKeys.includes(uuid)) {
+          expandedRowKeys.push(uuid)
+        }
+        if (!matches.includes(uuid)) {
+          matches.push(uuid)
+        }
+      })
+
+      if (child.children && child.children.length > 0) {
+        // expandedRowKeys.push(child.uuid)
+        // 如果父级匹配到无需展示，可以删掉下面两行代码
+        const children = getAllChildrenKeys(child.children, [])
+        matches.push(...children)
+      }
+    }
+    const newParents = [...parents, child.uuid]
+    if (child.children && child.children.length > 0) {
+      serchOnSrcList(child.children, key, objectName, newParents, matches, expandedRowKeys)
+    }
+  }
+
+  return { matches, expandedRowKeys }
+}
+
+const getAllChildrenKeys = (objectList: Array<Obj>, keys: Array<string>): Array<string> => {
+  for (const child of objectList) {
+    keys.push(child.uuid)
+    if (child.children && child.children.length > 0) {
+      getAllChildrenKeys(child.children, keys)
+    }
+  }
+  return keys
+}
+
+const getNewTree = (matches: Array<string>, parents: Obj, objectList?: Array<Obj>) => {
+  if (!objectList) {
+    return
+  }
+  for (const child of objectList) {
+    if (matches.includes(child.uuid)) {
+      const { uuid, objectName, identifier, key, sort, type, subType, extra, icon, status, pUUID } = child
+      const item = { uuid, objectName, identifier, key, sort, type, subType, extra, icon, status, pUUID }
+      if (!parents.children) {
+        parents.children = [item]
+      } else {
+        parents.children.push(item)
+      }
+      getNewTree(matches, item, child.children)
+    }
+  }
 }
 </script>

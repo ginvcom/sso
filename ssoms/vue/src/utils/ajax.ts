@@ -3,7 +3,7 @@ import { message } from 'ant-design-vue'
 import { getCookie } from './cookie'
 
 // import qs from 'qs'
-let baseURL = <string>import.meta.env.VITE_BASEURL|| '/'
+let baseURL = <string>import.meta.env.VITE_BASEURL || '/'
 // 线上灰度不同环境支持
 const env = window.location.origin.search('gray.') > -1 ? 'gray' : 'online'
 // test不同环境支持
@@ -16,7 +16,13 @@ if (baseMatch !== null && baseMatch.length > 1) {
     }
   }
 }
-export const instance = axios.create({ baseURL })
+
+export const server = baseURL
+
+export const instance = axios.create({
+  baseURL,
+  withCredentials: true
+})
 
 function signOutForward () {
   localStorage.removeItem('router')
@@ -44,7 +50,6 @@ instance.interceptors.request.use((config: AxiosRequestConfig) =>{
       config.headers['Content-Type'] = 'application/json;charset=utf-8'
       
     }
-    // config.withCredentials = true
   }
 //   config.data = qs.stringify(config.data)
   return config

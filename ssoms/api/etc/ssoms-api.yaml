@@ -1,6 +1,6 @@
 Name: ssoms-api
 Host: 0.0.0.0
-Port: 8888
+Port: 8889
 Mysql:
   DataSource: root:123456@tcp(localhost:13306)/ginv_user?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:

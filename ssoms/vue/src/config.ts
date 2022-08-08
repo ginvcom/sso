@@ -1,5 +1,7 @@
 import Ajax from "./utils/ajax"
 
+export const systemCode = "ssoms"
+
 export const ossConfig = {
   ginv: {
     bucket: 'ginv',

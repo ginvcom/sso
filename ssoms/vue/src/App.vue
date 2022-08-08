@@ -82,6 +82,8 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons-vue'
 import router from './router'
+import { systemCode } from './config'
+import { server } from './utils/ajax'
 
 dayjs.locale('zh-cn')
 
@@ -96,7 +98,7 @@ const onHeaderClick = ({ key }) => {
   if (key === 'profile') {
     router.push('/profile')
   } else if (key === 'logout') {
-    // 登出
+    window.location.href = server + '/sign-out?service=' + systemCode
   }
 }
 </script>

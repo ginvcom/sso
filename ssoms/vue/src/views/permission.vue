@@ -27,14 +27,14 @@
     </div>
   </a-col>
   <a-col flex="1">
-  <a-checkbox-group  v-model:value="formState.uuidArray" style="width: 100%">
+  <a-checkbox-group  v-model:value="formState.ActionUUIDArray" style="width: 100%">
   <a-table
   :loading="state.loading"
   class="apis-check__table"
   bordered
   rowKey="value"
   size="small"
-  :row-selection="{ checkStrictly: false, selectedRowKeys: formState.uuidArray, onChange, onSelect, onSelectAll }"
+  :row-selection="{ checkStrictly: false, selectedRowKeys: formState.MenuUUIDArray, onChange }"
   :dataSource="respState.list"
   :columns="columns"
   :pagination="false"
@@ -85,7 +85,7 @@ const columns = [
   {
     title: '菜单',
     dataIndex: 'label',
-    key: 'label',
+    key: 'value',
     width: '200px'
   },
   {
@@ -144,6 +144,7 @@ const getList = () => {
   state.loading = true
   roleOperations(state.params).then((data) => {
     respState.list = data.list
+    formState.MenuUUIDArray = ['k7vcb745vcsb', '8yzo4kzfucsb']
   }).finally(() => {
     state.loading = false
   })
@@ -156,6 +157,7 @@ const onTableChange = ({ current, pageSize }) => {
 }
 
 const onChangeSystem = (obj: Obj) => {
+  console.log(obj)
   if (state.params.topKey === obj.key) {
     return
   }
@@ -168,12 +170,14 @@ const modalFormRef = ref<FormInstance>()
 
 interface Form {
   loading: boolean
-  uuidArray: Array<string>
+  MenuUUIDArray: Array<string>
+  ActionUUIDArray: Array<string>
 }
 
 const formState = reactive<Form>({
   loading: false,
-  uuidArray: ['8yzo4kzfucsb', 'k7vcb745vcsb']
+  MenuUUIDArray: [],
+  ActionUUIDArray:[]
 })
 
 const getSystemOptions = () => {
@@ -191,32 +195,25 @@ const getSystemOptions = () => {
 }
 
 
-const onChange = (selectedRowKeys: (string | number)[], selectedRows: ObjectOption[]) => {
-  console.log(selectedRowKeys, selectedRows)
-}
-
-const onSelect = (record: ObjectOption, selected: boolean, selectedRows: ObjectOption[]) => {
-  console.log(record, selected, selectedRows)
-}
-
-const onSelectAll = (selected: boolean) => {
-  console.log(selected)
+const onChange = (selectedRowKeys: string[]) => {
+  console.log(selectedRowKeys)
+  formState.MenuUUIDArray = selectedRowKeys
 }
 
 const checkAllApis = (record: ObjectOption[]) => {
   console.log('checkAllApis', record)
   record.forEach(obj => {
-    const index = formState.uuidArray.indexOf(obj.value)
+    const index = formState.ActionUUIDArray.indexOf(obj.value)
     if (index < 0) {
-      formState.uuidArray.push(obj.value)
+      formState.ActionUUIDArray.push(obj.value)
     }
   })
-  console.log('checkAllApis', formState.uuidArray)
+  console.log('checkAllApis', formState.ActionUUIDArray)
 }
 
 const isAllApiChecked = (record: ObjectOption[]) => {
   for (const obj of record) {
-    const index = formState.uuidArray.indexOf(obj.value)
+    const index = formState.ActionUUIDArray.indexOf(obj.value)
     if (index < 0) {
       return false
     }
