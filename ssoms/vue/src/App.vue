@@ -1,7 +1,7 @@
 <template>
   <a-config-provider :locale="zhCN">
     <a-layout>
-      <a-layout-header class="header__bar">
+      <a-layout-header class="header__bar" theme="dark">
         <div class="header__logo">
           <a class="header__logo-link" href="/">
             <img alt="Vue logo" src="./assets/logo.png" />
@@ -98,7 +98,7 @@ const onHeaderClick = ({ key }) => {
   if (key === 'profile') {
     router.push('/profile')
   } else if (key === 'logout') {
-    window.location.href = server + '/sign-out?service=' + systemCode
+    window.location.href = server + '/sign-out?system=' + systemCode
   }
 }
 </script>

@@ -1,8 +1,7 @@
-package auth
+package logic
 
 import (
 	"context"
-	"net/http"
 
 	"sso/auth/api/internal/svc"
 	"sso/auth/api/internal/types"
@@ -24,7 +23,7 @@ func NewSignOutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SignOutLo
 	}
 }
 
-func (l *SignOutLogic) SignOut(r *http.Request) (resp *types.SignOutReply, err error) {
+func (l *SignOutLogic) SignOut() (resp *types.SignOutReply, err error) {
 	// todo: add your logic here and delete this line
 
 	return

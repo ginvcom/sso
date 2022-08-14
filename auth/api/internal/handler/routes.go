@@ -4,7 +4,6 @@ package handler
 import (
 	"net/http"
 
-	auth "sso/auth/api/internal/handler/auth"
 	"sso/auth/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -16,17 +15,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/sign-in",
-				Handler: auth.SignInHandler(serverCtx),
+				Handler: signInHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodGet,
-				Path:    "/verify-token",
-				Handler: auth.VerifyHandler(serverCtx),
+				Method:  http.MethodPost,
+				Path:    "/verify-request",
+				Handler: verifyHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sign-out",
-				Handler: auth.SignOutHandler(serverCtx),
+				Handler: signOutHandler(serverCtx),
 			},
 		},
 	)

@@ -3,6 +3,7 @@ package object
 import (
 	"context"
 
+	"sso/ssoms/api/internal/config"
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
 	"sso/ssoms/model"
@@ -25,6 +26,8 @@ func NewObjectListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Object
 }
 
 func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.ObjectListReply, err error) {
+	logx.WithContext(l.ctx).Info(l.ctx.Value(config.UUID))
+	logx.WithContext(l.ctx).Info(l.ctx.Value(config.Name))
 	args := &model.ObjectListArgs{
 		TopKey:     req.TopKey,
 		ObjectName: req.ObjectName,

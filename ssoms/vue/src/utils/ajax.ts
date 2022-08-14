@@ -1,9 +1,10 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue'
 import { getCookie } from './cookie'
 
 // import qs from 'qs'
 let baseURL = <string>import.meta.env.VITE_BASEURL || '/'
+const system = <string>import.meta.env.VITE_SYSTEM_NAME || ''
 // 线上灰度不同环境支持
 const env = window.location.origin.search('gray.') > -1 ? 'gray' : 'online'
 // test不同环境支持
@@ -48,7 +49,6 @@ instance.interceptors.request.use((config: AxiosRequestConfig) =>{
   if (config.method === 'post' || config.method === 'put') {
     if (config.headers !== undefined) {
       config.headers['Content-Type'] = 'application/json;charset=utf-8'
-      
     }
   }
 //   config.data = qs.stringify(config.data)
@@ -64,17 +64,34 @@ instance.interceptors.response.use((res) => {
   } else {
     if (res.data.code === -99999) {
       signOutForward()
+      window.location.href = server + '/sign-out?system=' + system
     } else {
+      message.error({ content: res.data.msg, key: 'golbal' })
       return Promise.reject(new Error(res.data.msg))
     }
   }
-}, (error) => {
-  message.error({ content: error.message, key: 'golbal' })
+}, (error: AxiosError) => {
+  if (error.response) {
+    if (error.response.status == 401) {
+      signOutForward()
+      window.location.href = server + '/sign-out?system=' + system
+      return Promise.reject(error)
+    } else {
+      if (error.response.data) {
+        message.error({ content: <string>error.response.data, key: 'golbal' })
+        return Promise.reject(error)
+      }
+    }
+  }
+    message.error({ content: error.message, key: 'golbal' })
+    return Promise.reject(error)
 })
 
 export default class Ajax {
+  private systemCode: string
   private serviceCode: string
-  constructor (serviceCode: string) {
+  constructor (systemCode: string, serviceCode: string) {
+    this.systemCode = systemCode
     this.serviceCode = serviceCode
   }
   private setPath (url: string, params: any) {
@@ -90,28 +107,40 @@ export default class Ajax {
     }
     return { realpath: url, realParams: params }
   }
+  private getHeaders (url: string) {
+    return {
+      'X-Origin-Uri' : url,
+      'X-Origin-System': this.systemCode,
+      'X-Origin-Service': this.serviceCode
+    }
+  }
   public get<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.get(realpath, { params: realParams, headers: { 'X-Origin-Uri' : url, 'X-Origin-Service': this.serviceCode } })
+    const headers = this.getHeaders(url)
+    return instance.get(realpath, { params: realParams, headers })
   }
 
   public delete<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.delete(realpath, { params: realParams, headers: { 'X-Origin-Uri' : url, 'X-Origin-Service': this.serviceCode } })
+    const headers = this.getHeaders(url)
+    return instance.delete(realpath, { params: realParams, headers })
   }
 
   public post<T = any, R = T, D = any>(url: string, data?: D, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.post(realpath, data, { params: realParams, headers: { 'X-Origin-Uri' : url, 'X-Origin-Service': this.serviceCode } })
+    const headers = this.getHeaders(url)
+    return instance.post(realpath, data, { params: realParams, headers })
   }
 
   public put<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.put(realpath, data, { params: realParams, headers: { 'X-Origin-Uri' : url, 'X-Origin-Service': this.serviceCode } })
+    const headers = this.getHeaders(url)
+    return instance.put(realpath, data, { params: realParams, headers })
   }
 
   public patch<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    return instance.patch(realpath, data, { params: realParams, headers: { 'X-Origin-Uri' : url, 'X-Origin-Service': this.serviceCode } })
+    const headers = this.getHeaders(url)
+    return instance.patch(realpath, data, { params: realParams, headers })
   }
 }

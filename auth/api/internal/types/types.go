@@ -8,10 +8,10 @@ type Option struct {
 }
 
 type SignInReq struct {
-	ServiceCode string `json:"serviceCode"`
-	Mobile      string `json:"mobile"`
-	Password    string `json:"password"`
-	Remember    string `json:"remember,optional"`
+	SystemCode string `json:"systemCode"`
+	Mobile     string `json:"mobile"`
+	Password   string `json:"password"`
+	Remember   string `json:"remember,optional"`
 }
 
 type SignInReply struct {
@@ -21,6 +21,7 @@ type SignInReply struct {
 	Mobile      string   `json:"mobile"`
 	Avatar      string   `json:"avatar"`
 	Gender      int64    `json:"gender"`
+	Expire      int64    `json:"expire"`
 	Roles       []Option `json:"roles"`
 }
 
@@ -28,7 +29,14 @@ type SignOutReply struct {
 	Success bool `json:"success"`
 }
 
-type VerifyTokenReply struct {
-	UserId  int64 `json:"userId"`
-	Success bool  `json:"success"`
+type VerifyRequestReq struct {
+	Token       string `json:"token"`
+	SystemCode  string `json:"systemCode"`
+	ServiceCode string `json:"serviceCode"`
+	URI         string `json:"uri"`
+}
+
+type VerifyRequestReply struct {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
 }

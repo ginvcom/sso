@@ -10,16 +10,16 @@ import (
 	"sso/ssoms/api/internal/types"
 )
 
-func PasswordResetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func InfoEditHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.PasswordResetReq
+		var req types.InfoEditReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
 			return
 		}
 
-		l := user.NewPasswordResetLogic(r.Context(), svcCtx)
-		resp, err := l.PasswordReset(&req)
+		l := user.NewInfoEditLogic(r.Context(), svcCtx)
+		resp, err := l.InfoEdit(&req)
 		util.Response(w, resp, err)
 	}
 }

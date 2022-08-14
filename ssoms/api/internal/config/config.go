@@ -16,3 +16,8 @@ type Config struct {
 		AccessExpire int64  // jwt token有效期，单位：秒  1天=86400秒
 	}
 }
+
+type BasicContext string
+
+const UUID BasicContext = "uuid"
+const Name BasicContext = "name"

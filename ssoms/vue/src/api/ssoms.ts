@@ -76,11 +76,34 @@ export function userPermissions(req: components.UserPermissionsReq) {
 }
 
 /**
- * @description 
+ * @description "个人中心用户信息"
+ */
+export function profile() {
+	return ssoms.get<components.UserForm>("/user/profile")
+}
+
+/**
+ * @description "个人中心头像上传修改"
+ * @param req
+ */
+export function avatarUpload(req: components.AvatarUploadReq) {
+	return ssoms.post<components.AvatarUploadReply>("/user/avatarUpload", req)
+}
+
+/**
+ * @description "个人中心基础信息修改"
+ * @param req
+ */
+export function infoEdit(req: components.InfoEditReq) {
+	return ssoms.post<components.InfoEditReply>("/user/infoEdit", req)
+}
+
+/**
+ * @description "个人中心密码重置"
  * @param req
  */
 export function passwordReset(req: components.PasswordResetReq) {
-	return ssoms.patch<components.PasswordResetReply>("/user/passwordReset", req)
+	return ssoms.post<components.PasswordResetReply>("/user/passwordReset", req)
 }
 
 /**

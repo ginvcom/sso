@@ -105,6 +105,22 @@ type UserPermissionsReply {
 	Systems []Option `json:"system"`
 }
 
+type AvatarUploadReq {
+	Avatar   string `json:"avatar"`
+}
+
+type AvatarUploadReply {
+	Success bool `json:"success"`
+}
+
+type InfoEditReq{
+	Introduction  string `json:"introduction"`
+}
+
+type InfoEditReply {
+	Success bool `json:"success"`
+}
+
 type PasswordResetReq {
 	OldPassword string `json:"oldPassword"`
 	Password string `json:"password"`
@@ -156,6 +172,19 @@ service ssoms-api {
 	@handler userPermissions
 	get /permissions (UserPermissionsReq) returns (UserPermissionsReply)
 
+	@doc "个人中心用户信息"
+	@handler profile
+	get /user/profile returns (UserForm)
+
+	@doc "个人中心头像上传修改"
+	@handler avatarUpload
+	post /user/avatarUpload (AvatarUploadReq) returns (AvatarUploadReply)
+
+	@doc "个人中心基础信息修改"
+	@handler infoEdit
+	post /user/infoEdit (InfoEditReq) returns (InfoEditReply)
+
+	@doc "个人中心密码重置"
 	@handler passwordReset
-	patch /user/passwordReset (PasswordResetReq) returns (PasswordResetReply)
+	post /user/passwordReset (PasswordResetReq) returns (PasswordResetReply)
 }

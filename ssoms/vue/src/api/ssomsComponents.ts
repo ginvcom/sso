@@ -117,6 +117,22 @@ export interface UserPermissionsReply {
 	system: Array<Option>
 }
 
+export interface AvatarUploadReq {
+	avatar: string
+}
+
+export interface AvatarUploadReply {
+	success: boolean
+}
+
+export interface InfoEditReq {
+	introduction: string
+}
+
+export interface InfoEditReply {
+	success: boolean
+}
+
 export interface PasswordResetReq {
 	oldPassword: string
 	password: string

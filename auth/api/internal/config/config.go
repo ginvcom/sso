@@ -12,4 +12,5 @@ type Config struct {
 		AccessExpire         int64  // jwt token有效期，单位：秒  1天=86400秒
 		RememberAccessExpire int64  // jwt  记住登录时token有效期，单位：秒  3天=259200秒,  7天=604800秒
 	}
+	NoAuthUrls map[string]string
 }

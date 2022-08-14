@@ -5,10 +5,10 @@ type Option {
 }
 
 type SignInReq {
-	ServiceCode string `json:"serviceCode"`
-	Mobile      string `json:"mobile"`
-	Password    string `json:"password"`
-	Remember    string `json:"remember,optional"`
+	SystemCode string `json:"systemCode"`
+	Mobile     string `json:"mobile"`
+	Password   string `json:"password"`
+	Remember   string `json:"remember,optional"`
 }
 
 type SignInReply {
@@ -18,6 +18,7 @@ type SignInReply {
 	Mobile      string   `json:"mobile"`
 	Avatar      string   `json:"avatar"`
 	Gender      int64    `json:"gender"`
+	Expire      int64    `json:"expire"`
 	Roles       []Option `json:"roles"`
 }
 
@@ -25,23 +26,26 @@ type SignOutReply {
 	Success bool `json:"success"`
 }
 
-type VerifyTokenReply {
-	UserId  int64 `json:"userId"`
-	Success bool  `json:"success"`
+type VerifyRequestReq {
+	Token       string `json:"token"`
+	SystemCode  string `json:"systemCode"`
+	ServiceCode string `json:"serviceCode"`
+	URI         string `json:"uri"`
 }
 
-@server(
-	group: auth
-)
+type VerifyRequestReply {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
+}
 
 service auth-api {
 	@doc "登录账号"
 	@handler signIn
 	post /sign-in (SignInReq) returns (SignInReply)
 	
-	@doc "登录账号"
+	@doc "验证请求"
 	@handler verify
-	get /verify-token returns (VerifyTokenReply)
+	post /verify-request (VerifyRequestReq) returns (VerifyRequestReply)
 	
 	@doc "退出登录"
 	@handler signOut

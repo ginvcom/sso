@@ -1,4 +1,4 @@
-package auth
+package logic
 
 import (
 	"context"
@@ -48,13 +48,13 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 	}
 
 	objectArgs := &model.ObjectFindOneArgs{
-		TopKey: req.ServiceCode,
+		TopKey: req.SystemCode,
 	}
 
 	object, err := l.svcCtx.ObjectModel.FindOne(l.ctx, objectArgs)
 	if err != nil {
 		fmt.Println(err)
-		err = fmt.Errorf("service \"%s\" not exits", req.ServiceCode)
+		err = fmt.Errorf("system \"%s\" not exits", req.SystemCode)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 	if req.Remember == "on" {
 		seconds = l.svcCtx.Config.Auth.RememberAccessExpire
 	}
-	jwtToken, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, now, seconds, user.Id)
+	jwtToken, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, now, seconds, user)
 	if err != nil {
 		return
 	}
@@ -76,16 +76,28 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 		Mobile:      user.Mobile,
 		Avatar:      user.Avatar,
 		Gender:      user.Gender,
+		Expire:      seconds,
 	}
+
 	return
 }
 
-func (l *SignInLogic) getJwtToken(secretKey string, iat, seconds, userId int64) (string, error) {
-	claims := make(jwt.MapClaims)
-	claims["exp"] = iat + seconds // jwt的过期时间，等于签发时间加上配置的过期时间
-	claims["iat"] = iat           // jwt的签发时间
-	claims["userId"] = userId
-	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims = claims
+func (l *SignInLogic) getJwtToken(secretKey string, iat, seconds int64, user *model.User) (string, error) {
+	// claims := make(jwt.MapClaims)
+	// claims["exp"] = iat + seconds // jwt的过期时间，等于签发时间加上配置的过期时间
+	// claims["iat"] = iat           // jwt的签发时间
+	// claims["uuid"] = user.Uuid
+	// claims["name"] = user.Name
+	// token := jwt.New(jwt.SigningMethodHS256)
+	// token.Claims = claims
+	// return token.SignedString([]byte(secretKey))
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"exp":  iat + seconds,
+		"iat":  iat,
+		"uuid": user.Uuid,
+		"name": user.Name,
+	})
+
 	return token.SignedString([]byte(secretKey))
 }

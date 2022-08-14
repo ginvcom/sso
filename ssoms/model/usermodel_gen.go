@@ -32,6 +32,8 @@ type (
 		FindOne(ctx context.Context, mobile string) (*User, error) // 用于登录匹配用户
 		FindOneByUuid(ctx context.Context, uuid string) (*User, error)
 		Update(ctx context.Context, newData *User) error
+		BasicUpdate(ctx context.Context, newData *User) error
+		PasswordReset(ctx context.Context, uuid, md5Password, salt string) error
 		Delete(ctx context.Context, uuid string) error
 		FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (*[]UserOption, error)
 		UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (*[]UserOption, error)
@@ -214,6 +216,67 @@ func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error
 	}
 
 	res, err := stmt.ExecCtx(ctx, placeholder...)
+	if err !=nil{
+		return
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err !=nil{
+		return
+	}
+
+	if rowsAffected == 0 {
+		err = errors.New("no rows affected")
+	}
+
+	return err
+}
+
+// 个人中心更新头像或希望可以更新的基础信息
+func (m *defaultUserModel) BasicUpdate(ctx context.Context, newData *User) (err error) {
+	var placeholder []interface{}
+	now := time.Now().Local()
+	query := fmt.Sprintf("update %s set", m.table)
+	if newData.Avatar != "" {
+		query += " `avatar` = ?,"
+		placeholder = append(placeholder, newData.Avatar)
+	}
+	if newData.Introduction != "" {
+		query += " `introduction` = ?,"
+		placeholder = append(placeholder, newData.Introduction)
+	}
+	query += " `update_time`=? where `is_delete` = 0 and `uuid` = ?"
+	placeholder = append(placeholder, now, newData.Uuid)
+	stmt, err := m.conn.PrepareCtx(ctx, query)
+	if err !=nil{
+		return
+	}
+
+	res, err := stmt.ExecCtx(ctx, placeholder...)
+	if err !=nil{
+		return
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err !=nil{
+		return
+	}
+
+	if rowsAffected == 0 {
+		err = errors.New("no rows affected")
+	}
+
+	return err
+}
+
+func (m *defaultUserModel) PasswordReset(ctx context.Context, uuid, md5Password, salt string) (err error) {
+	query := fmt.Sprintf("update %s set `password`=?, `salt`=?, `update_time`=? where `is_delete` = 0 and `uuid` = ?", m.table)
+	stmt, err := m.conn.PrepareCtx(ctx, query)
+	if err !=nil{
+		return
+	}
+	now := time.Now().Local()
+	res, err := stmt.ExecCtx(ctx, md5Password, salt, now, uuid)
 	if err !=nil{
 		return
 	}

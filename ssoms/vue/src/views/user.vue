@@ -47,7 +47,7 @@
     </template>
   </a-table>
   <a-modal
-    width="930px"
+    width="694px"
     v-model:visible="formState.visible"
     :title="formState.type == 'add' ? '添加用户' : '修改用户'"
     :loading="formState.loading"
@@ -56,7 +56,7 @@
     @ok="onSubmit">
     <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
       <a-row :gutter="24">
-        <a-col :span="6">
+        <a-col :span="8">
           <a-form-item label="头像">
             <template v-if="cropperState.visible">
               <vue-cropper
@@ -88,7 +88,7 @@
             </a-upload>
           </a-form-item>
         </a-col>
-        <a-col :span="12">
+        <a-col :span="16">
           <a-row :gutter="24">
           <a-col :span="12">
             <a-form-item label="姓名" name="name" :rules="[{ required: true, message: '请输入用户姓名' }]">
@@ -126,12 +126,10 @@
           </a-col>
         </a-row>
         </a-col>
-        <a-col :span="6">
-          <a-form-item label="用户简介" name="summary">
-            <a-textarea v-model:value="formState.form.introduction" placeholder="填写职业技能、擅长的事情、喜欢的事情等" :rows="9" show-count :maxlength="100" />
-          </a-form-item>
-        </a-col>
       </a-row>
+      <a-form-item label="用户简介" name="summary">
+        <a-textarea v-model:value="formState.form.introduction" placeholder="填写职业技能、擅长的事情、喜欢的事情等" :rows="3" show-count :maxlength="100" />
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>

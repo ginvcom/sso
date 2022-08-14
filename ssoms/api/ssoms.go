@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/http"
@@ -23,6 +24,22 @@ func main() {
 
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
+
+	// 全局中间件, 获取网关传递的用户基本信息
+	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			uuid := r.Header.Get("X-Origin-Uuid")
+			name := r.Header.Get("X-Origin-Name")
+			// 可能存在无需登录就能访问的页面
+			if uuid == "" || name == "" {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			ctx := context.WithValue(r.Context(), config.UUID, uuid)
+			ctx = context.WithValue(ctx, config.Name, name)
+			next(w, r.WithContext(ctx))
+		}
+	})
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

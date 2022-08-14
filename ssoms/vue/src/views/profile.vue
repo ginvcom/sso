@@ -44,25 +44,25 @@
           </a-tooltip>
         </div>
         <div  class="profile__profile">
-          <h1>{{profile.info.name}}</h1>
-          <p>个人说明：{{profile.info.introduction}}</p>
+          <h1>{{profileData.info.name}}</h1>
+          <p>个人说明：{{profileData.info.introduction}}</p>
         </div>
         <div class="profile__basic">
           <div>
             <b>uuid：</b>
-            <span>{{profile.info.uuid}}</span>
+            <span>{{profileData.info.uuid}}</span>
           </div>
           <div>
             <b>手机号：</b>
-            <span>{{profile.info.mobile}}</span>
+            <span>{{profileData.info.mobile}}</span>
           </div>
           <div>
             <b>生日：</b>
-            <span>{{profile.info.name}}</span>
+            <span>{{profileData.info.birth}}</span>
           </div>
           <div>
             <b>性别：</b>
-            <span>{{profile.info.mobile}}</span>
+            <span>{{profileData.info.mobile}}</span>
           </div>
         </div>
       </div>
@@ -70,13 +70,13 @@
     <a-tabs v-model:activeKey="activeKey" :tabBarStyle="{padding: '0 10px'}">
       <a-tab-pane key="2" tab="最近我添加菜单" force-render>Content of Tab Pane 2</a-tab-pane>
       <a-tab-pane key="3" tab="批量导入菜单">Content of Tab Pane 3</a-tab-pane>
-      <a-tab-pane key="1" tab="基础设置"><profile-change /></a-tab-pane>
+      <a-tab-pane key="1" tab="基础设置"><profile-change v-bind="profileData.info" @change="onProfileChange" /></a-tab-pane>
       <a-tab-pane key="4" tab="密码修改"><password-reset /></a-tab-pane>
     </a-tabs>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onBeforeMount, onMounted, reactive, ref } from 'vue'
 import VueCropper from 'vue-cropperjs'
 import { message } from 'ant-design-vue'
 import { UserOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
@@ -86,7 +86,7 @@ import { ossConfig } from '@/config'
 import PasswordReset from '@/components/PasswordReset.vue'
 import ProfileChange from '@/components/ProfileChange.vue'
 import {
-  userDetail,
+  profile,
   UserForm
 } from '../api/ssoms'
 
@@ -110,19 +110,29 @@ interface ProfileInfo {
   info: UserForm
 }
 
-const profile = reactive<ProfileInfo>({
+const profileData = reactive<ProfileInfo>({
   loading: false,
   info: {
-    uuid: 'xxdsdeweew',
-    name: '时代大厦',
-    mobile: '1516000017882',
+    uuid: '',
+    name: '',
+    mobile: '',
     avatar: '',
     gender: 1,
-    birth: '2000-01-01',
-    introduction: '所得到的多多多多多多多多多所得到的多多，所得到的多多多多多',
+    birth: '',
+    introduction: '',
     status: 1
   }
 })
+
+onBeforeMount(() => {
+  profile().then(res => {
+    profileData.info = res
+  })
+})
+
+const onProfileChange = ({ introduction }) => {
+  profileData.info.introduction = introduction
+}
 
 const activeKey = ref('4')
 
@@ -225,7 +235,7 @@ const doUpload = async (blob: Blob) => {
       console.log(res)
       uploadState.loading = false
       uploadState.imageUrl = ossConfig.ginvdoc.domain + res.name
-      profile.info.avatar = res.name
+      profileData.info.avatar = res.name
     } catch (e) {
       // onError()
       message.error((e as Error).message)

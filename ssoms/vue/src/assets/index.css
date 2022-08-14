@@ -44,8 +44,6 @@
 .header__bar.ant-layout-header {
     height: 48px;
     padding: 0 24px;
-    background-color: #fff;
-    box-shadow: 0 0 8px 0 rgb(0 0 0 / 10%);
     display: flex;
     justify-content: space-between;
     z-index: 999;
@@ -55,6 +53,7 @@
     display: flex;
     align-items: center;
     height: 48px;
+    color: #fff;
 }
 
 .header__logo img {
@@ -65,7 +64,9 @@
 .header__logo h1 {
     font-size: 15px;
     margin: 0 0 0 8px;
-    color: #262626;
+    height: 46px;
+    line-height: 46px;
+    color: #fff;
 }
 
 .header__actions{
@@ -100,6 +101,7 @@
     padding: 0;
     display: inline-block;
     margin-left: 10px;
+    color: #fff;
   }
   
   .header__account-info .ant-dropdown-trigger{

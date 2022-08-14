@@ -62,7 +62,22 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.UserPermissionsHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPatch,
+				Method:  http.MethodGet,
+				Path:    "/user/profile",
+				Handler: user.ProfileHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/avatarUpload",
+				Handler: user.AvatarUploadHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/infoEdit",
+				Handler: user.InfoEditHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/user/passwordReset",
 				Handler: user.PasswordResetHandler(serverCtx),
 			},

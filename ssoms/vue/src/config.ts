@@ -1,6 +1,6 @@
 import Ajax from "./utils/ajax"
 
-export const systemCode = "ssoms"
+export const systemCode = <string>import.meta.env.VITE_SYSTEM_NAME || ''
 
 export const ossConfig = {
   ginv: {
@@ -18,4 +18,4 @@ export const ossConfig = {
   }
 }
 
-export const ssoms = new Ajax('ssoms')
+export const ssoms = new Ajax(systemCode, 'ssoms')

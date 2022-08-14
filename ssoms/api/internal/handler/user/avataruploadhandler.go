@@ -10,16 +10,16 @@ import (
 	"sso/ssoms/api/internal/types"
 )
 
-func PasswordResetHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AvatarUploadHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.PasswordResetReq
+		var req types.AvatarUploadReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
 			return
 		}
 
-		l := user.NewPasswordResetLogic(r.Context(), svcCtx)
-		resp, err := l.PasswordReset(&req)
+		l := user.NewAvatarUploadLogic(r.Context(), svcCtx)
+		resp, err := l.AvatarUpload(&req)
 		util.Response(w, resp, err)
 	}
 }

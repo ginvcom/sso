@@ -106,6 +106,22 @@ type UserPermissionsReply struct {
 	Systems []Option `json:"system"`
 }
 
+type AvatarUploadReq struct {
+	Avatar string `json:"avatar"`
+}
+
+type AvatarUploadReply struct {
+	Success bool `json:"success"`
+}
+
+type InfoEditReq struct {
+	Introduction string `json:"introduction"`
+}
+
+type InfoEditReply struct {
+	Success bool `json:"success"`
+}
+
 type PasswordResetReq struct {
 	OldPassword     string `json:"oldPassword"`
 	Password        string `json:"password"`

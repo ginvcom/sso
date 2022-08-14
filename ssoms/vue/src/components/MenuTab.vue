@@ -75,10 +75,10 @@
         <template
           v-for="(fragment, i) in record.objectName
             .toString()
-            .split(new RegExp(`(?<=${state.params.objectName})|(?=${state.params.objectName})`, 'i'))"
+            .split(new RegExp(`(?<=${state.filterParams.objectName})|(?=${state.filterParams.objectName})`, 'i'))"
         >
           <b
-            v-if="fragment.toLowerCase() === state.params.objectName.toLowerCase()"
+            v-if="fragment.toLowerCase() === state.filterParams.objectName.toLowerCase()"
             :key="i"
             style="color: #f50"
           >
@@ -108,10 +108,10 @@
         <template
           v-for="(fragment, i) in record.key
             .toString()
-            .split(new RegExp(`(?<=${state.params.key})|(?=${state.params.key})`, 'i'))"
+            .split(new RegExp(`(?<=${state.filterParams.key})|(?=${state.filterParams.key})`, 'i'))"
         >
           <b
-            v-if="fragment.toLowerCase() === state.params.key.toLowerCase()"
+            v-if="fragment.toLowerCase() === state.filterParams.key.toLowerCase()"
             :key="i"
             style="color: #f50"
           >
@@ -367,6 +367,11 @@ interface System {
   icon: string
 }
 
+interface FilterParams {
+  objectName: string
+  key: string
+}
+
 interface State {
   loading: boolean
   currentSystem: System
@@ -376,6 +381,7 @@ interface State {
   menus: Array<MenuOption>
   apiParentMenus: Array<MenuOption>
   params: ObjectListReqParams
+  filterParams: FilterParams
 }
 
 
@@ -393,6 +399,10 @@ const state = reactive<State>({
   systems: [],
   menus: [],
   apiParentMenus: [],
+  filterParams: {
+    objectName: '',
+    key: ''
+  },
   params: {
     topKey: '',
     objectName: '',
@@ -615,12 +625,13 @@ const onChangeSystem = (obj: Obj) => {
 }
 
 const onSearch = (values: any) => {
-  if (!values && !values.objectName) {
+  const { key, objectName } = values
+  state.filterParams = { key, objectName }
+  if (!key && !objectName) {
     respState.list = srcList
     state.expandedRowKeys = getAllChildrenKeys(srcList, [])
     return
   }
-  
   const { matches, expandedRowKeys } = serchOnSrcList(srcList, values.key, values.objectName, [], [], [])
   respState.list = []
   if (!srcList) {
