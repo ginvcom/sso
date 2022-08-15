@@ -125,8 +125,10 @@ const profileData = reactive<ProfileInfo>({
 })
 
 onBeforeMount(() => {
-  profile().then(res => {
-    profileData.info = res
+  profile().then(data => {
+    profileData.info = data
+    uploadState.imageName = data.avatar
+    uploadState.imageUrl = ossConfig.ginvdoc.domain + data.avatar
   })
 })
 
