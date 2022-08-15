@@ -365,6 +365,7 @@
 .pofile__avatar{
     width: 260px;
     margin-top: -10px;
+    position: relative;
 }
 
 .profile__profile{
