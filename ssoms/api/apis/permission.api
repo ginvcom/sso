@@ -1,11 +1,11 @@
 type RolePermissionsReq {
 	RoleUUID string `path:"roleUUID"`
-	TypeName string `form:"typeName"` // system, others
 	PUUID    string `form:"pUUID,optional"`
 }
 
 type RolePermissionsReply {
-	UUIDArray []string `json:"uuidArray"`
+	MenuUUIDArray []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
 }
 
 type GrantReq {
