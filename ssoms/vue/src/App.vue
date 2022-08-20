@@ -87,7 +87,7 @@ onMounted(() => {
     nextTick(() => {
       getMenus()
     })
-  }, 300)
+  }, 200)
 })
 
 const getUserCookie = () => {
