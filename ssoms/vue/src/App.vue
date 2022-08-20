@@ -82,12 +82,7 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
-  console.log('getMenus')
-  setTimeout(() => {
-    nextTick(() => {
-      getMenus()
-    })
-  }, 200)
+  getMenus(1)
 })
 
 const getUserCookie = () => {
@@ -118,13 +113,18 @@ const state = reactive<State>({
   openKeys: []
 })
 
-const getMenus = () => {
+const getMenus = (times: number) => {
   try {
     const serverRouter = sessionStorage.getItem(SERVER_ROUTER_MENU_KEY)
-    console.log('serverRouter', serverRouter)
     if (serverRouter !== null) {
-      console.log(JSON.parse(serverRouter))
       state.menus = JSON.parse(serverRouter)
+    } else {
+      times++
+      if (times < 3) {
+        setTimeout(() => {
+          getMenus(times)
+        }, 200)
+      }
     }
   } catch (err) {
     console.log(err)
