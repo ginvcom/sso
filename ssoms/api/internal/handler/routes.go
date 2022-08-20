@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	home "sso/ssoms/api/internal/handler/home"
 	object "sso/ssoms/api/internal/handler/object"
 	permission "sso/ssoms/api/internal/handler/permission"
 	role "sso/ssoms/api/internal/handler/role"
@@ -14,6 +15,16 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/home/statistic",
+				Handler: home.HomeStatisticHandler(serverCtx),
+			},
+		},
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{

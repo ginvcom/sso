@@ -31,6 +31,7 @@ type (
 		FindOneByUuid(ctx context.Context, uuid string) (*Object, error)
 		Update(ctx context.Context, data *Object) error
 		Delete(ctx context.Context, uuid string) error
+		CountByType(ctx context.Context) (*[]ObjectTypeCountItem, error)
 	}
 
 	defaultObjectModel struct {
@@ -72,6 +73,11 @@ type (
 		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
+	}
+
+	ObjectTypeCountItem struct{
+		Typ    int64    `db:"type"`      // 类型: 1操作对象, 2菜单, 3操作(接口)
+		Count   int64    `db:"count"`    // 数量
 	}
 )
 
@@ -247,4 +253,16 @@ func (m *defaultObjectModel) Update(ctx context.Context, newData *Object) (err e
 	}
 
 	return err
+}
+
+
+// 用于首页展示统计数量
+func (m *defaultObjectModel) CountByType(ctx context.Context) (resp *[]ObjectTypeCountItem, err error) {
+	query := fmt.Sprintf("select `type`, count(*) as count from %s where `is_delete` = 0 and `status` =1 group by type", m.table)
+	
+	// 确定sql无参数，不需要Prepare
+	resp = new([]ObjectTypeCountItem)
+	err = m.conn.QueryRowsCtx(ctx, resp, query)
+
+	return resp, err
 }

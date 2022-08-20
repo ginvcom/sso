@@ -33,6 +33,7 @@ type (
 		TransCtx(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error
 		TransDeletePermission(ctx context.Context, session sqlx.Session, roleUUID, topKey string, updateTime time.Time) error
 		TransAddPermission(ctx context.Context, session sqlx.Session, dataArray []Permission, updateTime time.Time) error
+		CountPermisson(ctx context.Context) (int64, error)
 	}
 
 	defaultPermissionModel struct {
@@ -139,6 +140,13 @@ func (m *defaultPermissionModel) TransAddPermission(ctx context.Context, session
 		return
 	}
 	_, err = stmt.ExecCtx(ctx, placeholder...)
+	return
+}
+
+// 首页授权数量统计
+func (m *defaultPermissionModel) CountPermisson(ctx context.Context) (count int64, err error) {
+	query := fmt.Sprintf("select count(*) as count from %s where `is_delete`= 0", m.table)
+	err = m.conn.QueryRowCtx(ctx, &count, query)
 	return
 }
 

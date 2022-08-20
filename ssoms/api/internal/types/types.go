@@ -14,6 +14,15 @@ type OptionWithDisabled struct {
 	Disabled bool   `json:"disabled"`
 }
 
+type StatisticReply struct {
+	RoleAmount       int64 `json:"roleAmount"`
+	UserAmount       int64 `json:"userAmount"`
+	SystemAmount     int64 `json:"systemAmount"`
+	MenuAmount       int64 `json:"menuAmount"`
+	ActionAmount     int64 `json:"actionAmount"`
+	PermissionAmount int64 `json:"permissionAmount"`
+}
+
 type UserListReq struct {
 	Name     string `form:"name,optional"`
 	Mobile   string `form:"mobile,optional"`

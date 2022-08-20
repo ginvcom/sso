@@ -66,6 +66,7 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 				Icon:       obj.Icon,
 				Identifier: obj.Identifier,
 				SubType:    obj.SubType,
+				Parents:    make([]string, 0, 1),
 			},
 			Key:   obj.Key,
 			PUUID: obj.Puuid,
@@ -79,11 +80,14 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 }
 
 func makeTree(obs []*types.Menu, puuid string) []*types.Menu {
-	var tree []*types.Menu
+	tree := make([]*types.Menu, 0, 1)
 	for _, child := range obs {
 		if child.PUUID == puuid {
 			item := child
 			item.Children = makeTree(obs, item.UUID)
+			if puuid != "" {
+				item.Meta.Parents = append(item.Meta.Parents, puuid)
+			}
 			tree = append(tree, item)
 		}
 	}

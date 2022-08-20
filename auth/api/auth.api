@@ -45,10 +45,11 @@ type SessionMenusReq {
 }
 
 type Meta {
-	Name       string `json:"n"` // 菜单名
-	Icon       string `json:"i"` // 菜单icon
-	Identifier string `json:"u"` // 唯一标识符
-	SubType    int64  `json:"t"` // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+	Name       string   `json:"n"` // 菜单名
+	Icon       string   `json:"i"` // 菜单icon
+	Identifier string   `json:"u"` // 唯一标识符
+	SubType    int64    `json:"t"` // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+	Parents    []string `json:"p"` // 所有父级菜单uuid
 }
 
 type Menu {

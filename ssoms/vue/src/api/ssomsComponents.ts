@@ -13,6 +13,15 @@ export interface OptionWithDisabled {
 	disabled: boolean
 }
 
+export interface StatisticReply {
+	roleAmount: number
+	userAmount: number
+	systemAmount: number
+	menuAmount: number
+	actionAmount: number
+	permissionAmount: number
+}
+
 export interface UserListReq {
 }
 

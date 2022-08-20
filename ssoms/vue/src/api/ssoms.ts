@@ -3,6 +3,13 @@ import * as components from "./ssomsComponents"
 export * from "./ssomsComponents"
 
 /**
+ * @description "首页统计数据"
+ */
+export function homeStatistic() {
+	return ssoms.get<components.StatisticReply>("/home/statistic")
+}
+
+/**
  * @description "用户列表"
  * @param params
  */

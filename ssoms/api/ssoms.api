@@ -17,3 +17,22 @@ type OptionWithDisabled {
 	Extra    string `json:"extra,omitempty"`
 	Disabled bool   `json:"disabled"`
 }
+
+type StatisticReply {
+	RoleAmount       int64 `json:"roleAmount"`
+	UserAmount       int64 `json:"userAmount"`
+	SystemAmount     int64 `json:"systemAmount"`
+	MenuAmount       int64 `json:"menuAmount"`
+	ActionAmount     int64 `json:"actionAmount"`
+	PermissionAmount int64 `json:"permissionAmount"`
+}
+
+@server(
+	group: home
+)
+
+service ssoms-api {
+	@doc "首页统计数据"
+	@handler homeStatistic
+	get /home/statistic returns (StatisticReply)
+}

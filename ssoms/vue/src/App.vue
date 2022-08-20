@@ -43,18 +43,7 @@
             mode="inline"
             :style="{ borderRight: 0 }"
           >
-          <a-menu-item key="1">
-            <block-outlined />
-            <router-link to="/object">对象管理</router-link>
-          </a-menu-item>
-          <a-menu-item key="2">
-            <UserOutlined />
-            <router-link to="/user">用户管理</router-link>
-          </a-menu-item>
-          <a-menu-item key="5">
-            <appstore-outlined />
-            <router-link to="/role">角色管理</router-link>
-          </a-menu-item>
+          <menu-item v-for="menu in state.menus" :key="menu.n" v-bind="menu" />
           </a-menu>
         </a-layout-sider>
         <a-layout-content class="main__bar">
@@ -65,7 +54,7 @@
   </a-config-provider>
 </template>
 <script setup lang="ts">
-import { onBeforeMount, reactive } from 'vue'
+import { nextTick, onBeforeMount, onMounted, reactive } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -79,8 +68,10 @@ import {
 import router from '@/router'
 import { systemCode } from '@/config'
 import { server } from '@/utils/ajax'
+import MenuItem from '@/components/MenuItem.vue'
 import { message } from 'ant-design-vue'
-import { ossConfig } from '@/config'
+import { ossConfig, SERVER_ROUTER_MENU_KEY } from '@/config'
+import { Menu } from '@/api/auth'
 
 dayjs.locale('zh-cn')
 
@@ -88,6 +79,15 @@ const user = reactive({ name: '', avatar: '' })
 
 onBeforeMount(() => {
   getUserCookie()
+})
+
+onMounted(() => {
+  console.log('getMenus')
+  setTimeout(() => {
+    nextTick(() => {
+      getMenus()
+    })
+  }, 300)
 })
 
 const getUserCookie = () => {
@@ -104,10 +104,32 @@ const getUserCookie = () => {
   }
 }
 
-const state = reactive({
+
+
+interface State {
+  menus: Array<Menu>
+  selectedKeys: Array<string>
+  openKeys: Array<string>
+}
+
+const state = reactive<State>({
+  menus: [],
   selectedKeys: [],
   openKeys: []
 })
+
+const getMenus = () => {
+  try {
+    const serverRouter = sessionStorage.getItem(SERVER_ROUTER_MENU_KEY)
+    console.log('serverRouter', serverRouter)
+    if (serverRouter !== null) {
+      console.log(JSON.parse(serverRouter))
+      state.menus = JSON.parse(serverRouter)
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 const onHeaderClick = ({ key }) => {
   if (key === 'profile') {

@@ -2,48 +2,48 @@
 <div>
   <a-row :gutter="32">
     <a-col :span="16">
-      <h1 class="home__header">菜单 & 授权统计</h1>
+      <h1 class="home__header">菜单 & 操作新增统计</h1>
       <div ref="barChartContainer" style="height: 240px"></div>
     </a-col>
     <a-col :span="8">
       <a-row :gutter="20">
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="角色" :value="4">
+          <a-statistic class="home__statistic" title="角色" :value="statisticState.data.roleAmount">
             <template #suffix>
               <team-outlined class="blue" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="用户" :value="1">
+          <a-statistic class="home__statistic" title="用户" :value="statisticState.data.userAmount">
             <template #suffix>
               <user-outlined class="yellow" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="系统" :value="5">
+          <a-statistic class="home__statistic" title="系统" :value="statisticState.data.systemAmount">
             <template #suffix>
               <appstore-outlined class="purple" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="菜单" :value="30">
+          <a-statistic class="home__statistic" title="菜单" :value="statisticState.data.menuAmount">
             <template #suffix>
               <unordered-list-outlined class="pink" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="操作" :value="1128">
+          <a-statistic class="home__statistic" title="操作" :value="statisticState.data.actionAmount">
             <template #suffix>
               <calculator-outlined class="orange" />
             </template>
           </a-statistic>
         </a-col>
         <a-col :span="12">
-          <a-statistic class="home__statistic" title="授权" :value="523">
+          <a-statistic class="home__statistic" title="授权" :value="statisticState.data.permissionAmount">
             <template #suffix>
               <audit-outlined class="green" />
             </template>
@@ -96,7 +96,9 @@ import {
   ObjectOption,
   RoleOperationsReply,
   UserForm,
-  Object as Obj
+  Object as Obj,
+  homeStatistic,
+  StatisticReply
 } from '@/api/ssoms'
 import { ossConfig } from '@/config'
 
@@ -115,10 +117,28 @@ const state = reactive<State>({
   systems: []
 })
 
+interface StatisticState {
+  loading: boolean
+  data: StatisticReply
+}
+
+const statisticState = reactive<StatisticState>({
+  loading: false,
+  data: {
+    roleAmount: 0,
+    userAmount: 0,
+    systemAmount: 0,
+    menuAmount: 0,
+    actionAmount: 0,
+    permissionAmount: 0
+  }
+})
+
 const barChartContainer = ref()
 
 onBeforeMount(() => {
   getSystemOptions()
+  getStatistic()
 })
 
 const getSystemOptions = () => {
@@ -126,6 +146,12 @@ const getSystemOptions = () => {
     state.systems = data.list
   }).finally(() => {
     state.loading = false
+  })
+}
+
+const getStatistic = () => {
+  homeStatistic().then(data => {
+    statisticState.data = data
   })
 }
 
@@ -138,24 +164,46 @@ onMounted(() => {
 })
 
 const initChart = () => {
-  fetch('https://gw.alipayobjects.com/os/antfincdn/PC3daFYjNw/column-data.json')
-  .then((data) => data.json())
-  .then((data) => {
-    const column = new Column(barChartContainer.value, {
-      data,
-      theme: {
-        colors10: ['#1890ff', '#fa541c', '#41ca9d', '#ed8936']
-      },
-      maxColumnWidth: 10,
-      xField: 'city',
-      yField: 'value',
-      seriesField: 'type',
-      isGroup: true,
-      columnStyle: {
-        radius: [2, 2, 0, 0],
-      },
-    })
-    column.render()
+  const data = [
+    { "month": "9月", "type": "菜单", "value": 10 },
+    { "month": "9月", "type": "操作", "value": 40 },
+    { "month": "10月", "type": "菜单", "value": 20 },
+    { "month": "10月", "type": "操作", "value": 80 },
+    { "month": "11月", "type": "菜单", "value": 30 },
+    { "month": "11月", "type": "操作", "value": 120 },
+    { "month": "12月", "type": "菜单", "value": 35 },
+    { "month": "12月", "type": "操作", "value": 150 },
+    { "month": "1月", "type": "菜单", "value": 40 },
+    { "month": "1月", "type": "操作", "value": 150 },
+    { "month": "2月", "type": "菜单", "value": 12 },
+    { "month": "2月", "type": "操作", "value": 120 },
+    { "month": "3月", "type": "菜单", "value": 10 },
+    { "month": "3月", "type": "操作", "value": 50 },
+    { "month": "4月", "type": "菜单", "value": 20 },
+    { "month": "4月", "type": "操作", "value": 40 },
+    { "month": "5月", "type": "菜单", "value": 40 },
+    { "month": "5月", "type": "操作", "value": 40 },
+    { "month": "6月", "type": "菜单", "value": 20 },
+    { "month": "6月", "type": "操作", "value": 60 },
+    { "month": "7月", "type": "菜单", "value": 30 },
+    { "month": "7月", "type": "操作", "value": 100 },
+    { "month": "8月", "type": "菜单", "value": 10 },
+    { "month": "8月", "type": "操作", "value": 59 }
+  ]
+  const column = new Column(barChartContainer.value, {
+    data,
+    theme: {
+      colors10: ['#1890ff', '#fa541c']
+    },
+    maxColumnWidth: 15,
+    xField: 'month',
+    yField: 'value',
+    seriesField: 'type',
+    isGroup: true,
+    columnStyle: {
+      radius: [2, 2, 0, 0],
+    },
   })
+  column.render()
 }
 </script>

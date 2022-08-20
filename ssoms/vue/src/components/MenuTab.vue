@@ -221,6 +221,11 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
+          <a-form-item label="icon图标" name="icon">
+            <a-input v-model:value="formState.form.icon" placeholder="icon图标" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
           <a-form-item label="排序值" name="sort">
             <a-input-number v-model:value="formState.form.sort" placeholder="排序值小的靠前" style="width: 100%" />
           </a-form-item>

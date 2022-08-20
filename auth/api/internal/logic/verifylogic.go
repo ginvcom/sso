@@ -56,7 +56,7 @@ func (l *VerifyLogic) urlNoAuth(path string) bool {
 func (l *VerifyLogic) isPass(req *types.VerifyRequestReq) (uuid, name string, err error) {
 	tok, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(l.svcCtx.Config.Auth.AccessSecret), nil
 	})
