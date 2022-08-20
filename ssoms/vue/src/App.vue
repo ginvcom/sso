@@ -79,9 +79,6 @@ const user = reactive({ name: '', avatar: '' })
 
 onBeforeMount(() => {
   getUserCookie()
-})
-
-onMounted(() => {
   getMenus(1)
 })
 
