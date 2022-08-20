@@ -36,8 +36,10 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 	}
 	total, err := l.svcCtx.UserModel.ListCount(l.ctx, args)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
+
 	resp = &types.UserListReply{
 		Total: total,
 		List:  make([]types.User, 0, 1),
@@ -45,8 +47,20 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 
 	listData, err := l.svcCtx.UserModel.ListData(l.ctx, args)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
+
+	var userUUIDArray []string
+	for _, role := range *listData {
+		userUUIDArray = append(userUUIDArray, role.Uuid)
+	}
+	rolesResp, err := l.svcCtx.UserToRoleModel.ListRoleByUserUUidArray(l.ctx, &userUUIDArray)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+
 	for _, user := range *listData {
 		item := types.User{
 			UUID:   user.Uuid,
@@ -55,6 +69,16 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 			Mobile: util.MobileEncode(user.Mobile),
 			Status: user.Status,
 			Gender: user.Gender,
+		}
+		item.Roles = make([]types.Option, 0, 1)
+		for _, roleItem := range *rolesResp {
+			if roleItem.UserUuid == item.UUID {
+				role := types.Option{
+					Label: roleItem.RoleName,
+					Value: roleItem.RoleUUID,
+				}
+				item.Roles = append(item.Roles, role)
+			}
 		}
 		resp.List = append(resp.List, item)
 	}

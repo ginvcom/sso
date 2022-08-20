@@ -4,7 +4,7 @@
       <h1>后台系统</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加系统</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><appstore-add-outlined /></template>添加系统</a-button>
     </div>
   </div>
   <a-table
@@ -145,7 +145,7 @@ import {
 } from '../api/ssoms'
 import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, LoadingOutlined, AppstoreAddOutlined } from '@ant-design/icons-vue'
 import { getFileName } from '../utils/file'
 import { sts } from '../api/aliOss'
 import OSS from 'ali-oss'

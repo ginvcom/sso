@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
@@ -24,13 +25,57 @@ func NewAssignedRolesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 }
 
 func (l *AssignedRolesLogic) AssignedRoles(req *types.AssignedRolesReq) (resp *types.AssignedRolesReply, err error) {
-	// TODO 用户是否删除及状态判断和角色是否删除判断
-	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, req.UUID)
+	user, err := l.svcCtx.UserModel.FindOneByUuid(l.ctx, req.UUID)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
+	if user.IsDelete == 1 {
+		err = errors.New("user has been deleted")
+		return
+	}
+
+	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, req.UUID)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+	// resp = &types.AssignedRolesReply{
+	// 	RoleUUIDArray: *roleUUIDArray,
+	// }
+
+	opts, err := l.svcCtx.RoleModel.Options(l.ctx)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+	assignedRoles := make([]types.Option, 0, 1)
+	optionsRoles := make([]types.Option, 0, 1)
+
+	for _, opt := range *opts {
+		item := types.Option{
+			Label: opt.RoleName,
+			Value: opt.RoleUUID,
+			Extra: opt.Summary,
+		}
+		assigned := false
+		for _, roleUUID := range *roleUUIDArray {
+			if opt.RoleUUID == roleUUID {
+				assignedRoles = append(assignedRoles, item)
+				assigned = true
+				break
+			}
+		}
+		if !assigned {
+			optionsRoles = append(optionsRoles, item)
+		}
+	}
+
 	resp = &types.AssignedRolesReply{
-		RoleUUIDArray: *roleUUIDArray,
+		UUID:     user.Uuid,
+		Name:     user.Name,
+		Assigned: assignedRoles,
+		Options:  optionsRoles,
 	}
 
 	return

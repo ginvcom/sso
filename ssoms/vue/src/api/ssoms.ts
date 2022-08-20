@@ -1,4 +1,4 @@
-import { ssoms } from "../config"
+import { ssoms } from "@/config"
 import * as components from "./ssomsComponents"
 export * from "./ssomsComponents"
 
@@ -45,18 +45,18 @@ export function deleteUser(params: components.DeleteUserReqParams) {
 
 /**
  * @description "用户搜索下拉选项"
- * @param req
+ * @param params
  */
-export function userFilterOptions(req: components.UserFilterOptionsReq) {
-	return ssoms.get<components.UserFilterOptionsReply>("/filterOptions", req)
+export function userFilterOptions(params: components.UserFilterOptionsReqParams) {
+	return ssoms.get<components.UserFilterOptionsReply>("/filterOptions", params)
 }
 
 /**
  * @description "用户已分配的角色"
- * @param req
+ * @param params
  */
-export function assignedRoles(req: components.AssignedRolesReq) {
-	return ssoms.get<components.AssignedRolesReply>("/assignedRoles", req)
+export function assignedRoles(params: components.AssignedRolesReqParams) {
+	return ssoms.get<components.AssignedRolesReply>("/assignedRoles", params)
 }
 
 /**
@@ -64,7 +64,7 @@ export function assignedRoles(req: components.AssignedRolesReq) {
  * @param req
  */
 export function assignRole(req: components.AssignRoleReq) {
-	return ssoms.patch<components.AssignRoleReply>("/assignRole", req)
+	return ssoms.post<components.AssignRoleReply>("/assignRole", req)
 }
 
 /**
@@ -156,10 +156,10 @@ export function roleOptions() {
 
 /**
  * @description "角色已拥有的用户"
- * @param req
+ * @param params
  */
-export function assignedUsers(req: components.AssignedUsersReq) {
-	return ssoms.post<components.AssignedUsersReply>("/assignedUsers", req)
+export function assignedUsers(params: components.AssignedUsersReqParams) {
+	return ssoms.get<components.AssignedUsersReply>("/assignedUsers", params)
 }
 
 /**
@@ -264,8 +264,9 @@ export function rolePermissions(params: components.RolePermissionsReqParams) {
 
 /**
  * @description "将对象执行操作的权限授予角色"
+ * @param params
  * @param req
  */
-export function grant(req: components.GrantReq) {
-	return ssoms.post<components.GrantReply>("/permission/grant", req)
+export function grant(params: components.GrantReqParams, req: components.GrantReq) {
+	return ssoms.put<components.GrantReply>("/permission/role/:roleUUID/grant", params, req)
 }

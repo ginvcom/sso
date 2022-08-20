@@ -23,6 +23,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: verifyHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/session-menus",
+				Handler: menusHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPost,
 				Path:    "/sign-out",
 				Handler: signOutHandler(serverCtx),

@@ -38,6 +38,31 @@ type VerifyRequestReply {
 	Name string `json:"name"`
 }
 
+type SessionMenusReq {
+	Token      string `form:"token"`
+	SystemCode string `form:"systemCode"`
+	// SessionRoleUUID string `json:"sessionRoleUUID"`
+}
+
+type Meta {
+	Name       string `json:"n"` // 菜单名
+	Icon       string `json:"i"` // 菜单icon
+	Identifier string `json:"u"` // 唯一标识符
+	SubType    int64  `json:"t"` // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+}
+
+type Menu {
+	UUID     string  `json:"n"` // 路由命名
+	Key      string  `json:"p"` // 路由路径
+	Meta     Meta    `json:"m"` // 路由meat
+	Children []*Menu `json:"c"` // 路由children
+	PUUID    string  `json:"-"`
+}
+
+type SessionMenusReply {
+	List []*Menu `json:"list"`
+}
+
 service auth-api {
 	@doc "登录账号"
 	@handler signIn
@@ -46,6 +71,14 @@ service auth-api {
 	@doc "验证请求"
 	@handler verify
 	post /verify-request (VerifyRequestReq) returns (VerifyRequestReply)
+	
+	@doc "当前作用的角色分配的菜单权限"
+	@handler menus
+	get /session-menus (SessionMenusReq) returns (SessionMenusReply)
+	
+	// @doc "当前作用的角色某个菜单下分配的操作权限"
+	// @handler actions
+	// get /session-menu-actions (SessionMenuActionReq) returns (SessionMenuActionReply)
 	
 	@doc "退出登录"
 	@handler signOut

@@ -1,20 +1,23 @@
 type RolePermissionsReq {
 	RoleUUID string `path:"roleUUID"`
-	PUUID    string `form:"pUUID,optional"`
+	TopKey   string `form:"topKey"`
 }
 
 type RolePermissionsReply {
-	MenuUUIDArray []string `json:"menuUUIDArray"`
+	RoleName        string   `json:"roleName"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
 	ActionUUIDArray []string `json:"actionUUIDArray"`
 }
 
 type GrantReq {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	RoleUUID        string   `path:"roleUUID"`
+	TopKey          string   `json:"topKey"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
 }
 
 type GrantReply {
-	UUIDArray []string `json:"uuidArray"`
+	Success bool `json:"success"`
 }
 
 @server(
@@ -29,5 +32,5 @@ service ssoms-api {
 	
 	@doc "将对象执行操作的权限授予角色"
 	@handler grant
-	post /grant (GrantReq) returns (GrantReply)
+	put /role/:roleUUID/grant (GrantReq) returns (GrantReply)
 }

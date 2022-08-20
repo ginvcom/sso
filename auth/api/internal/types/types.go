@@ -40,3 +40,27 @@ type VerifyRequestReply struct {
 	UUID string `json:"uuid"`
 	Name string `json:"name"`
 }
+
+type SessionMenusReq struct {
+	Token      string `form:"token"`
+	SystemCode string `form:"systemCode"`
+}
+
+type Meta struct {
+	Name       string `json:"n"` // 菜单名
+	Icon       string `json:"i"` // 菜单icon
+	Identifier string `json:"u"` // 唯一标识符
+	SubType    int64  `json:"t"` // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+}
+
+type Menu struct {
+	UUID     string  `json:"n"` // 路由命名
+	Key      string  `json:"p"` // 路由路径
+	Meta     Meta    `json:"m"` // 路由meat
+	Children []*Menu `json:"c"` // 路由children
+	PUUID    string  `json:"-"`
+}
+
+type SessionMenusReply struct {
+	List []*Menu `json:"list"`
+}

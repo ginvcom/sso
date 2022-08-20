@@ -36,7 +36,7 @@ type (
 		PasswordReset(ctx context.Context, uuid, md5Password, salt string) error
 		Delete(ctx context.Context, uuid string) error
 		FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (*[]UserOption, error)
-		UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (*[]UserOption, error)
+		UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (*[]User, error)
 	}
 
 	defaultUserModel struct {
@@ -48,6 +48,8 @@ type (
 		UUID   string `db:"uuid"`
 		Name   string `db:"name"`
 		Avatar string `db:"avatar"`
+		Status int64  `db:"status"`
+
 	}
 
 	UserListArgs struct {
@@ -295,10 +297,10 @@ func (m *defaultUserModel) PasswordReset(ctx context.Context, uuid, md5Password,
 
 func (m *defaultUserModel) FilterOptions(ctx context.Context, args *UserFilterOptionsArgs) (options *[]UserOption, err error) {
 	var placeholder []interface{}
-	query := fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 order by create_time desc limit ?", m.table)
+	query := fmt.Sprintf("select uuid, name, avatar, status from %s where `is_delete` = 0 order by create_time desc limit ?", m.table)
 	if args.Name != "" {
 		placeholder = append(placeholder, args.Name + "%")
-		query = fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 and name like ? order by create_time desc limit ?", m.table)
+		query = fmt.Sprintf("select uuid, name, avatar, status from %s where `is_delete` = 0 and name like ? order by create_time desc limit ?", m.table)
 	}
 	
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
@@ -312,9 +314,9 @@ func (m *defaultUserModel) FilterOptions(ctx context.Context, args *UserFilterOp
 	return
 }
 
-func (m *defaultUserModel) UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (options *[]UserOption, err error) {
-	options = new([]UserOption)
-	if len(*userUUIDArray) == 0 {
+func (m *defaultUserModel) UserOptionsInUUIDArray(ctx context.Context, userUUIDArray *[]string) (options *[]User, err error) {
+	options = new([]User)
+	if *userUUIDArray == nil || len(*userUUIDArray) == 0 {
 		return
 	}
 	uuids:= "("
@@ -327,7 +329,7 @@ func (m *defaultUserModel) UserOptionsInUUIDArray(ctx context.Context, userUUIDA
 		uuids += "?"
 	}
 	uuids += ")"
-	query := fmt.Sprintf("select uuid, name, avatar from %s where `is_delete` = 0 and `status` = 1 and uuid in %s", m.table, uuids)
+	query := fmt.Sprintf("select %s from %s where `uuid` in %s", userRows, m.table, uuids)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err != nil {
 		return

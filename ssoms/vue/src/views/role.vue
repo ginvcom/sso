@@ -1,10 +1,10 @@
 <template>
   <div class="content-header is-sticky">
     <div>
-      <h1>角色</h1>
+      <h1>角色管理</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加角色</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><usergroup-add-outlined /></template>添加角色</a-button>
     </div>
   </div>
   <a-table
@@ -26,7 +26,12 @@
       <template v-if="column.dataIndex === 'summary'">
         <div>{{record.summary}}</div>
       </template>
+      <template v-if="column.dataIndex === 'usersAmount'">
+        <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: record.roleUUID } }">{{record.usersAmount}}</router-link>
+      </template>
       <template v-if="column.dataIndex === 'actions'">
+        <router-link :to="{ path: 'permission', query: { roleUUID: record.roleUUID } }">授权</router-link>
+        <a-divider type="vertical" />
         <a @click="initEdit(record.roleUUID)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
@@ -75,10 +80,10 @@ import {
   RoleListReply,
   RoleForm,
 RoleListReqParams
-} from '../api/ssoms'
+} from '@/api/ssoms'
 import type { FormInstance } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
-import { TeamOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { TeamOutlined, UsergroupAddOutlined } from '@ant-design/icons-vue'
 
 /**
  * 这是表格的列定义
@@ -94,10 +99,14 @@ const columns = [
     dataIndex: 'summary'
   },
   {
+    title: '已分配用户数',
+    dataIndex: 'usersAmount'
+  },
+  {
     title: '操作',
     dataIndex: 'actions',
     align: 'center',
-    width: '120px'
+    width: '150px'
   }
 ]
 
@@ -111,7 +120,7 @@ interface State {
  * 这是列表的入参
  * 没有动态变化，所以不使用reactive
  */
-const state = reactive({
+const state = reactive<State>({
   loading: false, // 列表是否加载完成
   params: {
     roleName: '',

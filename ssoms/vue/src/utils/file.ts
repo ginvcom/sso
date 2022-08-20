@@ -8,7 +8,7 @@ export function getFileName (file: File): string {
   return key
 }
 
-export  function getExt (file: File) {
+export function getExt (file: File) {
   const dot = file.name.lastIndexOf('.')
   const ext = file.name.substring(dot)
   if (file.type === 'image/jpeg') {

@@ -1,10 +1,10 @@
 <template>
   <div class="content-header is-sticky">
     <div>
-      <h1>用户</h1>
+      <h1>用户管理</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd"><template #icon><plus-outlined /></template>添加用户</a-button>
+      <a-button type="primary" @click="initAdd"><template #icon><user-add-outlined /></template>添加用户</a-button>
     </div>
   </div>
   <a-table
@@ -34,7 +34,15 @@
         <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
         <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
       </template>
+      <template v-if="column.dataIndex === 'roles'">
+        <span v-for="(role,i) in record.roles" :key="role.value">
+          <template v-if="i > 0">、</template>
+          <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: role.value } }">{{role.label}}</router-link>
+        </span>
+      </template>
       <template v-if="column.dataIndex === 'actions'">
+        <a @click="initAssignRole(record.uuid)">分配角色</a>
+        <a-divider type="vertical" />
         <a @click="initEdit(record.uuid)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
@@ -132,6 +140,47 @@
       </a-form-item>
     </a-form>
   </a-modal>
+  <a-modal
+    width="800px"
+    v-model:visible="assignFormState.visible"
+    :title="`用户“${assignFormState.name}”角色分配`"
+    :loading="assignFormState.loading"
+    :maskClosable="false"
+    @cancel="onCancel"
+    @ok="onAssignRole">
+    <a-form layout="vertical" ref="userAssignFormmRef" :model="formState.form">
+      <h3>已分配角色</h3>
+      <a-row :gutter="24">
+        <a-col v-for="role in assignFormState.assigned" :key="role.value" :span="8">
+          <div class="user-assign__item is-active" @click="removeAssignRole(role.value)">
+            <div>
+              <team-outlined />
+              <span style="margin-left: 10px">{{role.label}}</span>
+            </div>
+            <p>{{role.extra}}</p>
+          </div>
+        </a-col>
+        <a-col v-if="assignFormState.assigned.length == 0" :span="8" :offset="8">
+          <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+        </a-col>
+      </a-row>
+      <h3 style="margin-top: 20px">可分配角色</h3>
+      <a-row :gutter="24">
+        <a-col v-for="role in assignFormState.options" :key="role.value" :span="8">
+          <div class="user-assign__item" @click="addAssignRole(role.value)">
+            <div>
+              <team-outlined />
+              <span style="margin-left: 10px">{{role.label}}</span>
+            </div>
+            <p>{{role.extra}}</p>
+          </div>
+        </a-col>
+        <a-col v-if="assignFormState.options.length == 0" :span="8" :offset="8">
+          <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+        </a-col>
+      </a-row>
+    </a-form>
+  </a-modal>
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
@@ -145,14 +194,17 @@ import {
   deleteUser,
   UserListReqParams,
   UserListReply,
-  UserForm
-} from '../api/ssoms'
+  UserForm,
+  assignedRoles,
+  Option,
+assignRole
+} from '@/api/ssoms'
 import { sts } from '../api/aliOss'
-import type { FormInstance, UploadFile, UploadChangeParam, UploadProps } from 'ant-design-vue'
-import { message } from 'ant-design-vue'
-import { UserOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
+import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
+import { message, Empty } from 'ant-design-vue'
+import { UserOutlined, PlusOutlined, LoadingOutlined, UserAddOutlined, TeamOutlined } from '@ant-design/icons-vue'
 import OSS from 'ali-oss'
-import { getFileName } from '../utils/file'
+import { getFileName } from '@/utils/file'
 import { ossConfig } from '@/config'
 
 /**
@@ -177,10 +229,14 @@ const columns = [
     dataIndex: 'status'
   },
   {
+    title: '分配的角色',
+    dataIndex: 'roles'
+  },
+  {
     title: '操作',
     dataIndex: 'actions',
     align: 'center',
-    width: '120px'
+    width: '180px'
   }
 ]
 
@@ -189,6 +245,8 @@ interface State {
   loading: boolean
   params: UserListReqParams
 }
+
+const simpleImage = ref(Empty.PRESENTED_IMAGE_SIMPLE)
 
 
 /**
@@ -476,6 +534,65 @@ const doUpload = async (blob: Blob) => {
       // onError()
       message.error((e as Error).message)
     }
+  }
+}
+
+interface AssignFormState {
+  visible: boolean
+  loading: boolean
+  name: string
+  uuid: string
+  assigned: Array<Option>
+	options: Array<Option>
+}
+
+const assignFormState = reactive<AssignFormState>({
+  visible: false,
+  loading: false,
+  name: '',
+  uuid: '',
+  assigned: [],
+  options: []
+})
+
+// 用户分配角色弹窗
+const initAssignRole = (uuid: string) => {
+  assignedRoles({ uuid }).then((data) => {
+    assignFormState.assigned = data.assigned
+    assignFormState.options = data.options
+    assignFormState.uuid = data.uuid
+    assignFormState.name = data.name
+    assignFormState.visible = true
+  })
+}
+
+const onAssignRole = () => {
+  assignFormState.loading = true
+  const roleUUIDArray = assignFormState.assigned.map(item => item.value)
+  assignRole({ uuid: assignFormState.uuid, roleUUIDArray }).then(() => {
+    message.success('用户分配角色修改成功')
+    assignFormState.visible = false
+    getList()
+  }).finally(() => {
+    assignFormState.loading = false
+  })
+}
+
+const addAssignRole = (roleUUID: string) => {
+  const index = assignFormState.options.findIndex(item => item.value === roleUUID)
+  if (index > -1) {
+    const role = assignFormState.options[index]
+    assignFormState.assigned.push(role)
+    assignFormState.options.splice(index, 1)
+  }
+}
+
+const removeAssignRole = (roleUUID: string) => {
+  const index = assignFormState.assigned.findIndex(item => item.value === roleUUID)
+  if (index > -1) {
+    const role = assignFormState.assigned[index]
+    assignFormState.options.unshift(role)
+    assignFormState.assigned.splice(index, 1)
   }
 }
 </script>

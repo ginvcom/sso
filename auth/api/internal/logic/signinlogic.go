@@ -34,7 +34,7 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 	user, err := l.svcCtx.UserModel.FindOne(l.ctx, req.Mobile)
 	if err != nil {
 		if err == sqlc.ErrNotFound {
-			err = errors.New("mobile or password error")
+			err = errors.New("mobile not exits")
 		}
 
 		return
@@ -43,7 +43,7 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 	password := util.MD5(req.Password + user.Salt)
 
 	if password != user.Password {
-		err = errors.New("mobile or password error")
+		err = errors.New("password error")
 		return
 	}
 

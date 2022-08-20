@@ -32,6 +32,7 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 	}
 	total, err := l.svcCtx.RoleModel.ListCount(l.ctx, args)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
 	resp = &types.RoleListReply{
@@ -41,13 +42,31 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 
 	listData, err := l.svcCtx.RoleModel.ListData(l.ctx, args)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
+	}
+	var roleUUIDArray []string
+	for _, role := range *listData {
+		roleUUIDArray = append(roleUUIDArray, role.RoleUuid)
+	}
+	countResp, err := l.svcCtx.UserToRoleModel.CountUserGroupByRoleUuid(l.ctx, &roleUUIDArray)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+
+	countMap := make(map[string]int64)
+	for _, count := range *countResp {
+		countMap[count.RoleUuid] = count.Count
 	}
 	for _, role := range *listData {
 		item := types.Role{
 			RoleUUID: role.RoleUuid,
 			RoleName: role.RoleName,
 			Summary:  role.Summary,
+		}
+		if count, ok := countMap[role.RoleUuid]; ok {
+			item.UsersAmount = count
 		}
 		resp.List = append(resp.List, item)
 	}

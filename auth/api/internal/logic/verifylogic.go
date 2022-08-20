@@ -60,19 +60,6 @@ func (l *VerifyLogic) isPass(req *types.VerifyRequestReq) (uuid, name string, er
 		}
 		return []byte(l.svcCtx.Config.Auth.AccessSecret), nil
 	})
-	// parser := token.NewTokenParser()
-	// tok, err := parser.ParseToken(r, l.svcCtx.Config.Auth.AccessSecret, "")
-
-	// if err != nil {
-	// 	logx.Error(err)
-	// 	err = fmt.Errorf("tokenExipreError: JwtAuthLogic isPass  ParseToken err : %w", err)
-	// 	return
-	// }
-	// if !tok.Valid {
-	// 	logx.Error("tokenValidError")
-	// 	err = fmt.Errorf("tokenValidError: JwtAuthLogic.isPass invalid userId  tokRaw:%s , tokValid :%v ", tok.Raw, tok.Valid)
-	// 	return
-	// }
 	claims, ok := tok.Claims.(jwt.MapClaims) // 解析token中对内容
 	if !ok {
 		logx.Error("tokenExipreError")

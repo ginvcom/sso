@@ -4,7 +4,14 @@ package types
 type Option struct {
 	Label string `json:"label"`
 	Value string `json:"value"`
-	Extra string `json:"extra,optional"`
+	Extra string `json:"extra,omitempty"`
+}
+
+type OptionWithDisabled struct {
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Extra    string `json:"extra,omitempty"`
+	Disabled bool   `json:"disabled"`
 }
 
 type UserListReq struct {
@@ -73,7 +80,7 @@ type DeleteUserReply struct {
 }
 
 type UserFilterOptionsReq struct {
-	Name string `json:"name,optional"`
+	Name string `form:"name,optional"`
 }
 
 type UserFilterOptionsReply struct {
@@ -81,11 +88,14 @@ type UserFilterOptionsReply struct {
 }
 
 type AssignedRolesReq struct {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type AssignedRolesReply struct {
-	RoleUUIDArray []string `json:"roleUUIDArray"`
+	UUID     string   `json:"uuid"`
+	Name     string   `json:"name"`
+	Assigned []Option `json:"assigned"`
+	Options  []Option `json:"options"`
 }
 
 type AssignRoleReq struct {
@@ -188,11 +198,25 @@ type OptionsReply struct {
 }
 
 type AssignedUsersReq struct {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `form:"roleUUID"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
+}
+
+type UserOtion struct {
+	UUID     string `json:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Status   int64  `json:"status"`
+	IsDelete int64  `json:"isDelete"`
 }
 
 type AssignedUsersReply struct {
-	Users []Option `json:"users"`
+	Total    int64       `json:"total"`
+	List     []UserOtion `json:"list"`
+	RoleName string      `json:"roleName"`
 }
 
 type AssignUserReq struct {
@@ -332,7 +356,6 @@ type DeleteObjectReply struct {
 
 type RoleOperationsReq struct {
 	TopKey string `form:"topKey,optional"` // 传systemCode
-	PUUID  string `form:"pUUID,optional"`
 }
 
 type RoleOperationsReply struct {
@@ -341,19 +364,22 @@ type RoleOperationsReply struct {
 
 type RolePermissionsReq struct {
 	RoleUUID string `path:"roleUUID"`
-	TypeName string `form:"typeName"` // system, others
-	PUUID    string `form:"pUUID,optional"`
+	TopKey   string `form:"topKey"`
 }
 
 type RolePermissionsReply struct {
-	UUIDArray []string `json:"uuidArray"`
+	RoleName        string   `json:"roleName"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
 }
 
 type GrantReq struct {
-	TypeName string `json:"typeName"` // system, others
-	PUUID    string `json:"pUUID,optional"`
+	RoleUUID        string   `path:"roleUUID"`
+	TopKey          string   `json:"topKey"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
 }
 
 type GrantReply struct {
-	UUIDArray []string `json:"uuidArray"`
+	Success bool `json:"success"`
 }

@@ -12,6 +12,8 @@
     "ali-oss": "^6.17.1",
     "ant-design-vue": "3.2.10",
     "axios": "^0.27.2",
+    "lodash-es": "^4.17.21",
+    "nprogress": "^0.2.0",
     "qs": "^6.11.0",
     "vue": "^3.2.25",
     "vue-cropperjs": "^5.0.0",

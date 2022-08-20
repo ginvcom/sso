@@ -1,10 +1,11 @@
 <template>
   <div class="content-header is-sticky">
     <div>
-      <h1>授权管理</h1>
+      <h1>角色“{{state.roleName}}”授权管理</h1>
     </div>
     <div class="content-header__actions">
-      <a-button type="primary"><save-outlined />修改授权</a-button>
+      <a-button  @click="onBack"><template #icon><arrow-left-outlined /></template>返回列表</a-button>
+      <a-button type="primary" @click="onGrant"><save-outlined />修改授权</a-button>
     </div>
   </div>
   <a-row type="flex" :gutter="32">
@@ -27,14 +28,14 @@
     </div>
   </a-col>
   <a-col flex="1">
-  <a-checkbox-group  v-model:value="formState.ActionUUIDArray" style="width: 100%">
+  <a-checkbox-group  v-model:value="formState.form.actionUUIDArray" style="width: 100%">
   <a-table
   :loading="state.loading"
   class="apis-check__table"
   bordered
   rowKey="value"
   size="small"
-  :row-selection="{ checkStrictly: false, selectedRowKeys: formState.MenuUUIDArray, onChange }"
+  :row-selection="{ checkStrictly: false, selectedRowKeys: formState.form.menuUUIDArray, onChange }"
   :dataSource="respState.list"
   :columns="columns"
   :pagination="false"
@@ -62,20 +63,27 @@
   </a-row>
 </template>
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import 'cropperjs/dist/cropper.css'
 // Object 是js的关键字, 别名处理一下
 import {
   roleOperations,
+  rolePermissions,
+  GrantReq,
   objectList,
   ObjectListReply,
   ObjectOption,
   RoleOperationsReply,
-  Object as Obj
-} from '../api/ssoms'
-import type { FormInstance } from 'ant-design-vue'
-import { SaveOutlined } from '@ant-design/icons-vue'
+  Object as Obj,
+grant
+} from '@/api/ssoms'
+import { FormInstance, message } from 'ant-design-vue'
+import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { ossConfig } from '@/config'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 
 /**
  * 这是表格的列定义
@@ -101,6 +109,7 @@ interface System {
 
 interface State {
   loading: boolean
+  roleName: string
   currentSystem: System
   systems: Array<Obj>
   params: any
@@ -113,16 +122,15 @@ interface State {
  */
 const state = reactive<State>({
   loading: false, // 列表是否加载完成
+  roleName: '',
   currentSystem: {
     icon: '',
     name: ''
   },
   systems: [],
   params: {
-    pUUID: '',
-    mobile: '',
-    page: 1,
-    pageSize: 10
+    roleUUID: '',
+    topKey: ''
   }
 })
 
@@ -134,17 +142,38 @@ const respState = reactive<RoleOperationsReply>({
 })
 
 onMounted(() => {
+  state.params.roleUUID = route.query.roleUUID
   getSystemOptions()
 })
+
+watch(
+  () => route.query.roleUUID,
+  (val) => {
+    if (val) {
+      state.params.roleUUID = val
+      getSystemOptions()
+    }
+  }
+)
 
 /**
  * 获取列表
  */
 const getList = () => {
   state.loading = true
-  roleOperations(state.params).then((data) => {
+  roleOperations({ topKey: state.params.topKey }).then((data) => {
     respState.list = data.list
-    formState.MenuUUIDArray = ['k7vcb745vcsb', '8yzo4kzfucsb']
+    getPermissions()
+  }).finally(() => {
+    state.loading = false
+  })
+}
+
+const getPermissions = () => {
+  rolePermissions(state.params).then((data) => {
+    formState.form.menuUUIDArray = data.menuUUIDArray
+    formState.form.actionUUIDArray = data.actionUUIDArray
+    state.roleName = data.roleName
   }).finally(() => {
     state.loading = false
   })
@@ -157,27 +186,29 @@ const onTableChange = ({ current, pageSize }) => {
 }
 
 const onChangeSystem = (obj: Obj) => {
-  console.log(obj)
   if (state.params.topKey === obj.key) {
     return
   }
   state.currentSystem = { icon: obj.icon, name: obj.objectName }
-  state.params = { pUUID: obj.uuid, topKey: obj.key, objectName: obj.objectName }
-  // getList()
+  state.params.topKey = obj.key
+  formState.form.topKey = obj.key
+  getList()
 }
 
 const modalFormRef = ref<FormInstance>()
 
 interface Form {
   loading: boolean
-  MenuUUIDArray: Array<string>
-  ActionUUIDArray: Array<string>
+  form: GrantReq
 }
 
 const formState = reactive<Form>({
   loading: false,
-  MenuUUIDArray: [],
-  ActionUUIDArray:[]
+  form: {
+    topKey: state.params.topKey,
+    menuUUIDArray: [],
+    actionUUIDArray: []
+  }
 })
 
 const getSystemOptions = () => {
@@ -187,6 +218,7 @@ const getSystemOptions = () => {
       const firstSystem = state.systems[0]
       state.currentSystem = { name: firstSystem.objectName, icon: firstSystem.icon }
       state.params.topKey = firstSystem.key
+      formState.form.topKey = firstSystem.key
       getList()
     }
   }).finally(() => {
@@ -196,24 +228,23 @@ const getSystemOptions = () => {
 
 
 const onChange = (selectedRowKeys: string[]) => {
-  console.log(selectedRowKeys)
-  formState.MenuUUIDArray = selectedRowKeys
+  formState.form.menuUUIDArray = selectedRowKeys
 }
 
 const checkAllApis = (record: ObjectOption[]) => {
   console.log('checkAllApis', record)
   record.forEach(obj => {
-    const index = formState.ActionUUIDArray.indexOf(obj.value)
+    const index = formState.form.actionUUIDArray.indexOf(obj.value)
     if (index < 0) {
-      formState.ActionUUIDArray.push(obj.value)
+      formState.form.actionUUIDArray.push(obj.value)
     }
   })
-  console.log('checkAllApis', formState.ActionUUIDArray)
+  console.log('checkAllApis', formState.form.actionUUIDArray)
 }
 
 const isAllApiChecked = (record: ObjectOption[]) => {
   for (const obj of record) {
-    const index = formState.ActionUUIDArray.indexOf(obj.value)
+    const index = formState.form.actionUUIDArray.indexOf(obj.value)
     if (index < 0) {
       return false
     }
@@ -221,38 +252,13 @@ const isAllApiChecked = (record: ObjectOption[]) => {
   return true
 }
 
-/**
- * 获取用户详情, 用于编辑
- * @param uuid
- */
-// const initEdit = (uuid: string) => {
-//   userDetail({ uuid }).then((data) => {
-//     formState.form = data
-//   })
-// }
-
-/**
- * 新增或修改用户
- */
-const onSubmit = () =>{
-  modalFormRef.value?.validate().then(() => {
-    formState.loading = true
-    // updateUser({ uuid: formState.form.uuid! }, formState.form).then(() => {
-    //   message.success('修改用户成功')
-    //   modalFormRef.value?.resetFields()
-    //   getList()
-    // }).finally(() => {
-    //   formState.loading = false
-    // })
-  }).catch((err) => {
-    console.log(err)
+const onGrant = () => {
+  grant({ roleUUID: state.params.roleUUID }, formState.form).then(() => {
+    message.success('授权操作成功')
   })
 }
 
-/**
- * 关闭modelForm，重置表单
- */
-const onCancel = () => {
-  modalFormRef.value?.resetFields()
+const onBack = () => {
+  router.push({ path: '/role', replace: true })
 }
 </script>

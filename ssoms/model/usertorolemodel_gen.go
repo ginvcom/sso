@@ -27,7 +27,10 @@ type (
 	userToRoleModel interface {
 		TransCtx(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error
 		FindRoleUUIDArrByUserUuid(ctx context.Context, userUuid string) (*[]string, error)
-		FindUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (*[]string, error)
+		CountUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (int64, error)
+		FindUserUUIDArrByRoleUuid(ctx context.Context,  args *FindUserUUIDArrByRoleUuidArgs) (*[]string, error)
+		CountUserGroupByRoleUuid(ctx context.Context, roleUUIDArray *[]string) (*[]UserCount, error)
+		ListRoleByUserUUidArray(ctx context.Context, userUUIDArray *[]string) (*[]RoleListItem, error)
 		Insert(ctx context.Context, data *UserToRole) (sql.Result, error)
 		FindOne(ctx context.Context, userUuid string, roleUuid string) (*UserToRole, error)
 		Update(ctx context.Context, newData *UserToRole) error
@@ -49,6 +52,23 @@ type (
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
 	}
+
+	FindUserUUIDArrByRoleUuidArgs struct {
+		RoleUUID string
+		Page int64
+		PageSize int64
+	}
+
+	UserCount struct {
+		RoleUuid   string     `db:"role_uuid"`
+		Count      int64     `db:"count"`
+	}
+
+	RoleListItem struct {
+		UserUuid   string    `db:"user_uuid"`
+		RoleUUID   string    `db:"role_uuid"`
+		RoleName   string    `db:"role_name"`
+	}
 )
 
 func newUserToRoleModel(conn sqlx.SqlConn) *defaultUserToRoleModel {
@@ -58,15 +78,80 @@ func newUserToRoleModel(conn sqlx.SqlConn) *defaultUserToRoleModel {
 	}
 }
 
-func (m *defaultUserToRoleModel)FindUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (userUUIDArray *[]string, err error) {
-	query := fmt.Sprintf("select `user_uuid` from %s where `is_delete` = 0 and `role_uuid` = ?", m.table)
+func (m *defaultUserToRoleModel) CountUserUUIDArrByRoleUuid(ctx context.Context, roleUUID string) (count int64, err error) {
+	query := fmt.Sprintf("select count(*) as count from %s where `is_delete` = 0 and `role_uuid` = ?", m.table)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
+	}
+	err = stmt.QueryRowCtx(ctx, &count, roleUUID)
+
+	return
+}
+
+func (m *defaultUserToRoleModel)FindUserUUIDArrByRoleUuid(ctx context.Context, args *FindUserUUIDArrByRoleUuidArgs) (userUUIDArray *[]string, err error) {
+	query := fmt.Sprintf("select `user_uuid` from %s where `is_delete` = 0 and `role_uuid` = ? limit ? offset ?", m.table)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err!=nil {
 		return
 	}
 	userUUIDArray = new([]string)
-	err = stmt.QueryRowsCtx(ctx, userUUIDArray, roleUUID)
+	offset:= (args.Page - 1) * args.PageSize
+	err = stmt.QueryRowsCtx(ctx, userUUIDArray, args.RoleUUID, args.PageSize, offset)
 
+	return
+}
+
+func (m *defaultUserToRoleModel) CountUserGroupByRoleUuid(ctx context.Context, roleUUIDArray *[]string) (resp *[]UserCount, err error) {
+	if *roleUUIDArray == nil || len(*roleUUIDArray) == 0 {
+		return
+	}
+
+	uuids:= "("
+	var placeholder []interface{}
+	for i,roleUUID := range *roleUUIDArray {
+		if i >0 {
+			uuids += ", "
+		}
+		placeholder = append(placeholder, roleUUID)
+		uuids += "?"
+	}
+	uuids += ")"
+	query := fmt.Sprintf("select `role_uuid`, count(*) as count from %s where `is_delete` = 0 and `role_uuid` in %s group by `role_uuid`", m.table, uuids)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+
+	resp = new([]UserCount)
+	err = stmt.QueryRowsCtx(ctx, resp, placeholder...)
+	return
+}
+
+func (m *defaultUserToRoleModel)ListRoleByUserUUidArray(ctx context.Context, userUUIDArray *[]string) (resp *[]RoleListItem, err error) {
+	if *userUUIDArray == nil || len(*userUUIDArray) == 0 {
+		return
+	}
+
+	uuids:= "("
+	var placeholder []interface{}
+	for i,userUUID := range *userUUIDArray {
+		if i >0 {
+			uuids += ", "
+		}
+		placeholder = append(placeholder, userUUID)
+		uuids += "?"
+	}
+	uuids += ")"
+	// 表名是否要用*defaultRoleModel.tableName()来获取？
+	query := fmt.Sprintf("select utr.`user_uuid`, r.`role_uuid`, r.`role_name` from %s as utr right join role as r on utr.`role_uuid` = r.`role_uuid` where utr.`is_delete` = 0 and r.`is_delete` = 0 and utr.`user_uuid` in %s", m.table, uuids)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err != nil {
+		return
+	}
+
+	resp = new([]RoleListItem)
+	err = stmt.QueryRowsCtx(ctx, resp, placeholder...)
 	return
 }
 

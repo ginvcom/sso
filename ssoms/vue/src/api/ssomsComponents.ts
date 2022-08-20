@@ -6,6 +6,13 @@ export interface Option {
 	extra?: string
 }
 
+export interface OptionWithDisabled {
+	label: string
+	value: string
+	extra?: string
+	disabled: boolean
+}
+
 export interface UserListReq {
 }
 
@@ -84,7 +91,10 @@ export interface DeleteUserReply {
 }
 
 export interface UserFilterOptionsReq {
-	name?: string
+}
+
+export interface UserFilterOptionsReqParams {
+	name: string
 }
 
 export interface UserFilterOptionsReply {
@@ -92,11 +102,17 @@ export interface UserFilterOptionsReply {
 }
 
 export interface AssignedRolesReq {
+}
+
+export interface AssignedRolesReqParams {
 	uuid: string
 }
 
 export interface AssignedRolesReply {
-	roleUUIDArray: Array<string>
+	uuid: string
+	name: string
+	assigned: Array<Option>
+	options: Array<Option>
 }
 
 export interface AssignRoleReq {
@@ -211,11 +227,28 @@ export interface OptionsReply {
 }
 
 export interface AssignedUsersReq {
+}
+
+export interface AssignedUsersReqParams {
 	roleUUID: string
+	page: number
+	pageSize: number
+}
+
+export interface UserOtion {
+	uuid: string
+	name: string
+	mobile: string
+	avatar: string
+	gender: number
+	status: number
+	isDelete: number
 }
 
 export interface AssignedUsersReply {
-	users: Array<Option>
+	total: number
+	list: Array<UserOtion>
+	roleName: string
 }
 
 export interface AssignUserReq {
@@ -385,7 +418,6 @@ export interface RoleOperationsReq {
 
 export interface RoleOperationsReqParams {
 	topKey: string // 传systemCode
-	pUUID: string
 }
 
 export interface RoleOperationsReply {
@@ -397,20 +429,26 @@ export interface RolePermissionsReq {
 
 export interface RolePermissionsReqParams {
 	roleUUID: string
-	typeName: string // system, others
-	pUUID: string
+	topKey: string
 }
 
 export interface RolePermissionsReply {
-	uuidArray: Array<string>
+	roleName: string
+	menuUUIDArray: Array<string>
+	actionUUIDArray: Array<string>
 }
 
 export interface GrantReq {
-	typeName: string // system, others
-	pUUID?: string
+	topKey: string
+	menuUUIDArray: Array<string>
+	actionUUIDArray: Array<string>
+}
+
+export interface GrantReqParams {
+	roleUUID: string
 }
 
 export interface GrantReply {
-	uuidArray: Array<string>
+	success: boolean
 }
 

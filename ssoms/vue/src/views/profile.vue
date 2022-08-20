@@ -76,12 +76,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import { onBeforeMount, onMounted, reactive, ref } from 'vue'
+import { onBeforeMount, reactive, ref } from 'vue'
 import VueCropper from 'vue-cropperjs'
 import { message } from 'ant-design-vue'
 import { UserOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
-import type { FormInstance, UploadFile, UploadChangeParam, UploadProps } from 'ant-design-vue'
-import { getFileName } from '../utils/file'
+import type { UploadChangeParam, UploadProps } from 'ant-design-vue'
+import { getFileName } from '@/utils/file'
 import { ossConfig } from '@/config'
 import PasswordReset from '@/components/PasswordReset.vue'
 import ProfileChange from '@/components/ProfileChange.vue'

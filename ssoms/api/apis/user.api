@@ -5,14 +5,6 @@ type UserListReq {
 	PageSize int64  `form:"pageSize,default=20"`
 }
 
-// goctl api format ssoms.api -dir .
-// goctl format时下面取消注释
-// type Option {
-// 	Label string `json:"label"`
-// 	Value string `json:"value"`
-// 	Extra string `json:"extra,optional"`
-// }
-
 type User {
 	UUID   string   `json:"uuid"`
 	Name   string   `json:"name"`
@@ -72,7 +64,7 @@ type DeleteUserReply {
 }
 
 type UserFilterOptionsReq {
-	Name string `json:"name,optional"`
+	Name string `form:"name,optional"`
 }
 
 type UserFilterOptionsReply {
@@ -80,11 +72,14 @@ type UserFilterOptionsReply {
 }
 
 type AssignedRolesReq {
-	UUID string `json:"uuid"`
+	UUID string `form:"uuid"`
 }
 
 type AssignedRolesReply {
-	RoleUUIDArray []string `json:"roleUUIDArray"`
+	UUID  string `json:"uuid"`
+	Name  string `json:"name"`
+	Assigned []Option `json:"assigned"`
+	Options []Option `json:"options"`
 }
 
 type AssignRoleReq {
@@ -166,7 +161,7 @@ service ssoms-api {
 	
 	@doc "给用户分配角色"
 	@handler assignRole
-	patch /assignRole (AssignRoleReq) returns (AssignRoleReply)
+	post /assignRole (AssignRoleReq) returns (AssignRoleReply)
 	
 	@doc "用户通过其分配的角色获得的权限"
 	@handler userPermissions

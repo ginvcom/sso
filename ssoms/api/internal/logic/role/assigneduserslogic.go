@@ -2,10 +2,13 @@ package role
 
 import (
 	"context"
+	"errors"
 
 	"sso/ssoms/api/internal/svc"
 	"sso/ssoms/api/internal/types"
+	"sso/ssoms/model"
 
+	"github.com/ginvcom/util"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -24,30 +27,58 @@ func NewAssignedUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 }
 
 func (l *AssignedUsersLogic) AssignedUsers(req *types.AssignedUsersReq) (resp *types.AssignedUsersReply, err error) {
-	// TODO 用户是否删除及状态判断和角色是否删除判断
-	userUUIDArray, err := l.svcCtx.UserToRoleModel.FindUserUUIDArrByRoleUuid(l.ctx, req.RoleUUID)
+	role, err := l.svcCtx.RoleModel.FindOneByRoleUuid(l.ctx, req.RoleUUID)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+
+	if role.IsDelete == 1 {
+		err = errors.New("role not exits")
+		return
+	}
+
+	total, err := l.svcCtx.UserToRoleModel.CountUserUUIDArrByRoleUuid(l.ctx, req.RoleUUID)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
+		return
+	}
+	args := &model.FindUserUUIDArrByRoleUuidArgs{
+		RoleUUID: req.RoleUUID,
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	}
+	userUUIDArray, err := l.svcCtx.UserToRoleModel.FindUserUUIDArrByRoleUuid(l.ctx, args)
+	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
 
 	userOptions, err := l.svcCtx.UserModel.UserOptionsInUUIDArray(l.ctx, userUUIDArray)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
 
-	users := make([]types.Option, 0, 1)
+	users := make([]types.UserOtion, 0, 1)
 
-	for _, option := range *userOptions {
-		item := types.Option{
-			Label: option.Name,
-			Value: option.UUID,
-			Extra: option.Avatar,
+	for _, user := range *userOptions {
+		item := types.UserOtion{
+			Name:     user.Name,
+			UUID:     user.Uuid,
+			Mobile:   util.MobileEncode(user.Mobile),
+			Gender:   user.Gender,
+			Avatar:   user.Avatar,
+			Status:   user.Status,
+			IsDelete: user.IsDelete,
 		}
 		users = append(users, item)
 	}
 
 	resp = &types.AssignedUsersReply{
-		Users: users,
+		List:     users,
+		Total:    total,
+		RoleName: role.RoleName,
 	}
 
 	return

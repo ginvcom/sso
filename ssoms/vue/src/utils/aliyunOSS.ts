@@ -1,6 +1,6 @@
 import OSS from 'ali-oss'
-import { getKey } from './file'
-import webapi from './webapi'
+import { getFileName } from './file'
+import Ajax from './ajax'
 import type { UploadFile } from 'ant-design-vue'
 import { UploadFileStatus } from 'ant-design-vue/lib/upload/interface'
 
@@ -48,7 +48,8 @@ class AliyunOSS implements UploadFile {
       bucket: this.bucket,
       endpoint: this.endpoint,
       refreshSTSToken: async () => {
-        const info = await webapi.get('aliyun/sts', { bucket: 'doc' }) as any
+        const ajax = new Ajax('','')
+        const info = await ajax.get('aliyun/sts', { bucket: 'doc' }) as any
         return {
           accessKeyId: info.accessKeyId,
           accessKeySecret: info.accessKeySecret,
@@ -71,7 +72,7 @@ class AliyunOSS implements UploadFile {
       try {
         // object表示上传到OSS的文件名称。
         // file表示浏览器中需要上传的文件，支持HTML5 file和Blob类型。
-        this.name = getKey(this.file)
+        this.name = getFileName(this.file)
         const result = await this.store.multipartUpload(this.name, this.file, {
           progress: (p: any, cpt: any, res: any) => {
             // 为中断点赋值。

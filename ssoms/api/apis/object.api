@@ -100,7 +100,6 @@ type DeleteObjectReply {
 
 type RoleOperationsReq {
 	TopKey string `form:"topKey,optional"` // 传systemCode
-	PUUID  string `form:"pUUID,optional"`
 }
 
 type RoleOperationsReply {

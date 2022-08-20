@@ -17,28 +17,38 @@
     margin-right: 15px;
 }
 
-.method-get, .green {
+.method-get,
+.green {
     color: #41ca9d;
 }
 
-.method-post, .yellow {
+.method-post,
+.yellow {
     color: #ed8936
 }
 
-.method-put, .blue {
+.method-put,
+.blue {
     color: #1890ff;
 }
 
-.method-patch, .pink {
+.method-patch,
+.pink {
     color: #eb2f96;
 }
 
-.method-delete, .orange {
+.method-delete,
+.orange {
     color: #fa541c;
 }
 
-.method-other, .purple{
+.method-other,
+.purple {
     color: #9373ee;
+}
+
+.text-red {
+    color: #ff4d4f;
 }
 
 .header__bar.ant-layout-header {
@@ -69,59 +79,60 @@
     color: #fff;
 }
 
-.header__actions{
+.header__actions {
     display: block;
     float: right;
-  }
-  
-  .header__actions > ul {
+}
+
+.header__actions>ul {
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-  
-  .header__actions li .g-switch{
+}
+
+.header__actions li .g-switch {
     margin: 5px 0;
-  }
-  
-  .header__actions > ul > li{
+}
+
+.header__actions>ul>li {
     line-height: 48px;
     height: 48px;
     display: block;
     float: left;
-  }
-  
-  .header__actions > ul > li.header_logout{
+}
+
+.header__actions>ul>li.header_logout {
     display: flex;
     align-items: center;
-  }
-  .header__account-content{
+}
+
+.header__account-content {
     vertical-align: top;
     line-height: 48px;
     padding: 0;
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 8px;
     color: #fff;
-  }
-  
-  .header__account-info .ant-dropdown-trigger{
+}
+
+.header__account-info .ant-dropdown-trigger {
     display: inline-block;
     line-height: 48px;
     height: 48px;
     color: #606266;
     font-size: 14px;
-  }
-  
-  .header__account-info .g-avatar__string{
+}
+
+.header__account-info .g-avatar__string {
     position: absolute;
     left: 0;
     top: 0;
-  }
+}
 
 .sider__bar .ant-menu {
     background-color: #f8f8f8;
     height: calc(100vh - 50px);
-    overflow-x:hidden;
+    overflow-x: hidden;
     overflow-y: overlay;
 }
 
@@ -140,7 +151,7 @@
     background-color: rgba(255, 255, 255, 0.95);
 }
 
-.content-header__actions .ant-btn + .ant-btn {
+.content-header__actions .ant-btn+.ant-btn {
     margin-left: 8px;
 }
 
@@ -150,7 +161,7 @@
     z-index: 2;
 }
 
-.ant-tabs .content-header{
+.ant-tabs .content-header {
     position: fixed;
     top: 94px;
     z-index: 100;
@@ -172,7 +183,7 @@
     justify-content: space-between;
 }
 
-.avatar-uploader__img{
+.avatar-uploader__img {
     position: absolute;
     left: 0;
     top: 0;
@@ -274,11 +285,11 @@
     margin-top: 16px;
 }
 
-.apis-check__col{
+.apis-check__col {
     display: flex;
 }
 
-.apis-check__all{
+.apis-check__all {
     width: 40px;
     text-align: right;
     padding-right: 12px;
@@ -286,7 +297,7 @@
     visibility: hidden;
 }
 
-.apis-check__col:hover .apis-check__all{
+.apis-check__col:hover .apis-check__all {
     visibility: visible;
 }
 
@@ -345,41 +356,42 @@
     margin-left: 0;
 }
 
-.profile__header{
+.profile__header {
     background-color: #f8f8f8;
 }
 
-.profile__bg{
+.profile__bg {
     height: 220px;
     background: url(./bg.jpg) bottom center;
     clip-path: ellipse(100% 77% at 50% 23%);
     background-size: cover;
 }
 
-.profile__info{
+.profile__info {
     display: flex;
     justify-content: space-between;
     padding: 20px 20px 0;
 }
 
-.pofile__avatar{
+.pofile__avatar {
     width: 260px;
     margin-top: -10px;
     position: relative;
 }
 
-.profile__profile{
+.profile__profile {
     display: flex;
     margin-top: 50px;
     height: 200px;
     flex-direction: column;
 }
 
-.profile__profile h1{
-    margin-bottom: 20px;;
+.profile__profile h1 {
+    margin-bottom: 20px;
+    ;
 }
 
-.profile__basic{
+.profile__basic {
     margin-top: 50px;
     margin-left: 100px;
     height: 150px;
@@ -388,11 +400,44 @@
     justify-content: space-between;
 }
 
-.profile__basic b{
+.profile__basic b {
     display: inline-block;
 }
 
-.password-reset{
+.password-reset {
     margin: 40px auto;
     max-width: 1000px;
+}
+
+.user-assign__list{
+    overflow: hidden;
+}
+
+.user-assign__item{
+    border: 1px solid #d9d9d9;
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 12px 0;
+    background-color: rgba(0, 0, 0, 0.04);
+    padding: 10px;
+}
+
+.user-assign__item:hover {
+    color: #1890ff;
+    border-color: #1890ff;
+}
+
+.user-assign__item.is-active {
+    color: #1890ff;
+    border-color: #1890ff;
+    background-color: #e6f7ff;
+}
+
+.user-assign__item p {
+    color: #00000073;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 8px 0 0;
+    height: 22px;
 }

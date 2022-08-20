@@ -1,4 +1,4 @@
-import { ssoms } from "../config"
+import { ssoms } from "@/config"
 
 interface StsParams {
     bucket: string

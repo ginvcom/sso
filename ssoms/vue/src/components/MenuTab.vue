@@ -33,7 +33,7 @@
             <p class="object__current-system-name">{{state.currentSystem.name}}</p>
           </div>
           <a-button @click="initChangeSystem">
-            <template #icon><number-outlined /></template>
+            <template #icon><appstore-outlined /></template>
             切换系统
           </a-button>
         </div>
@@ -304,7 +304,7 @@
 </template>
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref } from 'vue'
-import { DownloadOutlined, SearchOutlined, UploadOutlined, PlusOutlined, NumberOutlined } from '@ant-design/icons-vue'
+import { DownloadOutlined, SearchOutlined, UploadOutlined, PlusOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
 // Object 是js的关键字, 别名处理一下
 import {
   objectList,

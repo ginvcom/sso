@@ -97,7 +97,7 @@ import {
   RoleOperationsReply,
   UserForm,
   Object as Obj
-} from '../api/ssoms'
+} from '@/api/ssoms'
 import { ossConfig } from '@/config'
 
 interface System {

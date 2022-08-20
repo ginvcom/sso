@@ -52,7 +52,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.AssignedRolesHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPatch,
+				Method:  http.MethodPost,
 				Path:    "/assignRole",
 				Handler: user.AssignRoleHandler(serverCtx),
 			},
@@ -117,7 +117,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: role.RoleOptionsHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
+				Method:  http.MethodGet,
 				Path:    "/assignedUsers",
 				Handler: role.AssignedUsersHandler(serverCtx),
 			},
@@ -192,8 +192,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: permission.RolePermissionsHandler(serverCtx),
 			},
 			{
-				Method:  http.MethodPost,
-				Path:    "/grant",
+				Method:  http.MethodPut,
+				Path:    "/role/:roleUUID/grant",
 				Handler: permission.GrantHandler(serverCtx),
 			},
 		},

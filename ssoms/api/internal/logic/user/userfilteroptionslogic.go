@@ -26,15 +26,16 @@ func NewUserFilterOptionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 func (l *UserFilterOptionsLogic) UserFilterOptions(req *types.UserFilterOptionsReq) (resp *types.UserFilterOptionsReply, err error) {
 
+	logx.WithContext(l.ctx).Info(req.Name)
+
 	args := &model.UserFilterOptionsArgs{
 		Name:  req.Name,
 		Limit: 20,
 	}
 
-	logx.Info(args)
-
 	options, err := l.svcCtx.UserModel.FilterOptions(l.ctx, args)
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
 

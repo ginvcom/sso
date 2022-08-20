@@ -42,10 +42,11 @@ func (l *AssignRoleLogic) AssignRole(req *types.AssignRoleReq) (resp *types.Assi
 
 		// 2. 插入或更新is_delete=0 insert into user_to_role values(xx,xx), (ff, ff) on dumplicate key update `is_delete`=0
 		err = l.svcCtx.UserToRoleModel.TransAddRoleUUIDArrayByUserUUID(ctx, session, req.UUID, req.RoleUUIDArray, now)
-
 		return err
 	})
+
 	if err != nil {
+		logx.WithContext(l.ctx).Error(err)
 		return
 	}
 

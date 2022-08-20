@@ -8,5 +8,12 @@ import (
 type Option {
 	Label string `json:"label"`
 	Value string `json:"value"`
-	Extra string `json:"extra,optional"`
+	Extra string `json:"extra,omitempty"`
+}
+
+type OptionWithDisabled {
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Extra    string `json:"extra,omitempty"`
+	Disabled bool   `json:"disabled"`
 }

@@ -24,6 +24,7 @@ type (
 		IsExist(ctx context.Context, args *ObjectIsExistArgs) (bool, error) // 用于新增、更新前的校验
 		FindOneByUuid(ctx context.Context, uuid string) (*Object, error)
 		FindOne(ctx context.Context, args *ObjectFindOneArgs) (*Object, error)
+		FindMenusInRoleUUIDArray(ctx context.Context, topKey string, roleUUIDArray *[]string) (*[]Menu, error)
 	}
 
 	defaultObjectModel struct {
@@ -65,6 +66,16 @@ type (
 		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
+	}
+
+	Menu struct {
+		Uuid       string    `db:"uuid"`
+		ObjectName string    `db:"object_name"`
+		Identifier     string    `db:"identifier"`
+		Key        string    `db:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+		SubType    int64     `db:"sub_type"`  // 子分类
+		Icon       string    `db:"icon"`      // 图标
+		Puuid      string    `db:"puuid"`     // 父级uuid
 	}
 )
 
@@ -145,4 +156,33 @@ func (m *defaultObjectModel) FindOne(ctx context.Context, args *ObjectFindOneArg
 	}
 
 	return
+}
+
+func (m *defaultObjectModel)FindMenusInRoleUUIDArray(ctx context.Context, topKey string, roleUUIDArray *[]string) (resp *[]Menu, err error) {
+	placeholder :=[]interface{}{topKey}
+	fields := "o.`uuid`, o.`object_name`, o.`identifier`, o.`key`, o.`sub_type`, o.`icon`, o.`puuid`"
+	where := "o.`is_delete` = 0 and o.`status` = 1 and o.`type` = 2 and p.`top_key` = ? and p.`is_delete` = 0"
+	for i, roleUUID := range *roleUUIDArray {
+		if i == 0 {
+			where += " and p.`role_uuid` in("
+		} else {
+			where += ", "
+		}
+		where += "?"
+		if i == len(*roleUUIDArray) - 1 {
+			where += ")"
+		}
+		placeholder = append(placeholder, roleUUID)
+	}
+	// 表名是否要用*defaultPermissionModel.tableName()来获取？
+	query := fmt.Sprintf("select %s from %s as o left join permission as p on o.uuid = p.`object_uuid` where %s order by o.`sort`, o.`create_time`", fields, m.table, where)
+	fmt.Println(query)
+	stmt, err:= m.conn.PrepareCtx(ctx, query)
+	if err!=nil {
+		return
+	}
+	resp = new([]Menu)
+	err = stmt.QueryRows(resp, placeholder...)
+
+	return resp, err
 }

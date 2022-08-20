@@ -62,11 +62,25 @@ type OptionsReply {
 }
 
 type AssignedUsersReq {
-	RoleUUID string `json:"roleUUID"`
+	RoleUUID string `form:"roleUUID"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
+}
+
+type UserOtion {
+	UUID   string   `json:"uuid"`
+	Name   string   `json:"name"`
+	Mobile string   `json:"mobile"`
+	Avatar string   `json:"avatar"`
+	Gender int64    `json:"gender"`
+	Status int64    `json:"status"`
+	IsDelete int64 `json:"isDelete"`
 }
 
 type AssignedUsersReply {
-	Users []Option `json:"users"`
+	Total int64  `json:"total"`
+	List  []UserOtion `json:"list"`
+	roleName string `json:"roleName"`
 }
 
 type AssignUserReq {
@@ -135,7 +149,7 @@ service ssoms-api {
 	
 	@doc "角色已拥有的用户"
 	@handler assignedUsers
-	post /assignedUsers (AssignedUsersReq) returns (AssignedUsersReply)
+	get /assignedUsers (AssignedUsersReq) returns (AssignedUsersReply)
 	
 	@doc "给角色添加用户"
 	@handler assignUser

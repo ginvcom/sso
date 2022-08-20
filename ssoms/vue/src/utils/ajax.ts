@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue'
-import { getCookie } from './cookie'
+import { cloneDeep } from 'lodash-es'
 
-// import qs from 'qs'
+
 let baseURL = <string>import.meta.env.VITE_BASEURL || '/'
 const system = <string>import.meta.env.VITE_SYSTEM_NAME || ''
 // 线上灰度不同环境支持
@@ -27,31 +27,17 @@ export const instance = axios.create({
 
 function signOutForward () {
   localStorage.removeItem('router')
-  // Cookies.remove('ticket')
-  // Cookies.remove('user')
-  // Cookies.remove('app')
-  // TODO 跳转到登出页，清cookie
   const beforeTemp = localStorage.getItem('beforeTemp')
   // window.location.href = server + '/redirect/sso?service=' + appName + '&env=' + env
 }
 
 // 请求拦截器
 instance.interceptors.request.use((config: AxiosRequestConfig) =>{
-  if (config.headers !== undefined) {
-    const userStr = getCookie('user')
-    if (userStr) {
-      const user = JSON.parse(userStr)
-      if (config.url !== '/sign-in' && user) {
-        config.headers.Authorization = user.accessToken
-      }
-    }
-  }
-  if (config.method === 'post' || config.method === 'put') {
+  if (config.method === 'post' || config.method === 'put' || config.method === 'patch') {
     if (config.headers !== undefined) {
       config.headers['Content-Type'] = 'application/json;charset=utf-8'
     }
   }
-//   config.data = qs.stringify(config.data)
   return config
 }, (err: Error) => {
   return Promise.reject(err)
@@ -87,6 +73,21 @@ instance.interceptors.response.use((res) => {
     return Promise.reject(error)
 })
 
+
+/**
+ * Ajax 创建使用XMLHttpRequests请求服务端的对象
+ * 
+ * url会在params内并取出匹配的参照作为路径参数
+ * 路径参数的格式是 冒号“:” + 字母和数字
+ * 
+ * 用法:
+ *  const ssoms = new Ajax(systemCode, serviceCode)
+ *  ssoms.get(url, params)
+ *  ssoms.post(url, data, params)
+ *  ssoms.put(url, params, data)
+ *  ssoms.patch(url, params, data)
+ *  ssoms.delete(url, params)
+ */
 export default class Ajax {
   private systemCode: string
   private serviceCode: string
@@ -94,24 +95,31 @@ export default class Ajax {
     this.systemCode = systemCode
     this.serviceCode = serviceCode
   }
+
   private setPath (url: string, params: any) {
+    const pms = cloneDeep(params)
+    if (!params) {
+      return { realpath: url, realParams: pms }
+    }
     const matches = url.match(/\/:[a-zA-z0-9]+/mg)
     if (matches) {
       for (const match of matches) {
         const key = match.slice(2)
-        if (params && params[key]) {
-          url = url.replace(match, '/' + params[key])
-          delete params[key]
+        if (pms && pms[key]) {
+          url = url.replace(match, '/' + pms[key])
+          delete pms[key]
         }
       }
     }
-    return { realpath: url, realParams: params }
+    return { realpath: url, realParams: pms }
   }
+
   private getHeaders (url: string) {
     return {
       'X-Origin-Uri' : url,
       'X-Origin-System': this.systemCode,
-      'X-Origin-Service': this.serviceCode
+      'X-Origin-Service': this.serviceCode,
+      'X-Origin-Env': env
     }
   }
   public get<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {

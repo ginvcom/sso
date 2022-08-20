@@ -13,8 +13,10 @@
             <li class="header__account-info">
               <a-dropdown>
                 <a class="ant-dropdown-link" @click.prevent>
-                  <a-avatar :size="30"><template #icon><UserOutlined /></template></a-avatar>
-                  <span class="header__account-content">{{ user.name }}</span>
+                  <a-avatar :size="24" :src="ossConfig.ginvdoc.domain + user.avatar">
+                    <template #icon><UserOutlined /></template>
+                  </a-avatar>
+                  <span class="header__account-content">hi! {{ user.name }}</span>
                 </a>
                 <template #overlay>
                   <a-menu @click="onHeaderClick">
@@ -53,10 +55,6 @@
             <appstore-outlined />
             <router-link to="/role">角色管理</router-link>
           </a-menu-item>
-          <a-menu-item key="6">
-            <audit-outlined />
-            <router-link to="/permission">授权管理</router-link>
-          </a-menu-item>
           </a-menu>
         </a-layout-sider>
         <a-layout-content class="main__bar">
@@ -67,27 +65,44 @@
   </a-config-provider>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onBeforeMount, reactive } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import {
-  HomeOutlined,
   BlockOutlined,
   UserOutlined,
-  AuditOutlined,
   AppstoreOutlined,
-  LoadingOutlined,
   SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons-vue'
-import router from './router'
-import { systemCode } from './config'
-import { server } from './utils/ajax'
+import router from '@/router'
+import { systemCode } from '@/config'
+import { server } from '@/utils/ajax'
+import { message } from 'ant-design-vue'
+import { ossConfig } from '@/config'
 
 dayjs.locale('zh-cn')
 
-const user = { name: 'xxx', avatar: '' }
+const user = reactive({ name: '', avatar: '' })
+
+onBeforeMount(() => {
+  getUserCookie()
+})
+
+const getUserCookie = () => {
+  let arr = document.cookie.match(new RegExp('(^| )ssoUser=([^;]*)(;|$)'))
+  if (arr !== null) {
+    try {
+      // 先uri_decode转义一下
+      const u = JSON.parse(decodeURIComponent(arr[2]))
+      user.name = u.name
+      user.avatar = u.avatar
+    } catch (err: Error) {
+      message.error(err.message)
+    }
+  }
+}
 
 const state = reactive({
   selectedKeys: [],
