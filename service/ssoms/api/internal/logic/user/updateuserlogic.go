@@ -30,6 +30,7 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUse
 	// TODO 增加校验
 	birth, err := util.StringToTime(req.Birth, "YYYY-MM-DD")
 	if err != nil {
+		l.Logger.Info(err)
 		return
 	}
 
@@ -52,8 +53,10 @@ func (l *UpdateUserLogic) UpdateUser(req *types.UserForm) (resp *types.UpdateUse
 	logx.Info(user)
 	err = l.svcCtx.UserModel.Update(l.ctx, user)
 	if err != nil {
+		l.Logger.Error(err)
 		return
 	}
+
 	resp = &types.UpdateUserReply{
 		Success: true,
 	}

@@ -29,12 +29,13 @@ func NewAvatarUploadLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Avat
 func (l *AvatarUploadLogic) AvatarUpload(req *types.AvatarUploadReq) (resp *types.AvatarUploadReply, err error) {
 	uuid := l.ctx.Value(config.UUID).(string)
 	if uuid == "" {
-		logx.WithContext(l.ctx).Info("missing user info")
+		l.Logger.Info("missing user info")
 		err = errors.New("missing user info")
 		return
 	}
 
 	if req.Avatar == "" {
+		l.Logger.Info("avatar is required")
 		err = errors.New("avatar is required")
 		return
 	}
@@ -45,7 +46,7 @@ func (l *AvatarUploadLogic) AvatarUpload(req *types.AvatarUploadReq) (resp *type
 	}
 	err = l.svcCtx.UserModel.BasicUpdate(l.ctx, user)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

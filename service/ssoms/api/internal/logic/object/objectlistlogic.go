@@ -26,8 +26,8 @@ func NewObjectListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Object
 }
 
 func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.ObjectListReply, err error) {
-	logx.WithContext(l.ctx).Info(l.ctx.Value(config.UUID))
-	logx.WithContext(l.ctx).Info(l.ctx.Value(config.Name))
+	l.Logger.Info(l.ctx.Value(config.UUID))
+	l.Logger.Info(l.ctx.Value(config.Name))
 	args := &model.ObjectListArgs{
 		TopKey:     req.TopKey,
 		ObjectName: req.ObjectName,

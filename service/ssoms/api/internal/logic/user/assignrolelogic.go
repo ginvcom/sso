@@ -46,7 +46,7 @@ func (l *AssignRoleLogic) AssignRole(req *types.AssignRoleReq) (resp *types.Assi
 	})
 
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

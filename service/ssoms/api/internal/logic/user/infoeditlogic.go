@@ -29,12 +29,13 @@ func NewInfoEditLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InfoEdit
 func (l *InfoEditLogic) InfoEdit(req *types.InfoEditReq) (resp *types.InfoEditReply, err error) {
 	uuid := l.ctx.Value(config.UUID).(string)
 	if uuid == "" {
-		logx.WithContext(l.ctx).Info("missing user info")
+		l.Logger.Info("missing user info")
 		err = errors.New("missing user info")
 		return
 	}
 
 	if req.Introduction == "" {
+		l.Logger.Info("introduction is required")
 		err = errors.New("introduction is required")
 		return
 	}
@@ -46,7 +47,7 @@ func (l *InfoEditLogic) InfoEdit(req *types.InfoEditReq) (resp *types.InfoEditRe
 	logx.Info(user)
 	err = l.svcCtx.UserModel.BasicUpdate(l.ctx, user)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

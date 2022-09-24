@@ -29,7 +29,7 @@ func NewAssignedUsersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 func (l *AssignedUsersLogic) AssignedUsers(req *types.AssignedUsersReq) (resp *types.AssignedUsersReply, err error) {
 	role, err := l.svcCtx.RoleModel.FindOneByRoleUuid(l.ctx, req.RoleUUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (l *AssignedUsersLogic) AssignedUsers(req *types.AssignedUsersReq) (resp *t
 
 	total, err := l.svcCtx.UserToRoleModel.CountUserUUIDArrByRoleUuid(l.ctx, req.RoleUUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	args := &model.FindUserUUIDArrByRoleUuidArgs{
@@ -50,13 +50,13 @@ func (l *AssignedUsersLogic) AssignedUsers(req *types.AssignedUsersReq) (resp *t
 	}
 	userUUIDArray, err := l.svcCtx.UserToRoleModel.FindUserUUIDArrByRoleUuid(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
 	userOptions, err := l.svcCtx.UserModel.UserOptionsInUUIDArray(l.ctx, userUUIDArray)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

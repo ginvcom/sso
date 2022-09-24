@@ -30,7 +30,7 @@ func (l *AssignUserLogic) AssignUser(req *types.AssignUserReq) (resp *types.Assi
 	userToRole, err := l.svcCtx.UserToRoleModel.FindOne(l.ctx, req.UserUUID, req.RoleUUID)
 
 	if err != nil && err != model.ErrNotFound {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (l *AssignUserLogic) AssignUser(req *types.AssignUserReq) (resp *types.Assi
 			}
 			err = l.svcCtx.UserToRoleModel.Update(l.ctx, args)
 			if err != nil {
-				logx.WithContext(l.ctx).Error(err)
+				l.Logger.Error(err)
 				return
 			}
 		}
@@ -61,7 +61,7 @@ func (l *AssignUserLogic) AssignUser(req *types.AssignUserReq) (resp *types.Assi
 	}
 	_, err = l.svcCtx.UserToRoleModel.Insert(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

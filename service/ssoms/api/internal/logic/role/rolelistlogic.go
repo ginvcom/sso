@@ -32,7 +32,7 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 	}
 	total, err := l.svcCtx.RoleModel.ListCount(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	resp = &types.RoleListReply{
@@ -42,7 +42,7 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 
 	listData, err := l.svcCtx.RoleModel.ListData(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	var roleUUIDArray []string
@@ -51,7 +51,7 @@ func (l *RoleListLogic) RoleList(req *types.RoleListReq) (resp *types.RoleListRe
 	}
 	countResp, err := l.svcCtx.UserToRoleModel.CountUserGroupByRoleUuid(l.ctx, &roleUUIDArray)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

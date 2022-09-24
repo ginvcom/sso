@@ -28,26 +28,26 @@ func (l *HomeStatisticLogic) HomeStatistic() (resp *types.StatisticReply, err er
 	args := &model.RoleListArgs{}
 	roleAmount, err := l.svcCtx.RoleModel.ListCount(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
 	userAmountArgs := &model.UserListArgs{}
 	userAmount, err := l.svcCtx.UserModel.ListCount(l.ctx, userAmountArgs)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
 	permissionAmount, err := l.svcCtx.PermissionModel.CountPermisson(l.ctx)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
 	objectAmounts, err := l.svcCtx.ObjectModel.CountByType(l.ctx)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

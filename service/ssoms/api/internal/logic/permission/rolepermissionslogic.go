@@ -27,7 +27,7 @@ func NewRolePermissionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *R
 func (l *RolePermissionsLogic) RolePermissions(req *types.RolePermissionsReq) (resp *types.RolePermissionsReply, err error) {
 	role, err := l.svcCtx.RoleModel.FindOneByRoleUuid(l.ctx, req.RoleUUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
@@ -38,7 +38,7 @@ func (l *RolePermissionsLogic) RolePermissions(req *types.RolePermissionsReq) (r
 
 	permissions, err := l.svcCtx.PermissionModel.PermissionByRoleUUID(l.ctx, req.RoleUUID, req.TopKey)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

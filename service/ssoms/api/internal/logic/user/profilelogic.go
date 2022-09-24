@@ -29,14 +29,17 @@ func NewProfileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ProfileLo
 func (l *ProfileLogic) Profile() (resp *types.UserForm, err error) {
 	uuid := l.ctx.Value(config.UUID).(string)
 	if uuid == "" {
-		logx.WithContext(l.ctx).Info("missing user info")
+		l.Logger.Info("missing user info")
 		err = errors.New("missing user info")
 		return
 	}
+
 	user, err := l.svcCtx.UserModel.FindOneByUuid(l.ctx, uuid)
 	if err != nil {
+		l.Logger.Error(err)
 		return
 	}
+
 	resp = &types.UserForm{
 		UUID:         user.Uuid,
 		Name:         user.Name,

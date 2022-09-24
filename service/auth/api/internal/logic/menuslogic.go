@@ -31,26 +31,27 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 		err = errors.New("params SystemCode is required")
 		return
 	}
-	logx.WithContext(l.ctx).Info(req.SystemCode)
+
+	l.Logger.Info(req.SystemCode)
 	uuid, err := l.isPass(req)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("authorization:%s, realRequestPath:%s", uuid)
+		l.Logger.Errorf("authorization:%s, realRequestPath:%s", uuid)
 		return
 	}
 
-	logx.WithContext(l.ctx).Info(uuid)
+	l.Logger.Info(uuid)
 
 	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, uuid)
 	if err != nil {
 		return
 	}
 
-	logx.WithContext(l.ctx).Info(roleUUIDArray)
+	l.Logger.Info(roleUUIDArray)
 
 	listData, err := l.svcCtx.ObjectModel.FindMenusInRoleUUIDArray(l.ctx, req.SystemCode, roleUUIDArray)
 
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

@@ -27,7 +27,7 @@ func NewAssignedRolesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ass
 func (l *AssignedRolesLogic) AssignedRoles(req *types.AssignedRolesReq) (resp *types.AssignedRolesReply, err error) {
 	user, err := l.svcCtx.UserModel.FindOneByUuid(l.ctx, req.UUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	if user.IsDelete == 1 {
@@ -37,7 +37,7 @@ func (l *AssignedRolesLogic) AssignedRoles(req *types.AssignedRolesReq) (resp *t
 
 	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, req.UUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	// resp = &types.AssignedRolesReply{
@@ -46,7 +46,7 @@ func (l *AssignedRolesLogic) AssignedRoles(req *types.AssignedRolesReq) (resp *t
 
 	opts, err := l.svcCtx.RoleModel.Options(l.ctx)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	assignedRoles := make([]types.Option, 0, 1)

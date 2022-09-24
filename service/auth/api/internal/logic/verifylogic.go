@@ -31,7 +31,7 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 	// 获取uuid并且到redis校验是否过期(退出登录需要主动失效)
 	uuid, name, err := l.isPass(req)
 	if err != nil {
-		logx.WithContext(l.ctx).Errorf("authorization:%s, realRequestPath:%s", uuid, name)
+		l.Logger.Errorf("authorization:%s, realRequestPath:%s", uuid, name)
 		return nil, err
 	}
 

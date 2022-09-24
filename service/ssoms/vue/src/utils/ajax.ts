@@ -116,10 +116,10 @@ export default class Ajax {
 
   private getHeaders (url: string) {
     return {
-      'X-Origin-Uri' : url,
-      'X-Origin-System': this.systemCode,
-      'X-Origin-Service': this.serviceCode,
-      'X-Origin-Env': env
+      'x-client-uri' : url,
+      'x-client-system': this.systemCode,
+      'x-client-service': this.serviceCode,
+      'x-client-env': env
     }
   }
   public get<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {

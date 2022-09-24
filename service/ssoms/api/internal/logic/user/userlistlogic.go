@@ -33,9 +33,10 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 		Page:     req.Page,
 		PageSize: req.PageSize,
 	}
+	l.Logger.Info("args", args)
 	total, err := l.svcCtx.UserModel.ListCount(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
@@ -46,7 +47,7 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 
 	listData, err := l.svcCtx.UserModel.ListData(l.ctx, args)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 
@@ -56,7 +57,7 @@ func (l *UserListLogic) UserList(req *types.UserListReq) (resp *types.UserListRe
 	}
 	rolesResp, err := l.svcCtx.UserToRoleModel.ListRoleByUserUUidArray(l.ctx, &userUUIDArray)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 

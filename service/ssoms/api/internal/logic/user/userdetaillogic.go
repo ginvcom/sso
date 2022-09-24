@@ -28,7 +28,7 @@ func NewUserDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserDe
 func (l *UserDetailLogic) UserDetail(req *types.UserDetailReq) (resp *types.UserForm, err error) {
 	user, err := l.svcCtx.UserModel.FindOneByUuid(l.ctx, req.UUID)
 	if err != nil {
-		logx.WithContext(l.ctx).Error(err)
+		l.Logger.Error(err)
 		return
 	}
 	resp = &types.UserForm{

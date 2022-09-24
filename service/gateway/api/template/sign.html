@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{ if ne .Redirect "" }}
+    <meta http-equiv="refresh" content="1;url={{.Redirect}}">
+    {{ end }}
+    <link rel="icon" href="/logo.png" />
+    <title>Single Sign On</title>
+</head>
+<body>
+    <div class="login">
+        <div class="login-left">
+            <div class="login-form">
+                <h3>Single Sign On ✨</h3>
+                <h4>Please sign in to continue</h4>
+                <form method="post" action="?system={{.SystemCode}}">
+                    {{ if ne .Msg "" }}
+                        <div class="form-message__error">
+                        {{ .Msg }}
+                        </div>
+                    {{ end }}
+                    {{ if ne .Redirect "" }}
+                        <div class="form-message__success">
+                            Login Successd! Redirect to destination
+                        </div>
+                    {{ end }}
+                    <div class="form-group {{ if ne .MobileMsg ""}}has-error{{end}}">
+                        <label for="mobile">mobile</label>
+                        <input id="mobile" type="text" name="mobile" value="{{.Mobile}}" />
+                        {{ if ne .MobileMsg ""}}
+                        <div class="explain-error">{{.MobileMsg}}</div>
+                        {{ end }}
+                    </div>
+                    <div class="form-group {{ if ne .PasswordMsg ""}}has-error{{end}}">
+                        <label for="password">password</label>
+                        <input id="password" type="password" name="password" value="{{.Password}}" />
+                        {{ if ne .PasswordMsg ""}}
+                        <div class="explain-error">{{.PasswordMsg}}</div>
+                        {{ end }}
+                    </div>
+                    <div class="form-group">
+                        <input id="remember" type="checkbox" name="remember" value="on" />
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" {{ if ne .Redirect "" }}disabled{{end}}>Sgin In</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="animat-rate">
+                <div class="animation-block">
+                    <div class="bg_circle">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div class="cross"></div>
+                    <div class="cross1"></div>
+                    <div class="cross2"></div>
+                    <div class="dot"></div>
+                    <div class="dot1"></div>
+                    <div class="maincircle"></div>
+                    <div class="top-circle"></div>
+                    <div class="center-circle"></div>
+                    <div class="bottom-circle"></div>
+                    <div class="bottom-circle1"></div>
+                    <div class="right-circle"></div>
+                    <div class="right-circle1"></div>
+                    <img class="heart-logo" src="5.png" alt="login logo" />
+                    <img class="has-logo" src="4.png" alt="login logo" />
+                    <img class="login-img" src="1.png" alt="login logo" />
+                    <img class="boy-logo" src="6.png" alt="login logo" />
+                    <img class="girl-logo" src="7.png" alt="login logo" />
+                    <img class="cloud-logo" src="2.png" alt="login logo" />
+                    <img class="cloud-logo1" src="2.png" alt="login logo" />
+                    <img class="cloud-logo2" src="2.png" alt="login logo" />
+                    <img class="cloud-logo3" src="2.png" alt="login logo" />
+                    <img class="cloud-logo4" src="2.png" alt="login logo" />
+                    <img class="has-logo1" src="4.png" alt="login logo">
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+		*{
+            box-sizing: border-box;
+        }
+        html,body{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-size: calc(12px + (14 - 13) * ((100vw - 320px) / (1920 - 320)));
+        }
+        .login{
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .login-left{
+            flex: 2;
+        }
+        .login-right{
+            flex: 3;
+            overflow: hidden;
+        }
+        .login-form{
+            padding: 50px;
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+        .logo{
+            display: block;
+            overflow: hidden;
+        }
+        .logo img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+            display: block;
+            float: left;
+        }
+        .logo h1{
+            display: block;
+            float: left;
+            margin: 0;
+            line-height: 50px;
+        }
+        h3{
+            font-size: calc(18px + (26 - 18) * ((100vw - 320px) / (1920 - 320)));
+            font-family: "Rubik", sans-serif;
+            font-weight: 500;
+            margin: 0;
+            padding-bottom: 5px;
+        }
+        h4{
+            margin: 0 0 75px;
+            line-height: 1.4;
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+        }
+        .login-form form{
+            position: relative;
+        }
+        .form-message__error{
+            border: 1px solid #ffccc7;
+            background: #fff2f0;
+            padding: 13px 20px;
+            border-radius: 2px;
+            position: absolute;
+            top: -60px;
+            left: 0;
+            right: 0;
+        }
+        .form-message__success{
+            border: 1px solid #b7eb8f;
+            background: #f6ffed;
+            padding: 13px 20px;
+            border-radius: 2px;
+            position: absolute;
+            top: -60px;
+            left: 0;
+            right: 0;
+        }
+        .form-group{
+            margin-bottom: 30px;
+            font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+            position: relative;
+        }
+        .form-group label{
+            display: block;
+            font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+            color: #223645;
+            font-family: Montserrat,sans-serif;
+            font-weight: 600;
+            padding-top: 0;
+            padding-bottom: 15px;
+            line-height: 1;
+        }
+
+        .form-group input{
+            display: block;
+            width: 100%;
+            height: calc(1.5em + 0.75rem + 2px);
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #d9d9d9;
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+
+        .form-group input:focus{
+            border-color: #1890ff;
+            outline: 0;
+        }
+
+        .form-group input[type=text],.form-group input[type=password]{
+            padding: 13px 20px;
+            border-radius: 2px;
+            height: auto;
+        }
+
+        .form-group.has-error input[type=text],.form-group.has-error input[type=password]{
+            border-color: #ff4d4f;
+        }
+
+        .form-group input[type=checkbox]{
+            width: 20px;
+            height: 20px;
+            float: left;
+            border: 1px solid #d9d9d9;
+            margin: 5px 8px 5px 0;
+        }
+
+        .form-group input[type=checkbox] + label{
+            line-height: 30px;
+            padding: 0;
+            font-weight: 400;
+        }
+        .explain-error{
+            position: absolute;
+            bottom: -24px;
+            left: 0;
+            color: #ff4d4f;
+            line-height: 24px;
+        }
+
+        .form-group button{
+            cursor: pointer;
+            font-size: calc(14px + (16 - 14) * ((100vw - 320px) / (1920 - 320)));
+            display: block;
+            width: 100%;
+            padding: 14px 50px;
+            border-radius: 2px;
+            font-weight: 600;
+            color: #fff;
+            background-color: #1890ff;
+            border:1px solid #1890ff;
+        }
+
+        .form-group button[disabled]{
+            cursor: not-allowed;
+            border-color: #d9d9d9;
+            color: rgba(0, 0, 0, .4);
+            background-color: #f5f5f5;
+        }
+
+        @keyframes animationFramesOne {
+            0% {
+                transform: translate(0px, 0px) rotate(0deg);
+            }
+            20% {
+                transform: translate(73px, -1px) rotate(36deg);
+            }
+            40% {
+                transform: translate(141px, 72px) rotate(72deg);
+            }
+            60% {
+                transform: translate(83px, 122px) rotate(108deg);
+            }
+            80% {
+                transform: translate(-40px, 72px) rotate(144deg);
+            }
+            100% {
+                transform: translate(0px, 0px) rotate(0deg);
+            }
+        }
+
+        @keyframes rotatedTwo {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .animat-rate{
+            background-color: #eff7fe;
+            height: 100%;
+        }
+        .animation-block {
+            z-index: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .animat-rate .bg_circle div:nth-of-type(1){
+            right: 50%;
+            animation: animationFramesOne 25s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(2){
+            right: 5%;
+            top: 5%;
+            animation: animationFramesOne 35s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(3){
+            bottom: 35%;
+            left: 20%;
+            animation: animationFramesOne 65s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(4){
+            bottom: 26%;
+            right: 35%;
+            animation: animationFramesOne 100s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(5){
+            bottom: 35%;
+            right: 5%;
+            animation: animationFramesOne 45s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(6){
+            bottom: 60%;
+            left: 10%;
+            animation: animationFramesOne 90s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(7){
+            top: 40%;
+            right: 40%;
+            animation: animationFramesOne 25s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(8){
+            bottom: 30%;
+            left: 3%;
+            animation: animationFramesOne 80s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(9){
+            top: 25%;
+            right: 35%;
+            animation: animationFramesOne 35s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(10){
+            top: 40%;
+            right: 25%;
+            animation: animationFramesOne 55s infinite linear;
+        }
+        .animat-rate .bg_circle div:nth-of-type(11){
+            bottom: 20%;
+            right: 14%;
+            animation: animationFramesOne 10s infinite linear;
+        }
+        .animat-rate .bg_circle > div{
+            width: 20px;
+            height: 20px;
+            border: 3px solid #d0eafb;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 9;
+        }
+        .animat-rate .cross{
+            position: absolute;
+            background: #d0eafb;
+            height: 15px;
+            width: 2px;
+            top: 175px;
+            right: 50px;
+            animation: rotatedTwo 22s linear infinite;
+        }
+        .animat-rate .cross::after{
+            position: absolute;
+            background: #d0eafb;
+            content: "";
+            height: 2px;
+            left: -6px;
+            top: 7px;
+            width: 15px;
+            animation: rotated 50s linear infinite;
+        }
+        .animat-rate .cross1{
+            position: absolute;
+            background: #d0eafb;
+            bottom: 10%;
+            height: 15px;
+            left: 50%;
+            width: 2px;
+            animation: rotatedTwo 50s linear infinite;
+        }
+        .animat-rate .cross1::after{
+            position: absolute;
+            background: #d0eafb;
+            content: "";
+            height: 2px;
+            left: -6px;
+            top: 7px;
+            width: 15px;
+            -webkit-animation: rotated 50s linear infinite;
+            animation: rotated 50s linear infinite;
+        }
+        .animat-rate .cross2{
+            position: absolute;
+            background: #d0eafb;
+            top: 65%;
+            height: 15px;
+            left: 200px;
+            width: 2px;
+            animation: rotatedTwo 50s linear infinite;
+        }
+        .animat-rate .cross2::after{
+            position: absolute;
+            background: #d0eafb;
+            content: "";
+            height: 2px;
+            left: -6px;
+            top: 7px;
+            width: 15px;
+            animation: rotated 50s linear infinite;
+        }
+        .animat-rate .dot{
+            position: absolute;
+            height: 5px;
+            width: 5px;
+            background-color: #d0eafb;
+            border-radius: 50%;
+            display: inline-block;
+            animation: animationFramesOne 50s linear infinite;
+            top: 10%;
+        }
+        .animat-rate .dot1{
+            left: 15%;
+            position: absolute;
+            height: 5px;
+            width: 5px;
+            background-color: #d0eafb;
+            animation: animationFramesOne 90s linear infinite;
+            border-radius: 50%;
+        }
+        .maincircle {
+            background-image: linear-gradient(#cde7fa,#f1f8fe,#f1f8fe);
+            padding: 1px;
+            width: calc(100px + (680 - 100) * ((100vw - 320px) / (1920 - 320)));
+            height: calc(100px + (680 - 100) * ((100vw - 320px) / (1920 - 320)));
+            border-color: transparent;
+            border-radius: 50%;
+            border-width: 1px;
+            top: 15%;
+            position: absolute;
+        }
+        .animat-rate .top-circle {
+            background-image: linear-gradient(#f1f8fe,#f1f8fe,#cde7fa);
+            top: 2%;
+            left: 20%;
+        }
+        .animat-rate .center-circle, .animat-rate .top-circle{
+            padding: 1px;
+            height: calc(50px + (100 - 50) * ((100vw - 320px) / (1920 - 320)));
+            width: calc(50px + (100 - 50) * ((100vw - 320px) / (1920 - 320)));
+            border-color: transparent;
+            border-radius: 50%;
+            border-width: 1px;
+            position: absolute;
+        }
+        .center-circle {
+            background-image: linear-gradient(90deg,#cde7fa,#f1f8fe,#f1f8fe);
+            top: 45%;
+            left: 6%;
+        }
+        .animat-rate .bottom-circle, .animat-rate .bottom-circle1{
+            background-image: linear-gradient(#cde7fa,#f1f8fe,#f1f8fe);
+            padding: 1px;
+            border-color: transparent;
+            border-radius: 50%;
+            border-width: 1px;
+            position: absolute;
+        }
+        .animat-rate .bottom-circle {
+            width: calc(50px + (100 - 50) * ((100vw - 320px) / (1920 - 320)));
+            height: calc(50px + (100 - 50) * ((100vw - 320px) / (1920 - 320)));
+            bottom: 0;
+            left: 13%;
+            }
+            .animat-rate .bottom-circle1 {
+            width: calc(40px + (120 - 40) * ((100vw - 320px) / (1920 - 320)));
+            height: calc(40px + (120 - 40) * ((100vw - 320px) / (1920 - 320)));
+            bottom: 2%;
+            right: 22%;
+        }
+        .animat-rate .right-circle{
+            background-image: linear-gradient(270deg,#f1f8fe,#f1f8fe,#cde7fa);
+            padding: 1px;
+            width: calc(90px + (260 - 90) * ((100vw - 320px) / (1920 - 320)));
+            height: calc(90px + (260 - 90) * ((100vw - 320px) / (1920 - 320)));
+            border-color: transparent;
+            border-radius: 50%;
+            border-width: 1px;
+            bottom: 18%;
+            right: 0;
+            position: absolute;
+        }
+        .animat-rate .right-circle1{
+            background-image: linear-gradient(90deg,#cde7fa,#f1f8fe,#f1f8fe,#f1f8fe);
+            padding: 1px;
+            width: calc(75px + (140 - 75) * ((100vw - 320px) / (1920 - 320)));
+            height: calc(75px + (140 - 75) * ((100vw - 320px) / (1920 - 320)));
+            border-color: transparent;
+            border-radius: 50%;
+            border-width: 1px;
+            top: 1%;
+            right: 9%;
+            position: absolute;
+        }
+        @keyframes heartbeat{
+            0%{
+                transform:scale(.75)
+            } 20% {
+                transform:scale(1)
+            } 40%{
+                transform:scale(.75)
+            } 60% {
+                transform:scale(1)
+            } 80% {
+                transform:scale(.75)
+            } to {
+                transform:scale(.75)
+            }
+        }
+        .heart-logo {
+            position: absolute;
+            animation: heartbeat 5s infinite;
+            top: 15%;
+            right: 35%;
+        }
+        .has-logo {
+            position: absolute;
+            top: 15%;
+            right: 27%;
+        }
+        .login-img {
+            position: absolute;
+            top: 30%;
+        }
+        .boy-logo {
+                position: absolute;
+                left: 36%;
+                top: 52%;
+        }
+        .girl-logo {
+                top: 27%;
+                right: 27%;
+                position: absolute;
+        }
+        @keyframes homecloud{
+            0% {
+                transform:translateX(0)
+            } 50% {
+                transform:translateX(1000px)
+            } to {
+                transform:translateX(400px)
+            }
+        }
+        @keyframes animateCloud {
+            0% {
+                margin-left:-700px
+            } to {
+                margin-left:100%
+            }
+        }
+        .cloud-logo {
+            position: absolute;
+            top: 15%;
+            left: 0;
+            animation: homecloud 90s linear infinite;
+            transform: scale(.15);
+        }
+        .cloud-logo1 {
+            position: absolute;
+            bottom: 10%;
+            animation: animateCloud 25s linear infinite;
+            height: 25px;
+        }
+        .cloud-logo2 {
+            position: absolute;
+            top: 2%;
+            animation: homecloud 60s linear infinite;
+            transform: scale(.5);
+        }
+        .cloud-logo3 {
+            position: absolute;
+            top: 31%;
+            animation: animateCloud 45s linear infinite;
+            transform: scaleX(-1);
+            height: 30px;
+        }
+        .cloud-logo4 {
+            position: absolute;
+            animation: animateCloud 80s linear infinite;
+            transform: scale(.55);
+        }
+        .has-logo1 {
+            position: absolute;
+            top: 60%;
+            left: 25%;
+            transform: scalex(-1);
+        }
+    </style>
+    </div>
+</body>
+</html>

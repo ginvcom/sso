@@ -33,6 +33,7 @@ func (l *AddUserLogic) AddUser(req *types.UserForm) (resp *types.AddUserReply, e
 	}
 	birth, err := util.StringToTime(req.Birth, "YYYY-MM-DD")
 	if err != nil {
+		l.Logger.Error("err")
 		return
 	}
 	// TODO 增加校验
@@ -51,11 +52,13 @@ func (l *AddUserLogic) AddUser(req *types.UserForm) (resp *types.AddUserReply, e
 		Introduction: req.Introduction,
 		Status:       req.Status,
 	}
-	logx.Info(user)
+	l.Logger.Info(user)
 	_, err = l.svcCtx.UserModel.Insert(l.ctx, user)
 	if err != nil {
+		l.Logger.Error(err)
 		return
 	}
+
 	resp = &types.AddUserReply{
 		UUID: uuid,
 	}
