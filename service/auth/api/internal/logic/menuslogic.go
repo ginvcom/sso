@@ -58,8 +58,9 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 	resp = &types.SessionMenusReply{
 		List: make([]*types.Menu, 0, 1),
 	}
+	logx.Info(listData)
 
-	for _, obj := range *listData {
+	for _, obj := range listData {
 		item := types.Menu{
 			UUID: obj.Uuid,
 			Meta: types.Meta{
@@ -76,7 +77,7 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 	}
 	newList := makeTree(resp.List, "")
 	resp.List = newList
-
+	logx.Info(newList)
 	return
 }
 

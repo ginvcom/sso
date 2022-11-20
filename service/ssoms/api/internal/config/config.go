@@ -6,6 +6,8 @@ import (
 )
 
 type Config struct {
+	Env     string
+	NsqHost string
 	rest.RestConf
 	Mysql struct {
 		DataSource string

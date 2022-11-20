@@ -7,6 +7,7 @@
       <a-button type="primary" @click="initAdd"><template #icon><appstore-add-outlined /></template>添加系统</a-button>
     </div>
   </div>
+  <advanced-search :value="searchForm" :data="searchFormData" @change="onSearch" />
   <a-table
   :dataSource="respState.list"
   :columns="columns"
@@ -31,7 +32,7 @@
         <a @click="initEdit(record.uuid)">编辑</a>
         <a-divider type="vertical" />
         <a-popconfirm
-          title="确定要删除该对象吗?"
+          title="确定要删除该后台系统吗?"
           placement="topRight"
           @confirm="onDelete(record.uuid)">
           <a>删除</a>
@@ -88,18 +89,18 @@
         <a-col :span="16">
           <a-row :gutter="24">
           <a-col :span="12">
-            <a-form-item label="系统代号" name="key" :rules="[{ required: true, message: '请输入系统代号' }]">
-              <a-input v-model:value="formState.form.key" placeholder="系统代号" />
+            <a-form-item label="系统代号" name="systemCode" :rules="[{ required: true, message: '请输入系统代号' }]">
+              <a-input v-model:value="formState.form.systemCode" placeholder="系统代号" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="系统名" name="objectName" :rules="[{ required: true, message: '请输入系统中文名' }]">
-              <a-input v-model:value="formState.form.objectName" placeholder="系统中文名" />
+            <a-form-item label="系统名" name="systemName" :rules="[{ required: true, message: '请输入系统中文名' }]">
+              <a-input v-model:value="formState.form.systemName" placeholder="系统中文名" />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="域名" name="identifier" :rules="[{ required: true, message: '请输入域名' }]">
-              <a-input v-model:value="formState.form.identifier" placeholder="域名" />
+            <a-form-item label="域名" name="domain" :rules="[{ required: true, message: '请输入域名' }]">
+              <a-input v-model:value="formState.form.domain" placeholder="域名" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -130,18 +131,19 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import CategoryModal from './CategoryModal.vue'
+import AdvancedSearch from '@/components/AdvancedSearch.vue'
+import CategoryModal from '@/components/CategoryModal.vue'
 import VueCropper from 'vue-cropperjs'
 import 'cropperjs/dist/cropper.css'
 import {
-  objectList,
-  objectDetail,
-  addObject,
-  updateObject,
-  deleteObject,
-  ObjectListReply,
-  ObjectForm,
-  ObjectListReqParams
+  systemList,
+  systemDetail,
+  addSystem,
+  updateSystem,
+  deleteSystem,
+  SystemListReply,
+  SystemForm,
+  SystemListReqParams
 } from '../api/ssoms'
 import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
 import { message } from 'ant-design-vue'
@@ -150,6 +152,34 @@ import { getFileName } from '../utils/file'
 import { sts } from '../api/aliOss'
 import OSS from 'ali-oss'
 import { ossConfig } from '@/config'
+import { useRoute, useRouter, stringifyQuery } from 'vue-router'
+const route = useRoute()
+const router = useRouter()
+const searchFormData = [
+  {
+    type: 'input',
+    col: 6,
+    form: {
+      label: '系统代号',
+      name: 'systemCode',
+      allowClear: true
+    }
+  },
+  {
+    type: 'input',
+    col: 6,
+    form: {
+      label: '系统名',
+      name: 'systemName',
+      allowClear: true
+    }
+  }
+]
+
+const searchForm = reactive<SystemListReqParams>({ systemCode: '', systemName: '' })
+const onSearch = () => {
+  getList()
+}
 
 /**
  * 这是表格的列定义
@@ -158,11 +188,11 @@ import { ossConfig } from '@/config'
 const columns = [
   {
     title: '系统代号',
-    dataIndex: 'key'
+    dataIndex: 'systemCode'
   },
   {
     title: '系统名',
-    dataIndex: 'objectName'
+    dataIndex: 'systemName'
   },
   {
     title: 'logo',
@@ -187,7 +217,7 @@ const columns = [
 interface State {
   aliOss?: any
   loading: boolean
-  params: ObjectListReqParams
+  params: SystemListReqParams
 }
 
 
@@ -198,16 +228,15 @@ interface State {
 const state = reactive<State>({
   loading: false, // 列表是否加载完成
   params: {
-    topKey: '',
-    objectName: '',
-    key: ''
+    systemCode: '',
+    systemName: ''
   }
 })
 
 /**
  * 这是列表响应
  */
-const respState = reactive<ObjectListReply>({
+const respState = reactive<SystemListReply>({
   list: []
 })
 
@@ -220,6 +249,12 @@ onMounted(() => {
     },
     refreshSTSTokenInterval: 300000
   })
+  if (route.query.systemCode) {
+    searchForm.systemCode = route.query.systemCode as string
+  }
+  if (route.query.systemName) {
+    searchForm.systemName = route.query.systemName as string
+  }
   getList()
 })
 
@@ -228,19 +263,23 @@ onMounted(() => {
  */
 const getList = () => {
   state.loading = true
-  objectList(state.params).then((data: ObjectListReply) => {
+  systemList(searchForm).then((data: SystemListReply) => {
     respState.list = data.list
   }).finally(() => {
+    let query = Object.assign({}, route.query, searchForm)
+    if (stringifyQuery(query) !== stringifyQuery(route.query)) {
+      router.replace({ query })
+    }
     state.loading = false
   })
 }
 
 /**
- * 删除对象
+ * 删除后台系统
  */
 const onDelete = (uuid: string) => {
-  deleteObject({ uuid }).then(() => {
-    message.success('删除对象操作成功')
+  deleteSystem({ uuid }).then(() => {
+    message.success('删除后台系统操作成功')
     getList()
   })
 }
@@ -251,7 +290,7 @@ interface Form {
   type: string
   visible: boolean,
   loading: boolean,
-  form: ObjectForm
+  form: SystemForm
 }
 
 const formState = reactive<Form>({
@@ -260,16 +299,13 @@ const formState = reactive<Form>({
   type: 'add',
   form: {
     uuid: '',
-    objectName: '',
-    identifier: '',
-    key: '',
+    systemName: '',
+    domain: '',
+    systemCode: '',
     icon: '',
-    type: 1,
     subType: 1,
-    pUUID: '',
     status: 1,
     sort: 0,
-    topKey: ''
   }
 })
 
@@ -277,16 +313,13 @@ const initAdd = () => {
   // resetFileds初始化无效，手动初始化
   formState.form = {
     uuid: '',
-    objectName: '',
-    identifier: '',
-    key: '',
+    systemName: '',
+    domain: '',
+    systemCode: '',
     icon: '',
-    type: 1,
     subType: 1,
-    pUUID: '',
     status: 1,
     sort: 0,
-    topKey: ''
   }
   formState.type = 'add'
   formState.visible = true
@@ -294,11 +327,11 @@ const initAdd = () => {
 
 
 /**
- * 获取对象详情, 用于编辑
+ * 获取后台系统详情, 用于编辑
  * @param uuid
  */
 const initEdit = (uuid: string) => {
-  objectDetail({ uuid }).then((data: ObjectForm) => {
+  systemDetail({ uuid }).then((data: SystemForm) => {
     formState.form = data
     formState.type = 'edit'
     formState.visible = true
@@ -306,15 +339,14 @@ const initEdit = (uuid: string) => {
 }
 
 /**
- * 新增或修改对象
+ * 新增或修改后台系统
  */
 const onSubmit = () =>{
   modalFormRef.value?.validate().then(() => {
     formState.loading = true
-    formState.form.topKey = formState.form.key
     if (formState.type === 'add') {
-      addObject(formState.form).then(() => {
-        message.success('新增对象成功')
+      addSystem(formState.form).then(() => {
+        message.success('新增后台系统成功')
         formState.visible = false
         modalFormRef.value?.resetFields()
         getList()
@@ -322,8 +354,8 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateObject({ uuid: formState.form.uuid! }, formState.form).then(() => {
-        message.success('修改对象成功')
+      updateSystem({ uuid: formState.form.uuid! }, formState.form).then(() => {
+        message.success('修改后台系统成功')
         formState.visible = false
         modalFormRef.value?.resetFields()
         getList()

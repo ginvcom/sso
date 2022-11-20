@@ -4,12 +4,10 @@ import (
 	"net/http"
 
 	"github.com/ginvcom/util"
-
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"sso/service/ssoms/api/internal/logic/object"
 	"sso/service/ssoms/api/internal/svc"
 	"sso/service/ssoms/api/internal/types"
-
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func AddObjectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -22,6 +20,7 @@ func AddObjectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := object.NewAddObjectLogic(r.Context(), svcCtx)
 		resp, err := l.AddObject(&req)
+
 		util.Response(w, resp, err)
 	}
 }

@@ -1,8 +1,0 @@
-Name: gateway-api
-Host: 0.0.0.0
-Port: 8000
-AllowOrigin: http://localhost:3000
-UserCookieDomin: localhost
-Upstreams:
-  auth: http://localhost:8888
-  ssoms: http://localhost:8889

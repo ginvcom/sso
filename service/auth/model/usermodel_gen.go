@@ -4,12 +4,13 @@ package model
 
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
+	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/core/stringx"
@@ -18,151 +19,138 @@ import (
 var (
 	userFieldNames          = builder.RawFieldNames(&User{})
 	userRows                = strings.Join(userFieldNames, ",")
-	userUpdateFields = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`is_delete`"), "=?,") + "=?"
-	userUpdateFieldsWithoutPassword = strings.Join(stringx.Remove(userFieldNames, "`id`", "uuid", "`create_time`", "`password`", "`salt`", "`is_delete`"), "=?,") + "=?"
+	userRowsExpectAutoSet   = strings.Join(stringx.Remove(userFieldNames, "`id`", "`update_at`", "`updated_at`", "`update_time`", "`create_at`", "`created_at`", "`create_time`"), ",")
+	userRowsWithPlaceHolder = strings.Join(stringx.Remove(userFieldNames, "`id`", "`update_at`", "`updated_at`", "`update_time`", "`create_at`", "`created_at`", "`create_time`"), "=?,") + "=?"
+
+	cacheUserIdPrefix   = "cache:user:id:"
+	cacheUserUuidPrefix = "cache:user:uuid:"
 )
 
 type (
 	userModel interface {
-		FindOne(ctx context.Context, mobile string) (*User, error) // 用于登录匹配用户
+		Insert(ctx context.Context, data *User) (sql.Result, error)
+		FindOne(ctx context.Context, id int64) (*User, error)
 		FindOneByUuid(ctx context.Context, uuid string) (*User, error)
-		Update(ctx context.Context, newData *User) error
-		Delete(ctx context.Context, uuid string) error
+		Update(ctx context.Context, data *User) error
+		Delete(ctx context.Context, id int64) error
 	}
 
 	defaultUserModel struct {
-		conn  sqlx.SqlConn
+		sqlc.CachedConn
 		table string
 	}
 
-	UserOption struct{
-		UUID   string `db:"uuid"`
-		Name   string `db:"name"`
-		Avatar string `db:"avatar"`
-	}
-
-	UserListArgs struct {
-		Name string
-		Mobile string
-		Page int64
-		PageSize int64
-	}
-
-	UserFilterOptionsArgs struct {
-		Name string
-		Limit int64
-	}
-
 	User struct {
-		Id         int64     `db:"id"`
-		Uuid       string    `db:"uuid"`
-		Avatar     string    `db:"avatar"`    // 头像
-		Name       string    `db:"name"`      // 姓名
-		Mobile     string    `db:"mobile"`    // 手机号
-		Password   string    `db:"password"`  // 密码
-		Salt       string    `db:"salt"`      // 密码盐
-		Gender     int64     `db:"gender"`    // 性别: 1男, 2女, 3未知
-		Birth      time.Time `db:"birth"`     // 生日
-		Introduction string `db:"introduction"` // 简介
-		Status     int64     `db:"status"`    // 状态: 1正常
-		IsDelete   int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
-		CreateTime time.Time `db:"create_time"`
-		UpdateTime time.Time `db:"update_time"`
+		Id           int64     `db:"id"`
+		Uuid         string    `db:"uuid"`
+		Avatar       string    `db:"avatar"`   // 头像
+		Name         string    `db:"name"`     // 姓名
+		Mobile       string    `db:"mobile"`   // 手机号
+		Password     string    `db:"password"` // 密码
+		Salt         string    `db:"salt"`     // 密码盐
+		Gender       int64     `db:"gender"`   // 性别: 1男, 2女, 3未知
+		Birth        time.Time `db:"birth"`    // 生日
+		Introduction string    `db:"introduction"`
+		Status       int64     `db:"status"`    // 状态: 1正常
+		IsDelete     int64     `db:"is_delete"` // 是否删除: 0正常, 1删除
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
 	}
-
 )
 
-func newUserModel(conn sqlx.SqlConn) *defaultUserModel {
+func newUserModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultUserModel {
 	return &defaultUserModel{
-		conn:  conn,
-		table: "`user`",
+		CachedConn: sqlc.NewConn(conn, c),
+		table:      "`user`",
 	}
 }
 
-func (m *defaultUserModel) Delete(ctx context.Context, uuid string) (err error) {
-	updateTime := time.Now().Local()
-	query := fmt.Sprintf("update %s set `is_delete`=1, `update_time`= ? where `uuid` = ?", m.table)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
+func (m *defaultUserModel) Delete(ctx context.Context, id int64) error {
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
 	}
 
-	res, err := stmt.ExecCtx(ctx, updateTime, uuid)
-	if err!=nil {
-		return
-	}
-
-	rowsAffected, err := res.RowsAffected()
-	if err !=nil{
-		return
-	}
-
-	if rowsAffected == 0 {
-		err = errors.New("no rows affected")
-	}
-
+	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, id)
+	userUuidKey := fmt.Sprintf("%s%v", cacheUserUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+		return conn.ExecCtx(ctx, query, id)
+	}, userIdKey, userUuidKey)
 	return err
 }
 
-func (m *defaultUserModel) FindOne(ctx context.Context, mobile string) (u *User, err error) {
-	query := fmt.Sprintf("select %s from %s where `mobile`= ? and `status`= 1 and `is_delete` = 0 limit 1", userRows, m.table)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
+func (m *defaultUserModel) FindOne(ctx context.Context, id int64) (*User, error) {
+	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, id)
+	var resp User
+	err := m.QueryRowCtx(ctx, &resp, userIdKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userRows, m.table)
+		return conn.QueryRowCtx(ctx, v, query, id)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
-	u = new(User)
-	err = stmt.QueryRowCtx(ctx, u, mobile)
-	if err == sqlc.ErrNotFound {
-		err = ErrNotFound
-	}
-
-	return
 }
 
-func (m *defaultUserModel) FindOneByUuid(ctx context.Context, uuid string) (u *User, err error) {
-	query := fmt.Sprintf("select %s from %s where `is_delete` = 0 and `uuid` = ? limit 1", userRows, m.table)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
+func (m *defaultUserModel) FindOneByUuid(ctx context.Context, uuid string) (*User, error) {
+	userUuidKey := fmt.Sprintf("%s%v", cacheUserUuidPrefix, uuid)
+	var resp User
+	err := m.QueryRowIndexCtx(ctx, &resp, userUuidKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
+		query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", userRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, uuid); err != nil {
+			return nil, err
+		}
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
-	u = new(User)
-	err = stmt.QueryRowCtx(ctx, u, uuid)
-	if err == sqlc.ErrNotFound {
-		err = ErrNotFound
-	}
-
-	return
 }
 
-func (m *defaultUserModel) Update(ctx context.Context, newData *User) (err error) {
-	var placeholder []interface{}
-	now := time.Now().Local()
-	query := fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFieldsWithoutPassword)
-	if newData.Password != "" {
-		query = fmt.Sprintf("update %s set %s where `is_delete` = 0 and `uuid` = ?", m.table, userUpdateFields)
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Salt,newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
-	} else {
-		placeholder = append(placeholder, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Gender, newData.Birth, newData.Introduction, newData.Status, now)
-	}
-	placeholder = append(placeholder, newData.Uuid)
-	stmt, err := m.conn.PrepareCtx(ctx, query)
-	if err !=nil{
-		return
+func (m *defaultUserModel) Insert(ctx context.Context, data *User) (sql.Result, error) {
+	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, data.Id)
+	userUuidKey := fmt.Sprintf("%s%v", cacheUserUuidPrefix, data.Uuid)
+	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, userRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Uuid, data.Avatar, data.Name, data.Mobile, data.Password, data.Salt, data.Gender, data.Birth, data.Introduction, data.Status, data.IsDelete)
+	}, userIdKey, userUuidKey)
+	return ret, err
+}
+
+func (m *defaultUserModel) Update(ctx context.Context, newData *User) error {
+	data, err := m.FindOne(ctx, newData.Id)
+	if err != nil {
+		return err
 	}
 
-	res, err := stmt.ExecCtx(ctx, placeholder...)
-	if err !=nil{
-		return
-	}
-
-	rowsAffected, err := res.RowsAffected()
-	if err !=nil{
-		return
-	}
-
-	if rowsAffected == 0 {
-		err = errors.New("no rows affected")
-	}
-
+	userIdKey := fmt.Sprintf("%s%v", cacheUserIdPrefix, data.Id)
+	userUuidKey := fmt.Sprintf("%s%v", cacheUserUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userRowsWithPlaceHolder)
+		return conn.ExecCtx(ctx, query, newData.Uuid, newData.Avatar, newData.Name, newData.Mobile, newData.Password, newData.Salt, newData.Gender, newData.Birth, newData.Introduction, newData.Status, newData.IsDelete, newData.Id)
+	}, userIdKey, userUuidKey)
 	return err
+}
+
+func (m *defaultUserModel) formatPrimary(primary interface{}) string {
+	return fmt.Sprintf("%s%v", cacheUserIdPrefix, primary)
+}
+
+func (m *defaultUserModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn, v, primary interface{}) error {
+	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userRows, m.table)
+	return conn.QueryRowCtx(ctx, v, query, primary)
+}
+
+func (m *defaultUserModel) tableName() string {
+	return m.table
 }

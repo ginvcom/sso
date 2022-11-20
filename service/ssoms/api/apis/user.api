@@ -48,6 +48,7 @@ type UpdateUserReq {
 	Avatar   string `json:"avatar"`
 	Gender   int64  `json:"gender"`
 	Birth    string `json:"birth"`
+	Introduction    string `json:"introduction"`
 	Status   int64  `json:"status,default=1"`
 }
 
@@ -130,7 +131,7 @@ type PasswordResetReply {
 	group: user
 )
 
-service ssoms-api {
+service ssoms {
 	@doc "用户列表"
 	@handler userList
 	get /user (UserListReq) returns (UserListReply)

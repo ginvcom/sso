@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"sso/service/ssoms/api/internal/config"
@@ -26,25 +27,35 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
-	nsqConfig := nsq.NewConfig()
-	producer, err := nsq.NewProducer("127.0.0.1:4150", nsqConfig)
-	if err != nil {
-		log.Fatal(err)
+	if c.Env != "dev" {
+		nsqConfig := nsq.NewConfig()
+		producer, err := nsq.NewProducer(c.NsqHost, nsqConfig)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer producer.Stop()
+		writer := logx.NewWriter(NewNSQWriter(producer))
+		logx.SetWriter(writer)
 	}
-	defer producer.Stop()
 
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
 
-	writer := logx.NewWriter(NewNSQWriter(producer))
-	logx.SetWriter(writer)
-
+	serviceNameField := logx.LogField{
+		Key:   "serviceName",
+		Value: c.Name,
+	}
+	envField := logx.LogField{
+		Key:   "env",
+		Value: c.Env,
+	}
+	logx.AddGlobalFields(serviceNameField, envField)
 	// 全局中间件, 获取网关传递的用户基本信息
 	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 
 			uuid := r.Header.Get("x-origin-Uuid")
-			name := r.Header.Get("x-origin-name")
+			name := url.QueryEscape(r.Header.Get("x-origin-name"))
 			// 可能存在无需登录就能访问的页面
 			if uuid == "" || name == "" {
 				w.WriteHeader(http.StatusUnauthorized)

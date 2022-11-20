@@ -205,6 +205,47 @@ export function extendRole(params: components.AddInheritanceReqParams, req: comp
 }
 
 /**
+ * @description "系统列表"
+ * @param params
+ */
+export function systemList(params: components.SystemListReqParams) {
+	return ssoms.get<components.SystemListReply>("/system", params)
+}
+
+/**
+ * @description "新增系统"
+ * @param req
+ */
+export function addSystem(req: components.SystemForm) {
+	return ssoms.post<components.AddSystemReply>("/system", req)
+}
+
+/**
+ * @description "系统详情"
+ * @param params
+ */
+export function systemDetail(params: components.SystemDetailReqParams) {
+	return ssoms.get<components.SystemForm>("/system/:uuid", params)
+}
+
+/**
+ * @description "修改系统"
+ * @param params
+ * @param req
+ */
+export function updateSystem(params: components.UpdateSystemReqParams, req: components.UpdateSystemReq) {
+	return ssoms.put<components.UpdateSystemReply>("/system/:uuid", params, req)
+}
+
+/**
+ * @description "删除系统"
+ * @param params
+ */
+export function deleteSystem(params: components.DeleteSystemReqParams) {
+	return ssoms.delete<components.DeleteSystemReply>("/system/:uuid", params)
+}
+
+/**
  * @description "操作对象列表"
  * @param params
  */

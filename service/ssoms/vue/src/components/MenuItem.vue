@@ -64,6 +64,6 @@ const visibleChildren = (c: Array<Menu>) => {
 }
 
 const iconFont = createFromIconfontCN({
-  scriptUrl: '//at.alicdn.com/t/c/font_3601463_v7r5pqljpw.js',
+  scriptUrl: '//at.alicdn.com/t/c/font_3601463_tk54gkmpecb.js',
 })
 </script>

@@ -13,6 +13,7 @@ type ServiceContext struct {
 	RoleModel       model.RoleModel
 	UserToRoleModel model.UserToRoleModel
 	ObjectModel     model.ObjectModel
+	ObjectLogModel  model.ObjectLogModel
 	PermissionModel model.PermissionModel
 }
 
@@ -24,6 +25,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RoleModel:       model.NewRoleModel(conn),
 		UserToRoleModel: model.NewUserToRoleModel(conn),
 		ObjectModel:     model.NewObjectModel(conn),
+		ObjectLogModel:  model.NewObjectLogModel(conn),
 		PermissionModel: model.NewPermissionModel(conn),
 	}
 }

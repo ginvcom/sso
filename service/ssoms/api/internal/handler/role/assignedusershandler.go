@@ -4,12 +4,10 @@ import (
 	"net/http"
 
 	"github.com/ginvcom/util"
-
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"sso/service/ssoms/api/internal/logic/role"
 	"sso/service/ssoms/api/internal/svc"
 	"sso/service/ssoms/api/internal/types"
-
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func AssignedUsersHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -22,6 +20,7 @@ func AssignedUsersHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := role.NewAssignedUsersLogic(r.Context(), svcCtx)
 		resp, err := l.AssignedUsers(&req)
+
 		util.Response(w, resp, err)
 	}
 }

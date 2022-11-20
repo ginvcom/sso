@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"sso/service/gateway/api/internal/types"
 )
 
@@ -22,11 +23,19 @@ func GetBody(c *ServiceContext, r *http.Request) (body []byte, err error) {
 			return
 		}
 	} else if c.Meta.Action == ActionVerify {
+		referer := r.Header.Get("Referer")
+		refererURL, err2 := url.Parse(referer)
+		if err2 != nil {
+			err = err2
+			return
+		}
 		req := types.VerifyReq{
 			SystemCode:  c.Meta.SystemCode,
 			ServiceCode: c.Meta.ServiceCode,
 			Token:       c.Meta.Token,
 			URI:         c.Meta.URI,
+			Method:      r.Method,
+			MenuURI:     refererURL.Path,
 		}
 		body, err = json.Marshal(req)
 		if err != nil {

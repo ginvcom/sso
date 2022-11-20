@@ -31,7 +31,8 @@ func NewSignInLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SignInLogi
 }
 
 func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err error) {
-	user, err := l.svcCtx.UserModel.FindOne(l.ctx, req.Mobile)
+	userRowBuilder := l.svcCtx.UserModel.RowBuilder()
+	user, err := l.svcCtx.UserModel.CustomFindOne(l.ctx, userRowBuilder, req.Mobile)
 	if err != nil {
 		if err == sqlc.ErrNotFound {
 			err = errors.New("mobile not exits")
@@ -51,9 +52,10 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 		TopKey: req.SystemCode,
 	}
 
-	object, err := l.svcCtx.ObjectModel.FindOne(l.ctx, objectArgs)
+	objectRowBuilder := l.svcCtx.ObjectModel.RowBuilder()
+	object, err := l.svcCtx.ObjectModel.CustomFindOne(l.ctx, objectRowBuilder, objectArgs)
 	if err != nil {
-		fmt.Println(err)
+		l.Logger.Error(err)
 		err = fmt.Errorf("system \"%s\" not exits", req.SystemCode)
 		return
 	}

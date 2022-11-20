@@ -1,6 +1,7 @@
 import (
 	"apis/user.api"
 	"apis/role.api"
+	"apis/system.api"
 	"apis/object.api"
 	"apis/permission.api"
 )
@@ -31,7 +32,7 @@ type StatisticReply {
 	group: home
 )
 
-service ssoms-api {
+service ssoms {
 	@doc "首页统计数据"
 	@handler homeStatistic
 	get /home/statistic returns (StatisticReply)

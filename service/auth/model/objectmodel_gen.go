@@ -4,59 +4,50 @@ package model
 
 import (
 	"context"
-	"errors"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
+	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 var (
 	objectFieldNames          = builder.RawFieldNames(&Object{})
 	objectRows                = strings.Join(objectFieldNames, ",")
+	objectRowsExpectAutoSet   = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`create_at`", "`created_at`", "`create_time`", "`update_at`", "`updated_at`", "`update_time`"), ",")
+	objectRowsWithPlaceHolder = strings.Join(stringx.Remove(objectFieldNames, "`id`", "`create_at`", "`created_at`", "`create_time`", "`update_at`", "`updated_at`", "`update_time`"), "=?,") + "=?"
+
+	cacheObjectIdPrefix   = "cache:object:id:"
+	cacheObjectUuidPrefix = "cache:object:uuid:"
 )
 
 type (
 	objectModel interface {
-		IsExist(ctx context.Context, args *ObjectIsExistArgs) (bool, error) // 用于新增、更新前的校验
+		Insert(ctx context.Context, data *Object) (sql.Result, error)
+		FindOne(ctx context.Context, id int64) (*Object, error)
 		FindOneByUuid(ctx context.Context, uuid string) (*Object, error)
-		FindOne(ctx context.Context, args *ObjectFindOneArgs) (*Object, error)
-		FindMenusInRoleUUIDArray(ctx context.Context, topKey string, roleUUIDArray *[]string) (*[]Menu, error)
+		Update(ctx context.Context, data *Object) error
+		Delete(ctx context.Context, id int64) error
 	}
 
 	defaultObjectModel struct {
-		conn  sqlx.SqlConn
+		sqlc.CachedConn
 		table string
-	}
-
-	ObjectListArgs struct {
-		TopKey string
-		ObjectName string
-		Key string
-		Status int64
-		Typ int64
-		ExcludeHide bool
-	}
-
-	ObjectIsExistArgs struct {
-		TopKey string
-		Key string
-		Typ int64
-		SubType int64
-		ExcludeUUID string
 	}
 
 	Object struct {
 		Id         int64     `db:"id"`
 		Uuid       string    `db:"uuid"`
 		ObjectName string    `db:"object_name"`
-		Identifier     string    `db:"identifier"`
+		Identifier string    `db:"identifier"`
 		Key        string    `db:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
 		Sort       int64     `db:"sort"`
-		Type       int64     `db:"type"`      // 类型: 1操作对象, 2菜单, 3操作(接口)
+		Type       int64     `db:"type"`      // 类型: 1系统, 2菜单, 3操作(接口)
 		SubType    int64     `db:"sub_type"`  // 子分类
 		Extra      string    `db:"extra"`     // 扩展字段，建议封装成 JSON 字符串
 		Icon       string    `db:"icon"`      // 图标
@@ -67,122 +58,101 @@ type (
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
 	}
-
-	Menu struct {
-		Uuid       string    `db:"uuid"`
-		ObjectName string    `db:"object_name"`
-		Identifier     string    `db:"identifier"`
-		Key        string    `db:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
-		SubType    int64     `db:"sub_type"`  // 子分类
-		Icon       string    `db:"icon"`      // 图标
-		Puuid      string    `db:"puuid"`     // 父级uuid
-	}
 )
 
-func newObjectModel(conn sqlx.SqlConn) *defaultObjectModel {
+func newObjectModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultObjectModel {
 	return &defaultObjectModel{
-		conn:  conn,
-		table: "`object`",
+		CachedConn: sqlc.NewConn(conn, c),
+		table:      "`object`",
 	}
 }
 
-func (m *defaultObjectModel) IsExist(ctx context.Context, args *ObjectIsExistArgs) (exist bool, err error) {
-	where := "`top_key` = ? and `key` = ? and `type` = ? and `sub_type` = ? and `is_delete` = 0"
-	placeholder :=[]interface{}{args.TopKey, args.Key, args.Typ, args.SubType}
-	if args.ExcludeUUID != "" {
-		where +=" and `uuid` != ?"
-		placeholder = append(placeholder, args.ExcludeUUID)
-	}
-	query := fmt.Sprintf("select count(*) as count from %s where %s limit 1", m.table, where)
-	stmt, err := m.conn.PrepareCtx(ctx, query)
+func (m *defaultObjectModel) Delete(ctx context.Context, id int64) error {
+	data, err := m.FindOne(ctx, id)
 	if err != nil {
-		return
-	}
-	var count int64
-	err = stmt.QueryRowCtx(ctx, &count, placeholder...)
-
-	if err !=nil{
-		return
+		return err
 	}
 
-	if count > 0 {
-		exist = true
-	}
-	
-	return
+	objectIdKey := fmt.Sprintf("%s%v", cacheObjectIdPrefix, id)
+	objectUuidKey := fmt.Sprintf("%s%v", cacheObjectUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+		return conn.ExecCtx(ctx, query, id)
+	}, objectIdKey, objectUuidKey)
+	return err
 }
 
-func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (resp *Object,  err error) {
-	query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", objectRows, m.table)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
+func (m *defaultObjectModel) FindOne(ctx context.Context, id int64) (*Object, error) {
+	objectIdKey := fmt.Sprintf("%s%v", cacheObjectIdPrefix, id)
+	var resp Object
+	err := m.QueryRowCtx(ctx, &resp, objectIdKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", objectRows, m.table)
+		return conn.QueryRowCtx(ctx, v, query, id)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
-	resp = new(Object)
-	err = stmt.QueryRowCtx(ctx, resp, uuid)
-	if err == sqlc.ErrNotFound {
-		err = ErrNotFound
-	}
-	return
 }
 
-type ObjectFindOneArgs struct {
-	Key string
-	TopKey string
-}
-
-func (m *defaultObjectModel) FindOne(ctx context.Context, args *ObjectFindOneArgs) (resp *Object, err error) {
-	where := "`status` = 1 and `is_delete` = 0"
-	placeholder :=[]interface{}{args.TopKey}
-	if args.TopKey != "" {
-		where += " and `top_key`=?"
-	} else {
-		err = errors.New("topKey is required")
-		return
-	}
-	if args.Key != "" {
-		where += " and `key`=?"
-		placeholder = append(placeholder, args.Key)
-	}
-	query := fmt.Sprintf("select %s from %s where %s limit 1", objectRows, m.table, where)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
-	}
-	resp = new(Object)
-	err = stmt.QueryRowCtx(ctx, resp, placeholder...)
-	if err == sqlc.ErrNotFound {
-		err = ErrNotFound
-	}
-
-	return
-}
-
-func (m *defaultObjectModel)FindMenusInRoleUUIDArray(ctx context.Context, topKey string, roleUUIDArray *[]string) (resp *[]Menu, err error) {
-	placeholder :=[]interface{}{topKey}
-	fields := "o.`uuid`, o.`object_name`, o.`identifier`, o.`key`, o.`sub_type`, o.`icon`, o.`puuid`"
-	where := "o.`is_delete` = 0 and o.`status` = 1 and o.`type` = 2 and p.`top_key` = ? and p.`is_delete` = 0"
-	for i, roleUUID := range *roleUUIDArray {
-		if i == 0 {
-			where += " and p.`role_uuid` in("
-		} else {
-			where += ", "
+func (m *defaultObjectModel) FindOneByUuid(ctx context.Context, uuid string) (*Object, error) {
+	objectUuidKey := fmt.Sprintf("%s%v", cacheObjectUuidPrefix, uuid)
+	var resp Object
+	err := m.QueryRowIndexCtx(ctx, &resp, objectUuidKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
+		query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", objectRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, uuid); err != nil {
+			return nil, err
 		}
-		where += "?"
-		if i == len(*roleUUIDArray) - 1 {
-			where += ")"
-		}
-		placeholder = append(placeholder, roleUUID)
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
-	// 表名是否要用*defaultPermissionModel.tableName()来获取？
-	query := fmt.Sprintf("select %s from %s as o left join permission as p on o.uuid = p.`object_uuid` where %s order by o.`sort`, o.`create_time`", fields, m.table, where)
-	fmt.Println(query)
-	stmt, err:= m.conn.PrepareCtx(ctx, query)
-	if err!=nil {
-		return
-	}
-	resp = new([]Menu)
-	err = stmt.QueryRows(resp, placeholder...)
+}
 
-	return resp, err
+func (m *defaultObjectModel) Insert(ctx context.Context, data *Object) (sql.Result, error) {
+	objectIdKey := fmt.Sprintf("%s%v", cacheObjectIdPrefix, data.Id)
+	objectUuidKey := fmt.Sprintf("%s%v", cacheObjectUuidPrefix, data.Uuid)
+	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, objectRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Uuid, data.ObjectName, data.Identifier, data.Key, data.Sort, data.Type, data.SubType, data.Extra, data.Icon, data.Status, data.Puuid, data.TopKey, data.IsDelete)
+	}, objectIdKey, objectUuidKey)
+	return ret, err
+}
+
+func (m *defaultObjectModel) Update(ctx context.Context, newData *Object) error {
+	data, err := m.FindOne(ctx, newData.Id)
+	if err != nil {
+		return err
+	}
+
+	objectIdKey := fmt.Sprintf("%s%v", cacheObjectIdPrefix, data.Id)
+	objectUuidKey := fmt.Sprintf("%s%v", cacheObjectUuidPrefix, data.Uuid)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, objectRowsWithPlaceHolder)
+		return conn.ExecCtx(ctx, query, newData.Uuid, newData.ObjectName, newData.Identifier, newData.Key, newData.Sort, newData.Type, newData.SubType, newData.Extra, newData.Icon, newData.Status, newData.Puuid, newData.TopKey, newData.IsDelete, newData.Id)
+	}, objectIdKey, objectUuidKey)
+	return err
+}
+
+func (m *defaultObjectModel) formatPrimary(primary interface{}) string {
+	return fmt.Sprintf("%s%v", cacheObjectIdPrefix, primary)
+}
+
+func (m *defaultObjectModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn, v, primary interface{}) error {
+	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", objectRows, m.table)
+	return conn.QueryRowCtx(ctx, v, query, primary)
+}
+
+func (m *defaultObjectModel) tableName() string {
+	return m.table
 }

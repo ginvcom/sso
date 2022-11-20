@@ -66,14 +66,15 @@ type UserDetailReq struct {
 }
 
 type UpdateUserReq struct {
-	UUID     string `path:"uuid"`
-	Name     string `json:"name"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password,optional"`
-	Avatar   string `json:"avatar"`
-	Gender   int64  `json:"gender"`
-	Birth    string `json:"birth"`
-	Status   int64  `json:"status,default=1"`
+	UUID         string `path:"uuid"`
+	Name         string `json:"name"`
+	Mobile       string `json:"mobile"`
+	Password     string `json:"password,optional"`
+	Avatar       string `json:"avatar"`
+	Gender       int64  `json:"gender"`
+	Birth        string `json:"birth"`
+	Introduction string `json:"introduction"`
+	Status       int64  `json:"status,default=1"`
 }
 
 type UpdateUserReply struct {
@@ -260,6 +261,69 @@ type AddInheritanceReq struct {
 }
 
 type AddInheritanceReply struct {
+	Success bool `json:"success"`
+}
+
+type SystemListReq struct {
+	SystemCode string `form:"systemCode,optional"`
+	SystemName string `form:"systemName,optional"`
+}
+
+type System struct {
+	UUID       string `json:"uuid"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
+	Status     int64  `json:"status"`
+}
+
+type SystemListReply struct {
+	List []*System `json:"list"`
+}
+
+type SystemForm struct {
+	UUID       string `json:"uuid,optional"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Icon       string `json:"icon"`    // 图标
+	Status     int64  `json:"status"`
+}
+
+type AddSystemReply struct {
+	UUID string `json:"uuid"`
+}
+
+type SystemDetailReq struct {
+	UUID string `path:"uuid"`
+}
+
+type UpdateSystemReq struct {
+	UUID       string `path:"uuid"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Icon       string `json:"icon"`    // 图标
+	Status     int64  `json:"status"`
+}
+
+type UpdateSystemReply struct {
+	Success bool `json:"success"`
+}
+
+type DeleteSystemReq struct {
+	UUID string `path:"uuid"`
+}
+
+type DeleteSystemReply struct {
 	Success bool `json:"success"`
 }
 

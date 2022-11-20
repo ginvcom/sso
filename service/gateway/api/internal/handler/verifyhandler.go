@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sso/service/gateway/api/internal/svc"
 	"sso/service/gateway/api/internal/types"
+	"strings"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -59,7 +60,12 @@ func VerifyHandler(svcCtx *svc.ServiceContext, w http.ResponseWriter, r *http.Re
 	}
 
 	if realResp.Code != 0 {
-		err = fmt.Errorf("verify request error, code: %d", realResp.Code)
+		err = fmt.Errorf("verify request error, code: %d, msg: %v", realResp.Code, realResp.Msg)
+		if strings.Contains(realResp.Msg, "authentication error") {
+			w.WriteHeader(http.StatusUnauthorized)
+		} else if realResp.Msg == "object not exits" {
+			err = fmt.Errorf("object not exits: %s %s", meta.Method, meta.URI)
+		}
 		w.Write(resp)
 		return
 	}

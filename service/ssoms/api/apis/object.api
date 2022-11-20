@@ -110,7 +110,7 @@ type RoleOperationsReply {
 	group: object
 )
 
-service ssoms-api {
+service ssoms {
 	@doc "操作对象列表"
 	@handler objectList
 	get /object (ObjectListReq) returns (ObjectListReply)

@@ -21,6 +21,7 @@ func signInHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := logic.NewSignInLogic(r.Context(), svcCtx)
 		resp, err := l.SignIn(&req)
+
 		util.Response(w, resp, err)
 	}
 }

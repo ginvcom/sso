@@ -1,0 +1,89 @@
+type SystemListReq {
+	SystemCode string `form:"systemCode,optional"`
+	SystemName string `form:"systemName,optional"`
+}
+
+type System {
+	UUID       string `json:"uuid"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
+	Status     int64  `json:"status"`
+}
+
+type SystemListReply {
+	List []*System `json:"list"`
+}
+
+type SystemForm {
+	UUID       string `json:"uuid,optional"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Icon       string `json:"icon"`    // 图标
+	Status     int64  `json:"status"`
+}
+
+type AddSystemReply {
+	UUID string `json:"uuid"`
+}
+
+type SystemDetailReq {
+	UUID string `path:"uuid"`
+}
+
+type UpdateSystemReq {
+	UUID       string `path:"uuid"`
+	SystemCode string `json:"systemCode"`
+	SystemName string `json:"systemName"`
+	Domain     string `json:"domain"`
+	Sort       int64  `json:"sort"`
+	SubType    int64  `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Icon       string `json:"icon"`    // 图标
+	Status     int64  `json:"status"`
+}
+
+type UpdateSystemReply {
+	Success bool `json:"success"`
+}
+
+type DeleteSystemReq {
+	UUID string `path:"uuid"`
+}
+
+type DeleteSystemReply {
+	Success bool `json:"success"`
+}
+
+@server(
+	group: system
+)
+
+service ssoms {
+	
+	@doc "系统列表"
+	@handler systemList
+	get /system (SystemListReq) returns (SystemListReply)
+	
+	@doc "新增系统"
+	@handler addSystem
+	post /system (SystemForm) returns (AddSystemReply)
+	
+	@doc "系统详情"
+	@handler systemDetail
+	get /system/:uuid (SystemDetailReq) returns (SystemForm)
+	
+	@doc "修改系统"
+	@handler updateSystem
+	put /system/:uuid (UpdateSystemReq) returns (UpdateSystemReply)
+	
+	@doc "删除系统"
+	@handler deleteSystem
+	delete /system/:uuid (DeleteSystemReq) returns (DeleteSystemReply)
+}

@@ -13,6 +13,7 @@ func ProfileHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l := user.NewProfileLogic(r.Context(), svcCtx)
 		resp, err := l.Profile()
+
 		util.Response(w, resp, err)
 	}
 }

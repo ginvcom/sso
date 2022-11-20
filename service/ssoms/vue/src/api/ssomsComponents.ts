@@ -77,6 +77,7 @@ export interface UpdateUserReq {
 	avatar: string
 	gender: number
 	birth: string
+	introduction: string
 	status: number
 }
 
@@ -304,6 +305,81 @@ export interface AddInheritanceReqParams {
 }
 
 export interface AddInheritanceReply {
+	success: boolean
+}
+
+export interface SystemListReq {
+}
+
+export interface SystemListReqParams {
+	systemCode: string
+	systemName: string
+}
+
+export interface System {
+	uuid: string
+	systemCode: string
+	systemName: string
+	domain: string
+	sort: number
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	extra?: string // 扩展字段
+	icon: string // 图标
+	status: number
+}
+
+export interface SystemListReply {
+	list: Array<System>
+}
+
+export interface SystemForm {
+	uuid?: string
+	systemCode: string
+	systemName: string
+	domain: string
+	sort: number
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	icon: string // 图标
+	status: number
+}
+
+export interface AddSystemReply {
+	uuid: string
+}
+
+export interface SystemDetailReq {
+}
+
+export interface SystemDetailReqParams {
+	uuid: string
+}
+
+export interface UpdateSystemReq {
+	systemCode: string
+	systemName: string
+	domain: string
+	sort: number
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	icon: string // 图标
+	status: number
+}
+
+export interface UpdateSystemReqParams {
+	uuid: string
+}
+
+export interface UpdateSystemReply {
+	success: boolean
+}
+
+export interface DeleteSystemReq {
+}
+
+export interface DeleteSystemReqParams {
+	uuid: string
+}
+
+export interface DeleteSystemReply {
 	success: boolean
 }
 

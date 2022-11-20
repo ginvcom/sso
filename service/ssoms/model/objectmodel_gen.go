@@ -91,7 +91,7 @@ func newObjectModel(conn sqlx.SqlConn) *defaultObjectModel {
 func (args *ObjectListArgs) getListConditions () (where string, placeholder []interface{}) {
 	where = "`is_delete` = 0"
 	if args.Status != 0 {
-		where +=" and status = ?"
+		where +=" and `status` = ?"
 		if (args.Status == -1) {
 			args.Status = 0
 		}
@@ -100,7 +100,7 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 
 	// 有type的是menuOptions请求，不会有TopKey参数
 	if args.Typ != 0 {
-		where +=" and type = ?"
+		where +=" and `type` = ?"
 		placeholder = append(placeholder, args.Typ)
 		if args.ExcludeHide {
 			where +=" and sub_type !=3"
@@ -110,7 +110,7 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 			where +=" and top_key = ? and type != 1"
 			placeholder = append(placeholder, args.TopKey)
 		} else {
-			where +=" and type = 1"
+			where +=" and `type` = 1"
 		}
 	}
 	if args.ObjectName != "" {
@@ -118,7 +118,7 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 		placeholder = append(placeholder, args.ObjectName)
 	}
 	if args.Key != "" {
-		where +=" and key like ?"
+		where +=" and `key` like ?"
 		placeholder = append(placeholder, args.Key + "%")
 	}
 	return

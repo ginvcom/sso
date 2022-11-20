@@ -24,20 +24,35 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-
-	nsqConfig := nsq.NewConfig()
-	producer, err := nsq.NewProducer("127.0.0.1:4150", nsqConfig)
+	err := config.GetWhiteList(c.Etcd.Hosts)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer producer.Stop()
+
+	if c.Env == "development" {
+		nsqConfig := nsq.NewConfig()
+		producer, err := nsq.NewProducer(c.NsqHost, nsqConfig)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer producer.Stop()
+		writer := logx.NewWriter(NewNSQWriter(producer))
+		logx.SetWriter(writer)
+	}
 
 	// server := rest.MustNewServer(c.RestConf)
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
 
-	writer := logx.NewWriter(NewNSQWriter(producer))
-	logx.SetWriter(writer)
+	serviceNameField := logx.LogField{
+		Key:   "serviceName",
+		Value: c.Name,
+	}
+	envField := logx.LogField{
+		Key:   "env",
+		Value: c.Env,
+	}
+	logx.AddGlobalFields(serviceNameField, envField)
 
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)

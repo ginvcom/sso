@@ -3,12 +3,11 @@ package user
 import (
 	"net/http"
 
+	"github.com/ginvcom/util"
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"sso/service/ssoms/api/internal/logic/user"
 	"sso/service/ssoms/api/internal/svc"
 	"sso/service/ssoms/api/internal/types"
-
-	"github.com/ginvcom/util"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func InfoEditHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -21,6 +20,7 @@ func InfoEditHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := user.NewInfoEditLogic(r.Context(), svcCtx)
 		resp, err := l.InfoEdit(&req)
+
 		util.Response(w, resp, err)
 	}
 }

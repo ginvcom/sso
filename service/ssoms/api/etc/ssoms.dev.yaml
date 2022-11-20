@@ -1,6 +1,8 @@
-Name: ssoms-api
+Env: dev
+Name: ssoms
 Host: 0.0.0.0
 Port: 8889
+NsqHost: 127.0.0.1:4150
 Mysql:
   DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:

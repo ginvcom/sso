@@ -25,7 +25,7 @@ type GrantReply {
 	prefix: permission
 )
 
-service ssoms-api {
+service ssoms {
 	@doc "角色已分配的权限"
 	@handler rolePermissions
 	get /role/:roleUUID/Permissions(RolePermissionsReq) returns (RolePermissionsReply)

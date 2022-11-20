@@ -44,6 +44,8 @@ type VerifyReq struct {
 	SystemCode  string `json:"systemCode"`
 	ServiceCode string `json:"serviceCode"`
 	URI         string `json:"uri"`
+	Method      string `json:"method"`
+	MenuURI     string `json:"menuURI"`
 }
 
 type VerifyReply struct {

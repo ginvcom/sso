@@ -21,6 +21,7 @@ func verifyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := logic.NewVerifyLogic(r.Context(), svcCtx)
 		resp, err := l.Verify(&req)
+
 		util.Response(w, resp, err)
 	}
 }

@@ -4,7 +4,8 @@
       <h1>角色“{{state.roleName}}”授权管理</h1>
     </div>
     <div class="content-header__actions">
-      <a-button  @click="onBack"><template #icon><arrow-left-outlined /></template>返回列表</a-button>
+      <a-button @click="getPermissions"><template #icon><sync-outlined :spin="state.loading" /></template>刷新授权</a-button>
+      <a-button @click="onBack"><template #icon><arrow-left-outlined /></template>返回列表</a-button>
       <a-button type="primary" @click="onGrant"><save-outlined />修改授权</a-button>
     </div>
   </div>
@@ -78,7 +79,7 @@ import {
 grant
 } from '@/api/ssoms'
 import { FormInstance, message } from 'ant-design-vue'
-import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
+import { SyncOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { ossConfig } from '@/config'
 import { useRoute, useRouter } from 'vue-router'
 

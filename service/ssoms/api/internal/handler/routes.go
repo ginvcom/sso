@@ -8,6 +8,7 @@ import (
 	object "sso/service/ssoms/api/internal/handler/object"
 	permission "sso/service/ssoms/api/internal/handler/permission"
 	role "sso/service/ssoms/api/internal/handler/role"
+	system "sso/service/ssoms/api/internal/handler/system"
 	user "sso/service/ssoms/api/internal/handler/user"
 	"sso/service/ssoms/api/internal/svc"
 
@@ -151,6 +152,36 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPatch,
 				Path:    "/role/:roleUUID/addInheritance",
 				Handler: role.ExtendRoleHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/system",
+				Handler: system.SystemListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/system",
+				Handler: system.AddSystemHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/system/:uuid",
+				Handler: system.SystemDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/system/:uuid",
+				Handler: system.UpdateSystemHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/system/:uuid",
+				Handler: system.DeleteSystemHandler(serverCtx),
 			},
 		},
 	)
