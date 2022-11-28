@@ -62,6 +62,9 @@ func (l *ObjectListLogic) ObjectList(req *types.ObjectListReq) (resp *types.Obje
 		return
 	}
 	newList := makeTree(resp.List, "")
+	if newList == nil {
+		newList = make([]*types.Object, 0, 1)
+	}
 	resp.List = newList
 	return
 }
