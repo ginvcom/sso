@@ -21,12 +21,12 @@ Ginv SSO的多个后台系统需是在同一个域名下的子域名。这样做
 
 | key | 说明 |
 |:--|:--|
-| cookie | 登录的后生成的cookie, 由gateway的登录后的跳转页面提供 |
-| Refere | 告诉服务端由哪个页面发起的请求，这边使用unsafe-url配置 |
-| x-client-env | 环境，可选值有online\|gray |
-| x-client-service | 请求的服务端的服务名 |
-| x-client-system | 后台系统的系统名 |
-| x-client-uri | 后台系统的系统名 |
+| cookie | 登录的后生成的cookie, 由gateway的登录后的跳转页面提供，用于登录校验、授权 |
+| Refere | 告诉服务端由哪个页面发起的请求，这边使用unsafe-url配置，用于日志、授权白名单等 |
+| x-client-env | 环境，可选值有test\|online\|gray，用于日志、不同环境处理等 |
+| x-client-service | 请求的服务端的服务名，用于转发请求 |
+| x-client-system | 后台系统的系统名，用于授权查询 |
+| x-client-uri | 请求服务端的操作，用于授权查询 |
 
 
 ### 关于gateway：
