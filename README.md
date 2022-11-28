@@ -12,7 +12,7 @@ gateway: 登录登出页面、负责接入请求和转发请求
 
 Ginv SSO的多个后台系统需是在同一个域名下的子域名。这样做的目的是使用安全的httpOnly的Cookie在多个系统之间进行用户身份识别。
 
-## 特色
+### 特色
 
 根据go-zero的goctl创建的api规则, 将请求按resetful风格进行权限校验，前端可以通过goctl的api文件生成ts，然后请求gateway。
 
