@@ -24,10 +24,10 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-	err := config.GetWhiteList(c.Etcd.Hosts)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err := config.GetWhiteList(c.Etcd.Hosts)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	if c.Env == "development" {
 		nsqConfig := nsq.NewConfig()
