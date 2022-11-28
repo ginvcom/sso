@@ -14,7 +14,7 @@ Ginv SSO的多个后台系统需是在同一个域名下的子域名。这样做
 
 ## 特色
 
-根据go-zero的goctl创建的api规则, 将请求按resetful风格进行权限交易，前端可以通过goctl的api文件生成ts，然后请求gateway。
+根据go-zero的goctl创建的api规则, 将请求按resetful风格进行权限校验，前端可以通过goctl的api文件生成ts，然后请求gateway。
 
 ### 关于前端请求
 前端请求的入口，接收的请求前端请求必须具有如下信息：
