@@ -17,8 +17,8 @@ Ginv SSO的多个后台系统需是在同一个域名下的子域名。这样做
 根据go-zero的goctl创建的api规则, 将请求按resetful风格进行权限校验，前端可以通过goctl的api文件生成ts，然后请求gateway。
 
 ### 关于前端请求
-前端请求的入口，接收的请求前端请求必须具有如下信息：
-headers
+前端请求的入口，接收的请求headers必须具有如下信息：
+
 | key | 说明 |
 |:--|:--|
 | cookie | 登录的后生成的cookie, 由gateway的登录后的跳转页面提供 |
@@ -33,7 +33,18 @@ headers
 gateway主要负责转发功能，为了保证生成Cookie由服务端下发的页面创建，网关还提供了登录、登出和登录跳转页(跳转到相应的系统)。
 
 gateway通过请求的headers[x-client-service], 知道转发给哪个服务，在转发请求之前，会请求auth服务，根据cookie, 会解析到用户的信息，根据x-client-system和x-client-uri
-则能可以知道是否具有权限。
+以及发起请求的Method则可以验证是否具有权限。如果验证通过，auth服务会返回用户的uuid和name，并追加到headers[x-origin-uuid]参数和headers[x-origin-name]参数。
+
+### 关于其他接入单点的系统
+先登录ssoms，通过`系统管理`创建系统，并在`菜单&操作`创建相应的页面及操作，最后给用户相应的角色进行授权。
+
+其他系统会全局接受headers[x-origin-uuid]和headers[x-origin-name]放入context中，在loginc函数中就可以直接拿取用户的uuid和name：
+```go
+uuid := l.ctx.Value(config.UUID).(string)
+name := l.ctx.Value(config.Name).(string)
+```
+
+
 
 
 
