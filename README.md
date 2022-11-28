@@ -1,7 +1,7 @@
 # sso
 基于rbac的单点系统
 
-这是一套后台单独管理系统，用于解决1个以上的后台账号登录和授权管理。ginv默认使用前后端分离技术。服务端采用golang开发，基于go-zero框架，前端才用vue3开发，基于ant design vue。
+这是一套后台单独管理系统，用于解决1个或1个以上后台管理系统的账号登录和授权管理。ginv默认使用前后端分离技术。服务端采用golang开发，基于go-zero框架，前端才用vue3开发，基于ant design vue。
 
 sso具有auth、ssoms、和gateway三个系统，分别具有以下功能：
 ```
