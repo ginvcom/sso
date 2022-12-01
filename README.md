@@ -16,6 +16,23 @@ Ginv SSO的多个后台系统需是在同一个域名下的子域名。这样做
 
 根据go-zero的goctl创建的api规则, 将请求按resetful风格进行权限校验，前端可以通过goctl的api文件生成ts，然后请求gateway。
 
+### 关于ssoms
+
+ssoms是单点登录的管理后台，它具有以下功能
+
+**用户管理：** 用户基本信息的增删改，角色分配
+
+**角色管理：** 角色基本操作，分配用户，角色的菜单&操作权限分配
+
+**系统管理：** 管理使用单点登录的后台系统
+
+**菜单管理：** 配置系统的菜单&操作，支持高亮查询，批量导入、导出
+
+**操作日志：** 主要是菜单&操作的变更记录
+
+**登录日志：** 用户登录系统的记录
+
+
 ### 关于前端请求
 前端请求的入口，接收的请求headers必须具有如下信息：
 
@@ -50,7 +67,13 @@ name := l.ctx.Value(config.Name).(string)
 
 
 
+## 部署说明
 
+1. 导入`backup.sql`,并执行下面的sql修改单点管理后台的域名:
+```sql
+-- identifier的值设置为单点管理后台的域名, 这边以http://ssoms.ginv.com为例
+UPDATE object SET identifier='http://ssoms.ginv.com' WHERE uuid='kreppg8md1sb'
+```
 
 
 

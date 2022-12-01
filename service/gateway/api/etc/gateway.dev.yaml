@@ -2,8 +2,6 @@ Env: dev
 Name: gateway
 Host: 0.0.0.0
 Port: 8000
-NsqHost: 127.0.0.1:4150
-AllowOrigin: http://localhost:3000,http://localhost:3001
 UserCookieDomin: localhost
 Upstreams:
   auth: http://localhost:8888

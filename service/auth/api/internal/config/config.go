@@ -9,9 +9,8 @@ import (
 type Config struct {
 	Env string
 	rest.RestConf
-	NsqHost string
-	Etcd    discov.EtcdConf
-	Mysql   struct {
+	Etcd  discov.EtcdConf
+	Mysql struct {
 		DataSource string
 	}
 	CacheRedis cache.CacheConf

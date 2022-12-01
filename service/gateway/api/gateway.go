@@ -4,12 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -17,7 +15,6 @@ import (
 	"sso/service/gateway/api/internal/handler"
 	"sso/service/gateway/api/internal/svc"
 
-	"github.com/nsqio/go-nsq"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,17 +26,6 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-
-	if c.Env != "dev" {
-		nsqConfig := nsq.NewConfig()
-		producer, err := nsq.NewProducer(c.NsqHost, nsqConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer producer.Stop()
-		writer := logx.NewWriter(NewNSQWriter(producer))
-		logx.SetWriter(writer)
-	}
 
 	serviceNameField := logx.LogField{
 		Key:   "serviceName",
@@ -148,25 +134,4 @@ func main() {
 		fmt.Println("Http server start failed", err)
 	}
 	<-done
-}
-
-type NSQWriter struct {
-	Producer *nsq.Producer
-}
-
-func NewNSQWriter(producer *nsq.Producer) *NSQWriter {
-	return &NSQWriter{
-		Producer: producer,
-	}
-}
-
-func (w *NSQWriter) Write(p []byte) (n int, err error) {
-	logTopic := "go-zero-log"
-	// 日志写入有换行符, 使用trim去掉.
-	messageBody := strings.TrimSpace(string(p))
-	if err := w.Producer.Publish(logTopic, []byte(messageBody)); err != nil {
-		return 0, err
-	}
-
-	return len(p), nil
 }

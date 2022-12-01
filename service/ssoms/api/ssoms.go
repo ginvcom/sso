@@ -4,39 +4,25 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"sso/service/ssoms/api/internal/config"
 	"sso/service/ssoms/api/internal/handler"
 	"sso/service/ssoms/api/internal/svc"
 
-	"github.com/nsqio/go-nsq"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 )
 
-var configFile = flag.String("f", "etc/ssoms-api.yaml", "the config file")
+var configFile = flag.String("f", "etc/ssoms.yaml", "the config file")
 
 func main() {
 	flag.Parse()
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-
-	if c.Env != "dev" {
-		nsqConfig := nsq.NewConfig()
-		producer, err := nsq.NewProducer(c.NsqHost, nsqConfig)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer producer.Stop()
-		writer := logx.NewWriter(NewNSQWriter(producer))
-		logx.SetWriter(writer)
-	}
 
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
@@ -90,25 +76,4 @@ func main() {
 
 func notAllowedFn(w http.ResponseWriter) {
 	w.Header().Add("Access-Control-Allow-Headers", "x-origin-service")
-}
-
-type NSQWriter struct {
-	Producer *nsq.Producer
-}
-
-func NewNSQWriter(producer *nsq.Producer) *NSQWriter {
-	return &NSQWriter{
-		Producer: producer,
-	}
-}
-
-func (w *NSQWriter) Write(p []byte) (n int, err error) {
-	logTopic := "go-zero-log"
-	// 日志写入有换行符, 使用trim去掉.
-	messageBody := strings.TrimSpace(string(p))
-	if err := w.Producer.Publish(logTopic, []byte(messageBody)); err != nil {
-		return 0, err
-	}
-
-	return len(p), nil
 }

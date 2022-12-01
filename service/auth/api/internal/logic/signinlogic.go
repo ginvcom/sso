@@ -49,6 +49,7 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 	}
 
 	objectArgs := &model.ObjectFindOneArgs{
+		Typ:    1,
 		TopKey: req.SystemCode,
 	}
 
@@ -80,6 +81,8 @@ func (l *SignInLogic) SignIn(req *types.SignInReq) (resp *types.SignInReply, err
 		Gender:      user.Gender,
 		Expire:      seconds,
 	}
+
+	l.Logger.Info("返回结果", resp.Redirect)
 
 	return
 }

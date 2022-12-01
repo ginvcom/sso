@@ -16,3 +16,25 @@ Auth:
   AccessSecret: ginv123456
   AccessExpire: 86400
   RememberAccessExpire: 604800
+NoAuthUrls:
+  /:
+    - Path: /home/statistic
+      Method: GET
+    - Path: /object
+      Method: GET
+  /user:
+    - Path: /assignedRoles
+      Method: GET
+  /object:
+    - Path: /object/menuOptions
+      Method: GET
+  /permission:
+    - Path: /object/roleOperations
+      Method: GET
+    - Path: /permission/role/:roleUUID/Permissions
+      Method: GET
+  /profile:
+    - Path: /user/profile
+      Method: GET
+    - Path: /user/infoEdit
+      Method: POST
