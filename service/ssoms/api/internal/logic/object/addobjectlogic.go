@@ -31,11 +31,15 @@ func NewAddObjectLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddObje
 }
 
 func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObjectReply, err error) {
+	// 生成添加对象的uuid
+	// 这里的对象只是菜单和操作，系统另外开接口
 	uuid, err := util.UUID()
 	if err != nil {
 		return
 	}
 
+	// 为日志记录所需的用户uuid和用户姓名
+	// 其实添加对象也是必须用户是登录
 	userUUID := l.ctx.Value(config.UUID).(string)
 	if userUUID == "" {
 		l.Logger.Info("missing user info")
@@ -50,7 +54,6 @@ func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObject
 		return
 	}
 
-	logx.Info(req)
 	if req.TopKey == "" {
 
 		err = errors.New("topKey is required oh")
@@ -97,12 +100,12 @@ func (l *AddObjectLogic) AddObject(req *types.ObjectForm) (resp *types.AddObject
 		TopKey:     req.TopKey,
 	}
 
-	logx.Info(object)
 	_, err = l.svcCtx.ObjectModel.Insert(l.ctx, object)
 	if err != nil {
 		return
 	}
 
+	// 成功后记录日志
 	if req.Typ != 1 {
 		summary := "添加菜单"
 		if req.Typ == 2 {
