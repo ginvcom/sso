@@ -13,13 +13,20 @@ export interface OptionWithDisabled {
 	disabled: boolean
 }
 
+export interface Statistic {
+	month: string
+	type: string
+	value: number
+}
+
 export interface StatisticReply {
-	roleAmount: number
-	userAmount: number
-	systemAmount: number
-	menuAmount: number
-	actionAmount: number
-	permissionAmount: number
+	roleAmount: number // 角色数量
+	userAmount: number // 用户数量
+	systemAmount: number // 系统数量
+	menuAmount: number // 菜单数量
+	actionAmount: number // 操作数量
+	permissionAmount: number // 授权数量
+	statistics: Array<Statistic> // 菜单&操作统计
 }
 
 export interface UserListReq {

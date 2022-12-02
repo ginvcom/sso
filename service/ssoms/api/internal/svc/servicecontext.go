@@ -15,6 +15,7 @@ type ServiceContext struct {
 	ObjectModel     model.ObjectModel
 	ObjectLogModel  model.ObjectLogModel
 	PermissionModel model.PermissionModel
+	StatisticModel  model.StatisticModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -27,5 +28,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		ObjectModel:     model.NewObjectModel(conn),
 		ObjectLogModel:  model.NewObjectLogModel(conn),
 		PermissionModel: model.NewPermissionModel(conn),
+		StatisticModel:  model.NewStatisticModel(conn),
 	}
 }
