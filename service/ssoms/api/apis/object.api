@@ -1,0 +1,166 @@
+type ObjectListReq {
+	TopKey     string `form:"topKey,optional"` // 传systemCode
+	ObjectName string `form:"objectName,optional"`
+	Key        string `form:"key,optional"`
+}
+
+type Object {
+	UUID       string    `json:"uuid"`
+	ObjectName string    `json:"objectName"`
+	Identifier string    `json:"identifier"`
+	Key        string    `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64     `json:"sort"`
+	Typ        int64     `json:"type"`           // 类型, 1操作对象, 2菜单，3操作(接口)
+	SubType    int64     `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string    `json:"extra,optional"` // 扩展字段
+	Icon       string    `json:"icon"`           // 图标
+	Status     int64     `json:"status"`
+	PUUID      string    `json:"pUUID,optional"`
+	Children   []*Object `json:"children,optional"`
+}
+
+type ObjectOption {
+	Value    string          `json:"value"`
+	Label    string          `json:"label"`
+	PUUID    string          `json:"pUUID,optional"`
+	Typ      int64           `json:"type"`    // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType  int64           `json:"subType"` // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Children []*ObjectOption `json:"children,optional"` // 子菜单
+	Apis     []*ObjectOption `json:"apis"` // 操作
+}
+
+type MenuOptionsReq {
+	ExcludeHide bool  `form:"excludeHide"` // 是否排查隐藏菜单
+}
+
+type MenuOption {
+	Value    string          `json:"value"`
+	Label    string          `json:"label"`
+	PUUID    string          `json:"pUUID,optional"`
+	Children []*MenuOption `json:"children,optional"` // 子菜单
+}
+
+type MenuOptionsReply {
+	List []*MenuOption `json:"list"`
+}
+
+type ObjectListReply {
+	List []*Object `json:"list"`
+}
+
+type ObjectForm {
+	UUID       string `json:"uuid,optional"`
+	ObjectName string `json:"objectName"`
+	Identifier string `json:"identifier"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"`           // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey,optional"` // 传systemCode
+}
+
+type AddObjectReply {
+	UUID string `json:"uuid"`
+}
+
+
+type ImportObjectReq {
+	UUID       string `json:"uuid"`
+	ObjectName string `json:"objectName"`
+	Identifier string `json:"identifier,optional"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"`           // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon,optional"`           // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey"` // 传systemCode
+}
+
+type ImportObjectReply {
+	Status string `json:"status"` // 导入结果状态
+	Msg string `json:"msg"` // 导入结果信息
+}
+
+type ObjectDetailReq {
+	UUID string `path:"uuid"`
+}
+
+type UpdateObjectReq {
+	UUID       string `path:"uuid"`
+	ObjectName string `json:"objectName"`
+	Identifier string `json:"identifier"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"`           // 类型, 1系统, 2菜单, 3操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon"`           // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey,optional"` // 更新时无法修改该值, 但是更新前需要使用该值校验对象是否已存在
+}
+
+type UpdateObjectReply {
+	Success bool `json:"success"`
+}
+
+type DeleteObjectReq {
+	UUID string `path:"uuid"`
+}
+
+type DeleteObjectReply {
+	Success bool `json:"success"`
+}
+
+type RoleOperationsReq {
+	TopKey string `form:"topKey,optional"` // 传systemCode
+}
+
+type RoleOperationsReply {
+	List []*ObjectOption `json:"list,optional"`
+}
+
+@server(
+	group: object
+)
+
+service ssoms {
+	@doc "操作对象列表"
+	@handler objectList
+	get /object (ObjectListReq) returns (ObjectListReply)
+	
+	@doc "新增操作对象"
+	@handler addObject
+	post /object (ObjectForm) returns (AddObjectReply)
+	
+	@doc "操作对象详情"
+	@handler objectDetail
+	get /object/:uuid (ObjectDetailReq) returns (ObjectForm)
+
+	@doc "操作对象导入"
+	@handler importObject
+	post /object/import (ImportObjectReq) returns (ImportObjectReply)
+	
+	@doc "修改操作对象"
+	@handler updateObject
+	put /object/:uuid (UpdateObjectReq) returns (UpdateObjectReply)
+	
+	@doc "删除操作对象"
+	@handler deleteObject
+	delete /object/:uuid (DeleteObjectReq) returns (DeleteObjectReply)
+
+	@doc "菜单选项，用于添加子菜单和操作时选择父级菜单"
+	@handler menuOptions
+	get /object/menuOptions (MenuOptionsReq) returns (MenuOptionsReply)
+	
+	@doc "角色可以分配权限的对象"
+	@handler roleOperations
+	get /object/roleOperations(RoleOperationsReq) returns (RoleOperationsReply)
+}

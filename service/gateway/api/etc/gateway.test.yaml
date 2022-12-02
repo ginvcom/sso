@@ -1,0 +1,9 @@
+Env: test
+Name: gateway
+Host: 0.0.0.0
+Port: 8000
+UserCookieDomin: localhost
+Upstreams:
+  auth: http://localhost:8888
+  ssoms: http://localhost:8889
+  docms: http://localhost:8890

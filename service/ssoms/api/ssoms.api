@@ -1,0 +1,39 @@
+import (
+	"apis/user.api"
+	"apis/role.api"
+	"apis/system.api"
+	"apis/object.api"
+	"apis/permission.api"
+)
+
+type Option {
+	Label string `json:"label"`
+	Value string `json:"value"`
+	Extra string `json:"extra,omitempty"`
+}
+
+type OptionWithDisabled {
+	Label    string `json:"label"`
+	Value    string `json:"value"`
+	Extra    string `json:"extra,omitempty"`
+	Disabled bool   `json:"disabled"`
+}
+
+type StatisticReply {
+	RoleAmount       int64 `json:"roleAmount"`
+	UserAmount       int64 `json:"userAmount"`
+	SystemAmount     int64 `json:"systemAmount"`
+	MenuAmount       int64 `json:"menuAmount"`
+	ActionAmount     int64 `json:"actionAmount"`
+	PermissionAmount int64 `json:"permissionAmount"`
+}
+
+@server(
+	group: home
+)
+
+service ssoms {
+	@doc "首页统计数据"
+	@handler homeStatistic
+	get /home/statistic returns (StatisticReply)
+}

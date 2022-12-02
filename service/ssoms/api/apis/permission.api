@@ -1,0 +1,36 @@
+type RolePermissionsReq {
+	RoleUUID string `path:"roleUUID"`
+	TopKey   string `form:"topKey"`
+}
+
+type RolePermissionsReply {
+	RoleName        string   `json:"roleName"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
+}
+
+type GrantReq {
+	RoleUUID        string   `path:"roleUUID"`
+	TopKey          string   `json:"topKey"`
+	MenuUUIDArray   []string `json:"menuUUIDArray"`
+	ActionUUIDArray []string `json:"actionUUIDArray"`
+}
+
+type GrantReply {
+	Success bool `json:"success"`
+}
+
+@server(
+	group: permission
+	prefix: permission
+)
+
+service ssoms {
+	@doc "角色已分配的权限"
+	@handler rolePermissions
+	get /role/:roleUUID/Permissions(RolePermissionsReq) returns (RolePermissionsReply)
+	
+	@doc "将对象执行操作的权限授予角色"
+	@handler grant
+	put /role/:roleUUID/grant (GrantReq) returns (GrantReply)
+}

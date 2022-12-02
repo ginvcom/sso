@@ -1,0 +1,186 @@
+type UserListReq {
+	Name     string `form:"name,optional"`
+	Mobile   string `form:"mobile,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
+}
+
+type User {
+	UUID   string   `json:"uuid"`
+	Name   string   `json:"name"`
+	Mobile string   `json:"mobile"`
+	Avatar string   `json:"avatar"`
+	Gender int64    `json:"gender"`
+	Status int64    `json:"status"`
+	Roles  []Option `json:"roles"`
+}
+
+type UserListReply {
+	Total int64  `json:"total"`
+	List  []User `json:"list"`
+}
+
+type UserForm {
+	UUID     string `json:"uuid,optional"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password,optional"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Introduction    string `json:"introduction"`
+	Status   int64  `json:"status,default=1"`
+}
+
+type AddUserReply {
+	UUID string `json:"uuid"`
+}
+
+type UserDetailReq {
+	UUID string `path:"uuid"`
+}
+
+type UpdateUserReq {
+	UUID     string `path:"uuid"`
+	Name     string `json:"name"`
+	Mobile   string `json:"mobile"`
+	Password string `json:"password,optional"`
+	Avatar   string `json:"avatar"`
+	Gender   int64  `json:"gender"`
+	Birth    string `json:"birth"`
+	Introduction    string `json:"introduction"`
+	Status   int64  `json:"status,default=1"`
+}
+
+type UpdateUserReply {
+	Success bool `json:"success"`
+}
+
+type DeleteUserReq {
+	UUID string `path:"uuid"`
+}
+
+type DeleteUserReply {
+	Success bool `json:"success"`
+}
+
+type UserFilterOptionsReq {
+	Name string `form:"name,optional"`
+}
+
+type UserFilterOptionsReply {
+	Options []Option `json:"options"`
+}
+
+type AssignedRolesReq {
+	UUID string `form:"uuid"`
+}
+
+type AssignedRolesReply {
+	UUID  string `json:"uuid"`
+	Name  string `json:"name"`
+	Assigned []Option `json:"assigned"`
+	Options []Option `json:"options"`
+}
+
+type AssignRoleReq {
+	UUID          string   `json:"uuid"`
+	RoleUUIDArray []string `json:"roleUUIDArray"`
+}
+
+type AssignRoleReply {
+	Success bool `json:"success"`
+}
+
+type UserPermissionsReq {
+	UUID string `json:"uuid"`
+	Typ  int64  `json:"type"` // 类型: 角色
+}
+
+type UserPermissionsReply {
+	Systems []Option `json:"system"`
+}
+
+type AvatarUploadReq {
+	Avatar   string `json:"avatar"`
+}
+
+type AvatarUploadReply {
+	Success bool `json:"success"`
+}
+
+type InfoEditReq{
+	Introduction  string `json:"introduction"`
+}
+
+type InfoEditReply {
+	Success bool `json:"success"`
+}
+
+type PasswordResetReq {
+	OldPassword string `json:"oldPassword"`
+	Password string `json:"password"`
+	ConfirmPassword string `json:"confirmPassword"`
+}
+
+type PasswordResetReply {
+	Success bool `json:"success"`
+}
+
+@server(
+	group: user
+)
+
+service ssoms {
+	@doc "用户列表"
+	@handler userList
+	get /user (UserListReq) returns (UserListReply)
+	
+	@doc "新增用户"
+	@handler addUser
+	post /user (UserForm) returns (AddUserReply)
+	
+	@doc "用户详情"
+	@handler userDetail
+	get /user/:uuid (UserDetailReq) returns (UserForm)
+	
+	@doc "修改用户"
+	@handler updateUser
+	put /user/:uuid (UpdateUserReq) returns (UpdateUserReply)
+	
+	@doc "删除用户"
+	@handler deleteUser
+	delete /user/:uuid (DeleteUserReq) returns (DeleteUserReply)
+	
+	@doc "用户搜索下拉选项"
+	@handler userFilterOptions
+	get /filterOptions (UserFilterOptionsReq) returns (UserFilterOptionsReply)
+	
+	@doc "用户已分配的角色"
+	@handler assignedRoles
+	get /assignedRoles (AssignedRolesReq) returns (AssignedRolesReply)
+	
+	@doc "给用户分配角色"
+	@handler assignRole
+	post /assignRole (AssignRoleReq) returns (AssignRoleReply)
+	
+	@doc "用户通过其分配的角色获得的权限"
+	@handler userPermissions
+	get /permissions (UserPermissionsReq) returns (UserPermissionsReply)
+
+	@doc "个人中心用户信息"
+	@handler profile
+	get /user/profile returns (UserForm)
+
+	@doc "个人中心头像上传修改"
+	@handler avatarUpload
+	post /user/avatarUpload (AvatarUploadReq) returns (AvatarUploadReply)
+
+	@doc "个人中心基础信息修改"
+	@handler infoEdit
+	post /user/infoEdit (InfoEditReq) returns (InfoEditReply)
+
+	@doc "个人中心密码重置"
+	@handler passwordReset
+	post /user/passwordReset (PasswordResetReq) returns (PasswordResetReply)
+}

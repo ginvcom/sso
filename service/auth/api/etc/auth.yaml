@@ -1,0 +1,40 @@
+Env: online
+Name: auth
+Host: 0.0.0.0
+Port: 8888
+NsqHost: 127.0.0.1:4150
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: /sso/api/wihtelist
+Mysql:
+  DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
+CacheRedis:
+  - Host: localhost:16379
+    Type: node
+Auth:
+  AccessSecret: ginv123456
+  AccessExpire: 86400
+  RememberAccessExpire: 604800
+NoAuthUrls:
+  /:
+    - Path: /home/statistic
+      Method: GET
+    - Path: /object
+      Method: GET
+  /user:
+    - Path: /assignedRoles
+      Method: GET
+  /object:
+    - Path: /object/menuOptions
+      Method: GET
+  /permission:
+    - Path: /object/roleOperations
+      Method: GET
+    - Path: /permission/role/:roleUUID/Permissions
+      Method: GET
+  /profile:
+    - Path: /user/profile
+      Method: GET
+    - Path: /user/infoEdit
+      Method: POST

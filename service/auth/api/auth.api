@@ -1,0 +1,89 @@
+type Option {
+	Label string `json:"label"`
+	Value string `json:"value"`
+	Extra string `json:"extra,optional"`
+}
+
+type SignInReq {
+	SystemCode string `json:"systemCode"`
+	Mobile     string `json:"mobile"`
+	Password   string `json:"password"`
+	Remember   string `json:"remember,optional"`
+}
+
+type SignInReply {
+	AccessToken string   `json:"accessToken"`
+	Redirect    string   `json:"redirect"`
+	Name        string   `json:"name"`
+	Mobile      string   `json:"mobile"`
+	Avatar      string   `json:"avatar"`
+	Gender      int64    `json:"gender"`
+	Expire      int64    `json:"expire"`
+	Roles       []Option `json:"roles"`
+}
+
+type SignOutReply {
+	Success bool `json:"success"`
+}
+
+type VerifyRequestReq {
+	Token       string `json:"token"`
+	SystemCode  string `json:"systemCode"`
+	ServiceCode string `json:"serviceCode"`
+	URI         string `json:"uri"`
+	Method      string `json:"method"`
+	MenuURI     string `json:"menuURI"`
+}
+
+type VerifyRequestReply {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
+}
+
+type SessionMenusReq {
+	Token      string `form:"token"`
+	SystemCode string `form:"systemCode"`
+	// SessionRoleUUID string `json:"sessionRoleUUID"`
+}
+
+type Meta {
+	Name       string   `json:"n"` // 菜单名
+	Icon       string   `json:"i"` // 菜单icon
+	Identifier string   `json:"u"` // 唯一标识符
+	SubType    int64    `json:"t"` // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+	Parents    []string `json:"p"` // 所有父级菜单uuid
+}
+
+type Menu {
+	UUID     string  `json:"n"` // 路由命名
+	Key      string  `json:"p"` // 路由路径
+	Meta     Meta    `json:"m"` // 路由meat
+	Children []*Menu `json:"c"` // 路由children
+	PUUID    string  `json:"-"`
+}
+
+type SessionMenusReply {
+	List []*Menu `json:"list"`
+}
+
+service auth {
+	@doc "登录账号"
+	@handler signIn
+	post /sign-in (SignInReq) returns (SignInReply)
+	
+	@doc "验证请求"
+	@handler verify
+	post /verify-request (VerifyRequestReq) returns (VerifyRequestReply)
+	
+	@doc "当前作用的角色分配的菜单权限"
+	@handler menus
+	get /session-menus (SessionMenusReq) returns (SessionMenusReply)
+	
+	// @doc "当前作用的角色某个菜单下分配的操作权限"
+	// @handler actions
+	// get /session-menu-actions (SessionMenuActionReq) returns (SessionMenuActionReply)
+	
+	@doc "退出登录"
+	@handler signOut
+	post /sign-out returns (SignOutReply)
+}

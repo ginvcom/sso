@@ -1,0 +1,169 @@
+type RoleListReq {
+	RoleName string `form:"roleName,optional"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
+}
+
+// goctl api format ssoms.api -dir .
+// goctl format时下面取消注释
+// type Option {
+// 	Label string `json:"label"`
+// 	Value string `json:"value"`
+// 	Extra string `json:"extra,optional"`
+// }
+
+type Role {
+	RoleUUID     string   `json:"roleUUID"`     // 角色uuid
+	RoleName     string   `json:"roleName"`     // 角色名称
+	Summary      string   `json:"summary"`      // 角色概述
+	Inheritances []Option `json:"inheritances"` // 继承的角色
+	UsersAmount  int64    `json:"usersAmount"`  // 拥有的用户数量
+}
+
+type RoleListReply {
+	Total int64  `json:"total"`
+	List  []Role `json:"list"`
+}
+
+type RoleForm {
+	RoleUUID string `json:"roleUUID,optional"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
+}
+
+type AddRoleReply {
+	RoleUUID string `json:"roleUUID"`
+}
+
+type RoleDetailReq {
+	RoleUUID string `path:"roleUUID"`
+}
+
+type UpdateRoleReq {
+	RoleUUID string `path:"roleUUID"`
+	RoleName string `json:"roleName"`
+	Summary  string `json:"summary"`
+}
+
+type UpdateRoleReply {
+	Success bool `json:"success"`
+}
+
+type DeleteRoleReq {
+	RoleUUID string `path:"roleUUID"`
+}
+
+type DeleteRoleReply {
+	Success bool `json:"success"`
+}
+
+type OptionsReply {
+	Options []Option `json:"options"`
+}
+
+type AssignedUsersReq {
+	RoleUUID string `form:"roleUUID"`
+	Page     int64  `form:"page"`
+	PageSize int64  `form:"pageSize,default=20"`
+}
+
+type UserOtion {
+	UUID   string   `json:"uuid"`
+	Name   string   `json:"name"`
+	Mobile string   `json:"mobile"`
+	Avatar string   `json:"avatar"`
+	Gender int64    `json:"gender"`
+	Status int64    `json:"status"`
+	IsDelete int64 `json:"isDelete"`
+}
+
+type AssignedUsersReply {
+	Total int64  `json:"total"`
+	List  []UserOtion `json:"list"`
+	roleName string `json:"roleName"`
+}
+
+type AssignUserReq {
+	RoleUUID string `path:"roleUUID"`
+	UserUUID string `json:"userUUID"`
+}
+
+type AssignUserReply {
+	Success bool `json:"success"`
+}
+
+type DeassignUserReq {
+	RoleUUID string `path:"roleUUID"`
+	UserUUID string `json:"userUUID"`
+}
+
+type DeassignUserReply {
+	Success bool `json:"success"`
+}
+
+type InheritancesReq {
+	RoleUUID string `path:"roleUUID"`
+}
+
+type InheritancesReply {
+	Roles []Option `json:"roles"`
+}
+
+type AddInheritanceReq {
+	RoleUUID                string   `path:"roleUUID"`
+	AddInheritanceUUIDArray []string `json:"extendedRoleUUIDArray"`
+}
+
+type AddInheritanceReply {
+	Success bool `json:"success"`
+}
+
+@server(
+	group: role
+)
+
+service ssoms {
+	@doc "角色列表"
+	@handler roleList
+	get /role (RoleListReq) returns (RoleListReply)
+	
+	@doc "新增角色"
+	@handler addRole
+	post /role (RoleForm) returns (AddRoleReply)
+	
+	@doc "角色详情"
+	@handler roleDetail
+	get /role/:roleUUID (RoleDetailReq) returns (RoleForm)
+	
+	@doc "修改角色"
+	@handler updateRole
+	put /role/:roleUUID (UpdateRoleReq) returns (UpdateRoleReply)
+	
+	@doc "删除角色"
+	@handler deleteRole
+	delete /role/:roleUUID (DeleteRoleReq) returns (DeleteRoleReply)
+	
+	@doc "角色已拥有的用户"
+	@handler roleOptions
+	get /role/options returns (OptionsReply)
+	
+	@doc "角色已拥有的用户"
+	@handler assignedUsers
+	get /assignedUsers (AssignedUsersReq) returns (AssignedUsersReply)
+	
+	@doc "给角色添加用户"
+	@handler assignUser
+	patch /role/:roleUUID/assignUser (AssignUserReq) returns (AssignUserReply)
+
+	@doc "给角色移出用户"
+	@handler deassignUser
+	patch /role/:roleUUID/deassignUser (DeassignUserReq) returns (DeassignUserReply)
+	
+	@doc "角色已继承的角色"
+	@handler inheritances
+	get /role/:roleUUID/inheritances (InheritancesReq) returns (InheritancesReply)
+	
+	@doc "角色继承另一个角色"
+	@handler extendRole
+	patch /role/:roleUUID/addInheritance (AddInheritanceReq) returns (AddInheritanceReply)
+}
