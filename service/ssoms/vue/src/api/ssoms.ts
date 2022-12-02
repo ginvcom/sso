@@ -270,6 +270,14 @@ export function objectDetail(params: components.ObjectDetailReqParams) {
 }
 
 /**
+ * @description "操作对象导入"
+ * @param req
+ */
+export function importObject(req: components.ImportObjectReq) {
+	return ssoms.post<components.ImportObjectReply>("/object/import", req)
+}
+
+/**
  * @description "修改操作对象"
  * @param params
  * @param req

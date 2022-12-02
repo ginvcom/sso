@@ -396,6 +396,26 @@ type AddObjectReply struct {
 	UUID string `json:"uuid"`
 }
 
+type ImportObjectReq struct {
+	UUID       string `json:"uuid"`
+	ObjectName string `json:"objectName"`
+	Identifier string `json:"identifier,optional"`
+	Key        string `json:"key"` // 操作对象的systemCode, 菜单的path, 操作的uri
+	Sort       int64  `json:"sort"`
+	Typ        int64  `json:"type"`           // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	SubType    int64  `json:"subType"`        // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	Extra      string `json:"extra,optional"` // 扩展字段
+	Icon       string `json:"icon,optional"`  // 图标
+	Status     int64  `json:"status"`
+	PUUID      string `json:"pUUID,optional"`
+	TopKey     string `json:"topKey"` // 传systemCode
+}
+
+type ImportObjectReply struct {
+	Status string `json:"status"` // 导入结果状态
+	Msg    string `json:"msg"`    // 导入结果信息
+}
+
 type ObjectDetailReq struct {
 	UUID string `path:"uuid"`
 }

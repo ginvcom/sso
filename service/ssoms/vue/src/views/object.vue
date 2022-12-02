@@ -8,11 +8,11 @@
         <template #icon><plus-outlined /></template>
         添加菜单
       </a-button>
-      <a-button>
+      <a-button @click="onExport">
         <template #icon><download-outlined /></template>
         导出菜单
       </a-button>
-      <a-button>
+      <a-button @click="onImport">
         <template #icon><upload-outlined /></template>
         导入菜单
       </a-button>
@@ -287,16 +287,50 @@
       </a-row>
     </a-form>
   </a-modal>
+  <a-modal
+    v-model:visible="importState.visible"
+    :closable="importState.percent == 100"
+    :maskClosable="false"
+    :bodyStyle="{padding:0}"
+    title="导入菜单&操作"
+    :footer="null"
+    @cancel="onImportCancel"
+    >
+    <div class="import-log">
+      <a-progress style="padding:0 8px 0 20px" :percent="importState.percent" stroke-color="#52c41a" />
+      <div class="import-log__content" ref="importLogContentRef">
+        <div v-for="(item, i) in importState.data" :key="i">
+          导入 {{item.uuid}} {{item.objectName}}
+          <span v-if="item.status == 'ready'" class="import-ready">准备中<ellipsis-outlined /></span>
+          <span v-else-if="item.status == 'doing'" class="import-doing">进行中<line-outlined spin /></span>
+          <span v-else-if="item.status == 'success'" class="import-success">已成功<exclamation-outlined /></span>
+          <span v-else-if="item.status == 'ignore'" class="import-ignore">已忽略<exclamation-outlined /></span>
+          <span v-else-if="item.status == 'failed'" class="import-failed">已失败<exclamation-outlined /></span>
+          <span>{{item.msg}}</span>
+        </div>
+      </div>
+      <div class="log__content_statistics">
+        <p>
+          结果: 共{{importState.total}}条, 已处理{{importState.data.filter(item => item.status != 'ready' && item.status != 'doing' ).length}}条,
+          成功<span class="import-success">{{importState.statistics.success}}</span>条,
+          忽略<span class="import-ignore">{{importState.statistics.ignore}}</span>条,
+          失败<span class="import-failed">{{importState.statistics.failed}}</span>条,
+          耗时{{importState.timeCount.toFixed(2)}}秒。
+        </p>
+      </div>
+    </div>
+  </a-modal>
 </template>
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref } from 'vue'
+import { onBeforeMount, reactive, ref, createVNode, nextTick, onBeforeUnmount } from 'vue'
 import AdvancedSearch from '@/components/AdvancedSearch.vue'
-import { DownloadOutlined, SearchOutlined, UploadOutlined, PlusOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
+import { DownloadOutlined, ExclamationCircleOutlined, EllipsisOutlined, ExclamationOutlined, LineOutlined, CloseOutlined, UploadOutlined, PlusOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
 // Object 是js的关键字, 别名处理一下
 import {
   objectList,
   objectDetail,
   addObject,
+  importObject,
   menuOptions,
   MenuOptionsReply,
   MenuOption,
@@ -308,8 +342,8 @@ import {
   Object as Obj
 } from '../api/ssoms'
 import { ossConfig } from '@/config'
-import type { FormInstance } from 'ant-design-vue'
-import { message } from 'ant-design-vue'
+import { FormInstance, message, Modal } from 'ant-design-vue'
+import * as XLSX from 'xlsx'
 
 const searchFormData = [
   {
@@ -641,9 +675,7 @@ const onSearch = () => {
     state.expandedRowKeys = getAllChildrenKeys(srcList, [])
     return
   }
-  console.log(srcList)
   const { matches, expandedRowKeys } = serchOnSrcList(srcList, searchForm.key, searchForm.objectName, [], [], [])
-  console.log(matches, expandedRowKeys)
   respState.list = []
   if (!srcList) {
     state.expandedRowKeys = []
@@ -729,4 +761,290 @@ const getNewTree = (matches: Array<string>, parents: Obj, objectList?: Array<Obj
     }
   }
 }
+
+let exportData: Array<Array<any>> = []
+
+const onExport = () => {
+  let content = `即将导出当系统"${state.currentSystem.name}"所有的菜单和操作`
+  if (searchForm.key !== '' || searchForm.objectName !== '') {
+    content = '即将导出当前系统筛选的菜单和操作'
+  }
+
+  Modal.confirm({
+    title: '批量导出菜单和操作',
+    icon: createVNode(ExclamationCircleOutlined),
+    content,
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      const DataTitles = ['uuid', '父级uuid', '菜单名称/操作名称', '类型', '菜单类型/请求方式', '菜单路径/操作uri', '状态', '排序', '图标', '标识符']
+      exportData = [DataTitles]
+      getExportArr(respState.list)
+      const ws = XLSX.utils.aoa_to_sheet(exportData)
+      ws['!cols'] = [{ wpx: 120 }, { wpx: 120 }, { wpx: 180 }, { wpx: 60 }, { wpx: 150 }, { wpx: 200 }, { wpx: 60 }, { wpx: 90 }, { wpx: 120 }, { wpx: 120 } ]
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+      XLSX.writeFile(wb, `${state.currentSystem.name}菜单和操作.xlsx`)
+    }
+  })
+}
+
+const getExportArr = (arr: Array<Obj>) => {
+  arr.forEach(item => {
+    let typ = ''
+    let subType = ''
+    let status = '启用'
+    if (item.status === 0) {
+      status = '停用'
+    }
+    if (item.type === 2) {
+      typ = '菜单'
+      if (item.subType === 1) {
+        subType = '菜单'
+      } else if (item.subType === 2) {
+        subType = '菜单组'
+      } else {
+        subType = '隐藏菜单'
+      }
+    } else {
+      typ = '操作'
+      if (item.subType === 1) {
+        subType = 'GET'
+      } else if (item.subType === 2) {
+        subType = 'POST'
+      } else if (item.subType === 3) {
+        subType = 'PUT'
+      } else if (item.subType === 4) {
+        subType = 'PATCH'
+      } else {
+        subType = 'DELETE'
+      }
+    }
+    const dataItem = [item.uuid, item.pUUID, item.objectName, typ, subType, item.key, status, item.sort, item.icon, item.identifier]
+    exportData.push(dataItem)
+    if (item.children && item.children.length > 0) {
+      getExportArr(item.children)
+    }
+  })
+}
+
+const importLogContentRef = ref()
+
+const onImport = () => {
+  Modal.confirm({
+    title: '批量导入菜单和操作',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: `即将导入到系统“${state.currentSystem.name}”, 确定吗？`,
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      let input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      input.addEventListener('change', doImportFileParse, false)
+      input.click()
+    }
+  })
+}
+
+const doImportFileParse = (evt: any) => {
+  try {
+    const file = evt.target.files[0]
+    const reader = new FileReader()
+    reader.onload = function (e: any) {
+      const workbook = XLSX.read(e.target.result, { type: 'binary' })
+      const wsname = workbook.SheetNames[0]// 取第个Sheet
+      const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname])// 生成纯数据
+      const importData: Array<Obj> = []
+      if (ws && ws.length) {
+        for (let i = 0; i < ws.length; i++) {
+          let { uuid, '父级uuid': pUUID, '菜单名称/操作名称': objectName, '类型': type, '菜单类型/请求方式': subType, '菜单路径/操作uri': key, '状态': status, '排序': sort, '图标': icon, '标识符': identifier } = ws[i] as any
+          if (uuid == '') {
+            message.error(`第${i+2}行,uuid列是空的`)
+            return
+          }
+          if (key == '') {
+            message.error(`第${i+2}行(uuid是${uuid}),菜单路径/操作uri是空的`)
+            return
+          }
+          let statusVal = -1
+          if (status === '启用') {
+            statusVal = 1
+          } else if (status === '停用') {
+            statusVal = 0
+          } else {
+            message.error(`第${i+2}行(uuid是${uuid}),状态的值异常`)
+            return
+          }
+          let typeVal = -1
+          let subTypeVal = -1
+          if (type === '菜单') {
+            typeVal = 2
+            if (subType === '菜单') {
+              subTypeVal = 1
+            } else if (subType === '菜单组') {
+              subTypeVal = 2
+            } else if (subType === '隐藏菜单')  {
+              subTypeVal = 3
+            } else {
+              message.error(`第${i+2}行,菜单类型/请求方式的值异常`)
+              return
+            }
+          } else if (type === '操作') {
+            typeVal = 3
+            if (subType === 'GET') {
+              subTypeVal = 1
+            } else if (subType === 'POST') {
+              subTypeVal = 2
+            } else if (subType === 'PUT') {
+              subTypeVal = 3
+            } else if (subType === 'PATCH') {
+              subTypeVal = 4
+              subType = 'PATCH'
+            } else if (subType === 'DELETE') {
+              subTypeVal = 5
+            } else {
+              message.error(`第${i+2}行,菜单类型/请求方式的值异常`)
+              return
+            }
+          } else {
+            message.error(`第${i+2}行,类型的值异常`)
+            return
+          }
+          importData.push({ uuid, pUUID, objectName, type: typeVal, subType: subTypeVal, key, status: statusVal, sort, icon, identifier })
+        }
+      }
+      if (importData.length > 0) {
+        doImmport(importData)
+      } else {
+        message.error('导入数据异常')
+      }
+    }
+    reader.readAsBinaryString(file)
+  } catch {
+    message.error('导入数据文件发生错误')
+  }
+}
+
+interface ImportItem {
+  uuid: string
+  objectName: string
+  status: string
+  msg: string
+}
+
+interface ImportState {
+  visible: boolean
+  percent: number
+  total: number // 共需要导入的数量
+  timeCount: number
+  data: Array<ImportItem>
+  statistics: Record<'success' | 'ignore' | 'failed', number>
+}
+
+const importState = reactive<ImportState>({
+  visible: false,
+  percent: 0,
+  total: 0,
+  timeCount: 0,
+  statistics: {
+    success: 0,
+    ignore: 0,
+    failed: 0
+  },
+  data: []
+})
+
+let timer: NodeJS.Timer
+
+const doImmport = async (importData: Array<any>) => {
+  importState.visible = true
+  // 打开导入弹窗，展示导入进度
+  importState.statistics = {
+    success: 0,
+    ignore: 0,
+    failed: 0
+  }
+  importState.total = importData.length
+  importState.data =[]
+  importState.percent = 0
+  importState.timeCount = 0
+  if (timer) {
+    clearInterval(timer)
+  }
+  timer = setInterval(() => {
+    importState.timeCount += 0.1
+  }, 100)
+  for (let i = 0; i < importData.length; i++) {
+    const item = importData[i]
+    item.topKey = state.params.topKey
+    console.log('import item', item)
+    importState.data.push({ uuid: item.uuid, objectName: item.objectName, status: 'doing', msg: '' })
+    try {
+      const { status, msg } = await importObject(item)
+      importState.data[importState.data.length -1].status = status
+      importState.data[importState.data.length -1].msg = msg
+      if (status === 'success') {
+        importState.statistics.success++
+      } else if(status === 'ignore') {
+        importState.statistics.ignore++
+      } else if(status === 'failed') {
+        importState.statistics.failed++
+      }
+    } catch (err: any) {
+      importState.data[importState.data.length -1].status = 'failed'
+      importState.data[importState.data.length -1].msg = err.message
+      importState.statistics.failed++
+    }
+    importState.percent = Math.ceil(importState.data.length / importData.length * 100)
+    if (importState.percent == 100) {
+      clearInterval(timer)
+      getList()
+    }
+    nextTick(() => {
+      importLogContentRef.value.scrollTop = importLogContentRef.value.scrollHeight
+    })
+  }
+}
+
+const onImportCancel = () => {
+  clearInterval(timer)
+}
+
+onBeforeUnmount(() => {
+  clearInterval(timer)
+})
 </script>
+<style scoped>
+.import-log{
+  overflow: hidden;
+}
+.import-log__content{
+  color: rgb(138, 138,138);
+  margin: 10px 20px;
+  background-color: black;
+  padding: 10px;
+  height: 200px;
+  overflow-y: scroll;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+}
+.import-ready{
+  color: yellow
+}
+.import-doing{
+  color: #2db7f5
+}
+.import-success{
+  color: green;
+}
+.import-failed{
+  color: red;
+}
+.import-ignore{
+  color: rgb(138, 138,138);
+}
+.log__content_statistics{
+  margin: 0 20px 20px;
+}
+</style>

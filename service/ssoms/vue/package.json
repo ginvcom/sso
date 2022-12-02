@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --mode testing",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
@@ -17,7 +17,8 @@
     "qs": "^6.11.0",
     "vue": "^3.2.41",
     "vue-cropperjs": "^5.0.0",
-    "vue-router": "^4.0.16"
+    "vue-router": "^4.0.16",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^3.1.9",

@@ -458,6 +458,26 @@ export interface AddObjectReply {
 	uuid: string
 }
 
+export interface ImportObjectReq {
+	uuid: string
+	objectName: string
+	identifier?: string
+	key: string // 操作对象的systemCode, 菜单的path, 操作的uri
+	sort: number
+	type: number // 类型, 1操作对象, 2模块，3菜单组，4菜单，5操作(接口)
+	subType: number // 子类型, 菜单时: (1菜单，2菜单组, 3隐藏菜单)
+	extra?: string // 扩展字段
+	icon?: string // 图标
+	status: number
+	pUUID?: string
+	topKey: string // 传systemCode
+}
+
+export interface ImportObjectReply {
+	status: string // 导入结果状态
+	msg: string // 导入结果信息
+}
+
 export interface ObjectDetailReq {
 }
 

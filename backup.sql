@@ -84,7 +84,7 @@ CREATE TABLE `object_log` (
   `user_uuid` char(12) NOT NULL COMMENT '用户uuid',
   `user_name` varchar(255) NOT NULL COMMENT '用户姓名',
   `type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '类型: 1系统, 2菜单, 3操作(接口)',
-  `log_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '日志类型: 1添加, 2更新, 3删除',
+  `log_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '日志类型: 1添加, 2更新, 3删除, 4导入添加, 5导入更新',
   `log_summary` varchar(1000) NOT NULL DEFAULT '' COMMENT '日志描述',
   `log_data` varchar(1000) NOT NULL DEFAULT '' COMMENT '日志内容',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -113,7 +113,7 @@ CREATE TABLE `permission` (
 
 -- ------------------------ --
 -- -------ssoms的数据------- --
-INSERT INTO `user` (`uuid`, `avatar`, `name`, `mobile`, `password`, `salt`, `gender`, `birth`, `introduction`, `status`, `is_delete`, `create_time`, `update_time`) VALUES ('0kfxnj6x0spb', '6165845514057090.png', '张三', '12345000001', 'c797f80662508b1e53b6e45800638945', 'qt0b79', 1, '2000-01-13 00:00:00', '你是我的好呀好朋友1', 1, 0, '2022-06-29 10:13:58', '2022-11-17 18:12:49');
+INSERT INTO `user` (`uuid`, `avatar`, `name`, `mobile`, `password`, `salt`, `gender`, `birth`, `introduction`, `status`, `is_delete`, `create_time`, `update_time`) VALUES ('0kfxnj6x0spb', '6165845514057090.png', '超管', '12345000001', 'c797f80662508b1e53b6e45800638945', 'qt0b79', 1, '2000-01-13 00:00:00', '你是我的好呀好朋友1', 1, 0, '2022-06-29 10:13:58', '2022-11-17 18:12:49');
 INSERT INTO `role`(`role_uuid`, `role_name`, `summary`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', '管理员角色', '这是概述1', 0, '2022-06-30 07:14:05', '2022-07-22 10:20:50');
 INSERT INTO `user_to_role` (`user_uuid`, `role_uuid`, `is_delete`, `create_time`, `update_time`) VALUES ('0kfxnj6x0spb', '82fbnyvb5vpb', 0, '2022-07-01 09:41:56', '2022-08-20 11:58:48');
 
@@ -129,6 +129,7 @@ INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('sln6ra37gfsb', '编辑对象', '', '/object/:uuid', 0, 3, 3, '', '', 1, '8yzo4kzfucsb', 0, 'ssoms', '2022-07-26 04:03:42', '2022-08-06 07:53:33');
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('wsvssh0gpfsb', '删除对象', '', '/object/:uuid', 0, 3, 5, '', '', 1, '8yzo4kzfucsb', 0, 'ssoms', '2022-07-26 05:47:22', '2022-08-06 07:53:33');
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('k7vcb745vcsb', '对象授权', '', '/permission', 0, 2, 3, '', '', 1, '8yzo4kzfucsb', 0, 'ssoms', '2022-07-25 10:40:32', '2022-08-06 07:53:33');
+INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('c9bcohdat75c', '导入对象', '', '/object/import', 0, 3, 2, '', '', 1, '8yzo4kzfucsb', 'ssoms', 0, '2022-12-02 04:29:26', '2022-12-02 04:29:26');
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('knffjw6tup3c', '角色授权', '', '/permission/role/:roleUUID/grant', 0, 3, 3, '', '', 1, 'c5gxcduqwpsb', 0, 'ssoms', '2022-11-17 01:34:06', '2022-11-17 09:34:53');
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('kbq34p6ergsb', '添加用户', '', '/user', 0, 3, 2, '', '', 1, 'g89tkuzdfdsb', 0, 'ssoms', '2022-07-26 12:52:47', '2022-08-06 07:53:33');
 INSERT INTO `object` (`uuid`, `object_name`, `identifier`, `key`, `sort`, `type`, `sub_type`, `extra`, `icon`, `status`, `puuid`, `is_delete`, `top_key`, `create_time`, `update_time`) VALUES ('47cp2hq92r3c', '分配角色', '', '/assignRole', 0, 3, 2, '', '', 1, 'g89tkuzdfdsb', 0, 'ssoms', '2022-11-17 09:41:17', '2022-11-17 09:41:17');
@@ -158,6 +159,7 @@ INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_del
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', '4fqt9v682fsb', 3, 'ssoms', 0, '2022-08-15 12:14:29', '2022-11-18 07:25:19');
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'sln6ra37gfsb', 3, 'ssoms', 0, '2022-08-15 12:14:29', '2022-11-18 07:25:19');
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'wsvssh0gpfsb', 3, 'ssoms', 0, '2022-08-15 12:14:29', '2022-11-18 07:25:19');
+INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'c9bcohdat75c', 3, 'ssoms', 0, '2022-12-02 04:29:37', '2022-12-02 12:29:38');
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'sd1w57qgfdsb', 2, 'ssoms', 0, '2022-08-15 12:14:47', '2022-11-18 07:25:19');
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'g8t8ym1xfdsb', 2, 'ssoms', 0, '2022-08-15 12:14:47', '2022-11-18 07:25:19');
 INSERT INTO `permission` (`role_uuid`, `object_uuid`, `type`, `top_key`, `is_delete`, `create_time`, `update_time`) VALUES ('82fbnyvb5vpb', 'c5gxcduqwpsb', 2, 'ssoms', 0, '2022-08-15 12:14:47', '2022-11-18 07:25:19');

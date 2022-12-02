@@ -68,10 +68,8 @@
       </div>
     </div>
     <a-tabs v-model:activeKey="activeKey" :tabBarStyle="{padding: '0 10px'}">
-      <a-tab-pane key="2" tab="最近我添加菜单" force-render>Content of Tab Pane 2</a-tab-pane>
-      <a-tab-pane key="3" tab="批量导入菜单">Content of Tab Pane 3</a-tab-pane>
       <a-tab-pane key="1" tab="基础设置"><profile-change v-bind="profileData.info" @change="onProfileChange" /></a-tab-pane>
-      <a-tab-pane key="4" tab="密码修改"><password-reset /></a-tab-pane>
+      <a-tab-pane key="2" tab="密码修改"><password-reset /></a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -136,7 +134,7 @@ const onProfileChange = ({ introduction }) => {
   profileData.info.introduction = introduction
 }
 
-const activeKey = ref('4')
+const activeKey = ref('1')
 
 const cropper = ref()
 

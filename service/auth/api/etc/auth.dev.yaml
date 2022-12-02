@@ -8,7 +8,7 @@ Etcd:
     - 127.0.0.1:2379
   Key: /sso/api/wihtelist
 Mysql:
-  DataSource: root:123456@tcp(localhost:13306)/ssobk?parseTime=true&loc=Asia%2FShanghai
+  DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:
   - Host: localhost:16379
     Type: node

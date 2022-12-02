@@ -204,6 +204,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: object.ObjectDetailHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPost,
+				Path:    "/object/import",
+				Handler: object.ImportObjectHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPut,
 				Path:    "/object/:uuid",
 				Handler: object.UpdateObjectHandler(serverCtx),
