@@ -2,7 +2,7 @@
 <div>
   <a-row :gutter="32">
     <a-col :span="16">
-      <h1 class="home__header">菜单 & 操作新增统计</h1>
+      <h1 class="home__header">菜单 & 操作统计</h1>
       <div ref="barChartContainer" style="height: 240px"></div>
     </a-col>
     <a-col :span="8">
@@ -130,7 +130,8 @@ const statisticState = reactive<StatisticState>({
     systemAmount: 0,
     menuAmount: 0,
     actionAmount: 0,
-    permissionAmount: 0
+    permissionAmount: 0,
+    statistics: []
   }
 })
 
@@ -138,7 +139,6 @@ const barChartContainer = ref()
 
 onBeforeMount(() => {
   getSystemOptions()
-  getStatistic()
 })
 
 const getSystemOptions = () => {
@@ -152,6 +152,7 @@ const getSystemOptions = () => {
 const getStatistic = () => {
   homeStatistic().then(data => {
     statisticState.data = data
+    initChart()
   })
 }
 
@@ -160,38 +161,12 @@ const joinSystem = (obj: Obj) => {
 }
 
 onMounted(() => {
-  initChart()
+  getStatistic()
 })
 
 const initChart = () => {
-  const data = [
-    { "month": "9月", "type": "菜单", "value": 10 },
-    { "month": "9月", "type": "操作", "value": 40 },
-    { "month": "10月", "type": "菜单", "value": 20 },
-    { "month": "10月", "type": "操作", "value": 80 },
-    { "month": "11月", "type": "菜单", "value": 30 },
-    { "month": "11月", "type": "操作", "value": 120 },
-    { "month": "12月", "type": "菜单", "value": 35 },
-    { "month": "12月", "type": "操作", "value": 150 },
-    { "month": "1月", "type": "菜单", "value": 40 },
-    { "month": "1月", "type": "操作", "value": 150 },
-    { "month": "2月", "type": "菜单", "value": 12 },
-    { "month": "2月", "type": "操作", "value": 120 },
-    { "month": "3月", "type": "菜单", "value": 10 },
-    { "month": "3月", "type": "操作", "value": 50 },
-    { "month": "4月", "type": "菜单", "value": 20 },
-    { "month": "4月", "type": "操作", "value": 40 },
-    { "month": "5月", "type": "菜单", "value": 40 },
-    { "month": "5月", "type": "操作", "value": 40 },
-    { "month": "6月", "type": "菜单", "value": 20 },
-    { "month": "6月", "type": "操作", "value": 60 },
-    { "month": "7月", "type": "菜单", "value": 30 },
-    { "month": "7月", "type": "操作", "value": 100 },
-    { "month": "8月", "type": "菜单", "value": 10 },
-    { "month": "8月", "type": "操作", "value": 59 }
-  ]
   const column = new Column(barChartContainer.value, {
-    data,
+    data: statisticState.data.statistics,
     theme: {
       colors10: ['#1890ff', '#fa541c']
     },

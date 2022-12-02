@@ -19,13 +19,20 @@ type OptionWithDisabled {
 	Disabled bool   `json:"disabled"`
 }
 
+type Statistic {
+	Month string `json:"month"`
+	Type  string `json:"type"`
+	Value int64  `json:"value"`
+}
+
 type StatisticReply {
-	RoleAmount       int64 `json:"roleAmount"`
-	UserAmount       int64 `json:"userAmount"`
-	SystemAmount     int64 `json:"systemAmount"`
-	MenuAmount       int64 `json:"menuAmount"`
-	ActionAmount     int64 `json:"actionAmount"`
-	PermissionAmount int64 `json:"permissionAmount"`
+	RoleAmount       int64       `json:"roleAmount"`       // 角色数量
+	UserAmount       int64       `json:"userAmount"`       // 用户数量
+	SystemAmount     int64       `json:"systemAmount"`     // 系统数量
+	MenuAmount       int64       `json:"menuAmount"`       // 菜单数量
+	ActionAmount     int64       `json:"actionAmount"`     // 操作数量
+	PermissionAmount int64       `json:"permissionAmount"` // 授权数量
+	Statistics       []Statistic `json:"statistics"`       // 菜单&操作统计
 }
 
 @server(
