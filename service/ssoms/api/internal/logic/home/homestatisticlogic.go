@@ -26,6 +26,8 @@ func NewHomeStatisticLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Hom
 }
 
 func (l *HomeStatisticLogic) HomeStatistic() (resp *types.StatisticReply, err error) {
+	// 1. 统计当前各种元素的数量
+	// 统计元素目前共6种，包括 角色、用户、系统、菜单、操作、授权
 	args := &model.RoleListArgs{}
 	roleAmount, err := l.svcCtx.RoleModel.ListCount(l.ctx, args)
 	if err != nil {
@@ -68,6 +70,9 @@ func (l *HomeStatisticLogic) HomeStatistic() (resp *types.StatisticReply, err er
 		}
 	}
 
+	// 2. 获取当前月份的统计,如果没有记录, 则将第1步统计到的结果插入数据库
+	// 如果有记录，但是和当前查出来的结果不一致，则更新当前月份的数据
+	// 插入和更新操作出错只记录错误日志，不中断程序继续进行
 	month := time.Now().Format("2006-01")
 	monthStatistic := &model.Statistic{
 		Month:            month,
@@ -99,7 +104,7 @@ func (l *HomeStatisticLogic) HomeStatistic() (resp *types.StatisticReply, err er
 			}
 		}
 	}
-
+	// 3. 获取12个月内的统计数据
 	yearsData, err := l.svcCtx.StatisticModel.FindYearsData(l.ctx)
 	if err != nil {
 		l.Logger.Error(err)
@@ -107,7 +112,9 @@ func (l *HomeStatisticLogic) HomeStatistic() (resp *types.StatisticReply, err er
 	}
 
 	resp.Statistics = make([]types.Statistic, 0, 1)
-
+	// 数据库倒序拿数据，所以这里从后往前循环拿数组的数据
+	// 统计元素目前共6种，包括 角色、用户、系统、菜单、操作、授权
+	// 只拿取了菜单和按钮,实际可以按需要拿取更多的元素
 	for i := (len(yearsData) - 1); i >= 0; i-- {
 		v := yearsData[i]
 		menuData := types.Statistic{

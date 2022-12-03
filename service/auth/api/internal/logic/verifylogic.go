@@ -38,6 +38,10 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 		return nil, err
 	}
 
+	// 注意身份验证报错是authentication error
+	// 权限校验报错是authorization error
+	// 明确错误结果，如果是授权对象不存在，告知对象不存在
+	// 如果授权对象存在但是未授权，告知需要授权的对象名称
 	if !l.urlNoAuth(req) {
 		// 需要权限校验的页面.
 		roleUUIDArr, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, uuid)

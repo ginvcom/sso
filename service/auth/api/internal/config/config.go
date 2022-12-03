@@ -19,6 +19,9 @@ type Config struct {
 		AccessExpire         int64  // jwt token有效期，单位：秒  1天=86400秒
 		RememberAccessExpire int64  // jwt  记住登录时token有效期，单位：秒  3天=259200秒,  7天=604800秒
 	}
+	// NoAuthUrls是一个无需权限校验白名单
+	// map的key是页面菜单的key, 数组元素是无需校验权限的请求(匹配请求方式和请求path)
+	// 有条件的做成配置中心配置这个无需权限校验白名单
 	NoAuthUrls map[string][]struct {
 		Path   string
 		Method string

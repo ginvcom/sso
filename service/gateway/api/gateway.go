@@ -27,6 +27,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
+	// 添加全局日志字段
 	serviceNameField := logx.LogField{
 		Key:   "serviceName",
 		Value: c.Name,
@@ -77,6 +78,7 @@ func main() {
 			} else if ctx.Meta.Action == svc.ActionSignOut {
 				handler.SignOutHandler(ctx, w, r)
 			} else {
+				// 直接请求auth的几个接口，可以在请求auth的同时在auth内部进行鉴权，这样可以少一次请求
 				if ctx.Meta.Action != svc.ActionSessionMenus && ctx.Meta.Action != svc.ActionSessionMenuActions {
 					//使用uri进行鉴权(白名单、单点操作)
 					fmt.Println("ctx", ctx.Meta.URI)

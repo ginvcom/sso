@@ -26,6 +26,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
 
+	// 添加全局日志字段
 	serviceNameField := logx.LogField{
 		Key:   "serviceName",
 		Value: c.Name,
@@ -44,6 +45,7 @@ func main() {
 }
 
 func notAllowedFn(w http.ResponseWriter) {
+	// 接受网关转发时的headers参数
 	w.Header().Add("Access-Control-Allow-Headers", "x-origin-service")
 	w.Header().Add("Access-Control-Allow-Headers", "x-origin-uri")
 	// w.Header().Add("Access-Control-Allow-Headers", "x-origin-Uri")

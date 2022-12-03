@@ -72,7 +72,7 @@ name := l.ctx.Value(config.Name).(string)
 
 ## 部署说明
 
-1. 导入`backup.sql`,并执行下面的sql修改单点管理后台的域名:
+1. 数据库导入`backup.sql`,并执行下面的sql修改单点管理后台的域名:
 ```sql
 -- identifier的值设置为单点管理后台的域名, 这边以http://ssoms.ginv.com为例
 UPDATE object SET identifier='http://ssoms.ginv.com' WHERE uuid='kreppg8md1sb'
@@ -107,6 +107,12 @@ go run auth.go
 # 默认加载etc/gateway.yaml配置文件，通过-f参数使用不同的配置文件，例如go run gateway.go -f etc/gateway.dev.yaml
 
 # 编译生成可执行文件: go build gateway.go
+```
+
+3. 运行或部署之后，修改单点后台超管的登录手机号和密码, 初始登录手机号和密码是:
+```
+12345000001
+123456
 ```
 
 
