@@ -27,6 +27,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(nil, notAllowedFn, "*"))
 	defer server.Stop()
 
+	// 添加全局日志字段
 	serviceNameField := logx.LogField{
 		Key:   "serviceName",
 		Value: c.Name,
