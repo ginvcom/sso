@@ -51,8 +51,8 @@ ssoms是单点登录的管理后台，它具有以下功能
 ### 关于gateway：
 gateway主要负责转发功能，为了保证生成Cookie由服务端下发的页面创建，网关还提供了登录、登出和登录跳转页(跳转到相应的系统)。
 
-gateway通过请求的headers[x-client-service], 知道转发给哪个服务，在转发请求之前，会请求auth服务，根据cookie, 会解析到用户的信息，根据x-client-system和x-client-uri
-以及发起请求的Method则可以验证是否具有权限。如果验证通过，auth服务会返回用户的uuid和name，并追加到headers[x-origin-uuid]参数和headers[x-origin-name]参数。
+gateway通过请求的`headers[x-client-service]`, 知道转发给哪个目标服务，在转发请求之前，gateway会请求auth服务，auth服务根据cookie, 会解析到用户的信息，根据x-client-system
+以及发起请求的`请求方式`和`请求网址`则可以验证是否具有权限。如果验证通过，auth服务会将用户的uuid和name返回给gateway。最后，网关将用户uuid和name分别追加到`headers[x-origin-uuid]`参数和`headers[x-origin-name]`参数转发给目标服务。
 
 ### 关于其他接入单点的系统
 先登录ssoms，通过`系统管理`创建系统，并在`菜单&操作`创建相应的页面及操作，最后给用户相应的角色进行授权。
