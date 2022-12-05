@@ -46,7 +46,6 @@ ssoms是单点登录的管理后台，它具有以下功能
 | x-client-env | 环境，可选值有test\|online\|gray，用于日志、不同环境处理等 |
 | x-client-service | 请求的服务端的服务名，用于转发请求 |
 | x-client-system | 后台系统的系统名，用于授权查询 |
-| x-client-uri | 请求服务端的操作，用于授权查询 |
 
 
 ### 关于gateway：

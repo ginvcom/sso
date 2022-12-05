@@ -16,7 +16,7 @@ func VerifyHandler(svcCtx *svc.ServiceContext, w http.ResponseWriter, r *http.Re
 	meta.Action = svc.ActionVerify
 	meta.Method = http.MethodPost
 	meta.ServiceCode = "auth"
-	meta.URL = "/verify-request"
+	meta.URI = r.URL.Path
 	authCtx := &svc.ServiceContext{
 		Config: svcCtx.Config,
 		Meta:   meta,
@@ -32,7 +32,7 @@ func VerifyHandler(svcCtx *svc.ServiceContext, w http.ResponseWriter, r *http.Re
 		w.Write(resStr)
 		return
 	}
-
+	authCtx.Meta.URI = "/verify-request"
 	status, resp, err := authCtx.Request(body)
 	if err != nil {
 		logx.Info(err)
