@@ -89,11 +89,13 @@ instance.interceptors.response.use((res) => {
  *  ssoms.delete(url, params)
  */
 export default class Ajax {
-  private systemCode: string
-  private serviceCode: string
+  private headers: Record<string, string>
   constructor (systemCode: string, serviceCode: string) {
-    this.systemCode = systemCode
-    this.serviceCode = serviceCode
+    this.headers = {
+      'x-client-system': systemCode,
+      'x-client-service': serviceCode,
+      'x-client-env': env
+    }
   }
 
   private setPath (url: string, params: any) {
@@ -114,41 +116,28 @@ export default class Ajax {
     return { realpath: url, realParams: pms }
   }
 
-  private getHeaders (url: string) {
-    return {
-      'x-client-uri' : url,
-      'x-client-system': this.systemCode,
-      'x-client-service': this.serviceCode,
-      'x-client-env': env
-    }
-  }
   public get<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    const headers = this.getHeaders(url)
-    return instance.get(realpath, { params: realParams, headers })
+    return instance.get(realpath, { params: realParams, headers: this.headers })
   }
 
   public delete<T = any, R = T, D = any>(url: string, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    const headers = this.getHeaders(url)
-    return instance.delete(realpath, { params: realParams, headers })
+    return instance.delete(realpath, { params: realParams, headers: this.headers })
   }
 
   public post<T = any, R = T, D = any>(url: string, data?: D, params?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    const headers = this.getHeaders(url)
-    return instance.post(realpath, data, { params: realParams, headers })
+    return instance.post(realpath, data, { params: realParams, headers: this.headers })
   }
 
   public put<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    const headers = this.getHeaders(url)
-    return instance.put(realpath, data, { params: realParams, headers })
+    return instance.put(realpath, data, { params: realParams, headers: this.headers })
   }
 
   public patch<T = any, R = T, D = any>(url: string, params: D, data?: D): Promise<R> {
     const { realpath, realParams } = this.setPath(url, params)
-    const headers = this.getHeaders(url)
-    return instance.patch(realpath, data, { params: realParams, headers })
+    return instance.patch(realpath, data, { params: realParams, headers: this.headers })
   }
 }

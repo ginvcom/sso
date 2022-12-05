@@ -3,6 +3,8 @@ package logic
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strings"
 
 	"sso/service/auth/api/internal/svc"
 	"sso/service/auth/api/internal/types"
@@ -71,17 +73,34 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 			SubType: subType,
 		}
 		objectRowBuilder := l.svcCtx.ObjectModel.RowBuilder()
-		object, err := l.svcCtx.ObjectModel.CustomFindOne(l.ctx, objectRowBuilder, objectArgs)
+		objects, err := l.svcCtx.ObjectModel.CustomFind(l.ctx, objectRowBuilder, objectArgs)
 		if err != nil {
-			l.Logger.Error(err)
 			if err == model.ErrNotFound {
-				err = fmt.Errorf("object \"%s %s\" not exits", req.Method, req.URI)
+				err = fmt.Errorf("no access path matches: \"%s %s\"", req.Method, req.URI)
 				return nil, err
 			}
+			l.Logger.Error(err)
+			return nil, err
+		}
+		l.Logger.Info("objects", objects)
+		object := &model.Object{}
+		for _, o := range objects {
+			ok, err2 := KeyMatch(req.URI, o.Key)
+			if err2 != nil {
+				l.Logger.Error(err2)
+			} else {
+				if ok {
+					object = o
+				}
+			}
+		}
+
+		if object.Id == 0 {
+			err = fmt.Errorf("no access path matches: \"%s %s\"", req.Method, req.URI)
 			return nil, err
 		}
 
-		exits, err := l.svcCtx.ObjectModel.FindObjectInRoleUUIDArray(l.ctx, req.SystemCode, req.URI, subType, roleUUIDArr)
+		exits, err := l.svcCtx.ObjectModel.FindObjectInRoleUUIDArray(l.ctx, req.SystemCode, object.Key, subType, roleUUIDArr)
 		if err != nil || !exits {
 			err2 := fmt.Errorf("authorization error: %s: %w", object.ObjectName, err)
 			l.Logger.Error(err2)
@@ -107,8 +126,15 @@ func (l *VerifyLogic) urlNoAuth(req *types.VerifyRequestReq) bool {
 	}
 
 	for _, p := range menuNoAuthPaths {
-		if req.URI == p.Path && req.Method == p.Method {
-			return true
+		if req.Method == p.Method {
+			ok, err := KeyMatch(req.URI, p.Path)
+			if err != nil {
+				l.Logger.Error(err)
+				continue
+			}
+			if ok {
+				return true
+			}
 		}
 	}
 
@@ -136,4 +162,19 @@ func (l *VerifyLogic) isPass(req *types.VerifyRequestReq) (uuid, name string, er
 	}
 
 	return
+}
+
+// KeyMatch2 determines whether key1 matches the pattern of key2 (similar to RESTful path), key2 can contain a *.
+// For example, "/foo/bar" matches "/foo/*", "/resource1" matches "/:resource"
+func KeyMatch(key1 string, key2 string) (bool, error) {
+	key2 = strings.Replace(key2, "/*", "/.*", -1)
+
+	re := regexp.MustCompile(`:[^/]+`)
+	key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
+
+	res, err := regexp.MatchString(key2, key1)
+	if err != nil {
+		return false, err
+	}
+	return res, nil
 }

@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -22,8 +23,7 @@ type Meta struct {
 	Action      int
 	SystemCode  string
 	ServiceCode string
-	URL         string // 实参的请求地址
-	URI         string // 形参的请求地址
+	URI         string // 请求地址
 	Token       string
 	UUID        string // 登录后通过jwt拿到的uuid
 	Name        string // 登录后通过jwt拿到的用户名
@@ -35,8 +35,8 @@ func GetMeta(r *http.Request) (c Meta, err error) {
 	destination := r.Header.Get("Accept")
 	c.SystemCode = r.Header.Get("x-client-system")
 	c.ServiceCode = r.Header.Get("x-client-service")
-	c.URI = r.Header.Get("x-client-uri")
-	c.URL = r.URL.RequestURI()
+	c.URI = r.URL.RequestURI()
+	fmt.Println("c.URI", c.URI)
 	if strings.Contains(destination, "text/html") {
 		c.SystemCode = r.URL.Query().Get("system")
 		if c.SystemCode == "" {
@@ -45,12 +45,10 @@ func GetMeta(r *http.Request) (c Meta, err error) {
 		if r.URL.Path == "/sign-out" {
 			c.ServiceCode = "auth"
 			c.URI = "/sign-out"
-			c.URL = "/sign-out"
 			c.Action = ActionSignOut
 		} else {
 			c.ServiceCode = "auth"
 			c.URI = "/sign-in"
-			c.URL = "/sign-in"
 			c.Action = ActionSignIn
 		}
 	} else if strings.Contains(destination, "image/*") {

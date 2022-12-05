@@ -21,7 +21,8 @@ func (svcCtx *ServiceContext) Request(body []byte) (status int, resp []byte, err
 		err = errors.New(ErrServiceNotExits)
 		return
 	}
-	requestURL := serviceAddress + svcCtx.Meta.URL
+
+	requestURL := serviceAddress + svcCtx.Meta.URI
 
 	// 获取菜单和获取页面操作对象的接口为了适配GET请求类型，采用地址传参
 	if svcCtx.Meta.Action == ActionSessionMenus || svcCtx.Meta.Action == ActionSessionMenuActions {

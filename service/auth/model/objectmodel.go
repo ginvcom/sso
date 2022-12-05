@@ -21,6 +21,7 @@ type (
 		RowBuilder() squirrel.SelectBuilder
 		CustomFindOneByUuid(ctx context.Context, selectBuilder squirrel.SelectBuilder, uuid string) (resp *Object, err error)
 		CustomFindOne(ctx context.Context, selectBuilder squirrel.SelectBuilder, args *ObjectFindOneArgs) (resp *Object, err error)
+		CustomFind(ctx context.Context, selectBuilder squirrel.SelectBuilder, args *ObjectFindOneArgs) (resp []*Object, err error)
 		FindMenusInRoleUUIDArray(ctx context.Context, topKey string, roleUUIDArray *[]string) (resp []*Menu, err error)
 		FindObjectInRoleUUIDArray(ctx context.Context, topKey, key string, subType int64, roleUUIDArray *[]string) (exits bool, err error)
 	}
@@ -79,10 +80,6 @@ func (m *defaultObjectModel) CustomFindOne(ctx context.Context, selectBuilder sq
 	}
 	newSelectedBuilder = newSelectedBuilder.Where("top_key=?", args.TopKey)
 
-	if args.Key != "" {
-		newSelectedBuilder = newSelectedBuilder.Where("`key`=?", args.Key)
-	}
-
 	if args.Typ != 0 {
 		newSelectedBuilder = newSelectedBuilder.Where("`type`=?", args.Typ)
 	}
@@ -96,7 +93,35 @@ func (m *defaultObjectModel) CustomFindOne(ctx context.Context, selectBuilder sq
 		return
 	}
 	resp = new(Object)
-	err = m.QueryRowNoCacheCtx(ctx, resp, query, values...)
+	err = m.QueryRowsNoCacheCtx(ctx, resp, query, values...)
+	if err == sqlc.ErrNotFound {
+		err = ErrNotFound
+	}
+	return
+}
+
+func (m *defaultObjectModel) CustomFind(ctx context.Context, selectBuilder squirrel.SelectBuilder, args *ObjectFindOneArgs) (resp []*Object, err error) {
+	newSelectedBuilder := selectBuilder.Where("`status`=?", 1).Where("is_delete=?", 0)
+	if args.TopKey == "" {
+		err = errors.New("topKey is required")
+		return
+	}
+	newSelectedBuilder = newSelectedBuilder.Where("top_key=?", args.TopKey)
+
+	if args.Typ != 0 {
+		newSelectedBuilder = newSelectedBuilder.Where("`type`=?", args.Typ)
+	}
+
+	if args.SubType != 0 {
+		newSelectedBuilder = newSelectedBuilder.Where("sub_type=?", args.SubType)
+	}
+
+	query, values, err := newSelectedBuilder.ToSql()
+	if err != nil {
+		return
+	}
+	resp = make([]*Object, 0, 1)
+	err = m.QueryRowsNoCacheCtx(ctx, &resp, query, values...)
 	if err == sqlc.ErrNotFound {
 		err = ErrNotFound
 	}
