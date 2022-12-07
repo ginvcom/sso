@@ -1,8 +1,12 @@
-Env: online
 Name: gateway
+Mode: pro
 Host: 0.0.0.0
 Port: 8000
 UserCookieDomin: localhost
+Log:
+  ServiceName: gateway
+  Mode: file
+  Path: ./logs/gateway
 Upstreams:
   auth: http://localhost:8888
   ssoms: http://localhost:8889

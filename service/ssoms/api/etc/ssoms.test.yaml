@@ -1,8 +1,11 @@
-Env: test
 Name: ssoms
+Mode: test
 Host: 0.0.0.0
 Port: 8889
-NsqHost: 127.0.0.1:4150
+Log:
+  ServiceName: ssoms
+  Mode: file
+  Path: ./logs/ssoms
 Mysql:
   DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:

@@ -32,11 +32,11 @@ func main() {
 		Key:   "serviceName",
 		Value: c.Name,
 	}
-	envField := logx.LogField{
-		Key:   "env",
-		Value: c.Env,
+	modeField := logx.LogField{
+		Key:   "mode",
+		Value: c.Mode,
 	}
-	logx.AddGlobalFields(serviceNameField, envField)
+	logx.AddGlobalFields(serviceNameField, modeField)
 	// 全局中间件, 获取网关传递的用户基本信息
 	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {

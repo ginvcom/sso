@@ -7,7 +7,6 @@ import (
 )
 
 type Config struct {
-	Env string
 	rest.RestConf
 	Etcd  discov.EtcdConf
 	Mysql struct {

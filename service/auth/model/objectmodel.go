@@ -93,7 +93,7 @@ func (m *defaultObjectModel) CustomFindOne(ctx context.Context, selectBuilder sq
 		return
 	}
 	resp = new(Object)
-	err = m.QueryRowsNoCacheCtx(ctx, resp, query, values...)
+	err = m.QueryRowNoCacheCtx(ctx, resp, query, values...)
 	if err == sqlc.ErrNotFound {
 		err = ErrNotFound
 	}

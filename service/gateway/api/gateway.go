@@ -32,11 +32,11 @@ func main() {
 		Key:   "serviceName",
 		Value: c.Name,
 	}
-	envField := logx.LogField{
-		Key:   "env",
-		Value: c.Env,
+	modeField := logx.LogField{
+		Key:   "mode",
+		Value: c.Mode,
 	}
-	logx.AddGlobalFields(serviceNameField, envField)
+	logx.AddGlobalFields(serviceNameField, modeField)
 
 	address := fmt.Sprintf("%s:%d", c.Host, c.Port)
 	var srv = &http.Server{
