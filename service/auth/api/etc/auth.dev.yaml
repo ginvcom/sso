@@ -1,14 +1,17 @@
-Env: dev
 Name: auth
+Mode: dev
 Host: 0.0.0.0
 Port: 8888
-NsqHost: 127.0.0.1:4150
+Log:
+  ServiceName: auth
+  Mode: console
+  Path: ./logs/auth
 Etcd:
   Hosts:
     - 127.0.0.1:2379
   Key: /sso/api/wihtelist
 Mysql:
-  DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
+  DataSource: root:123456@tcp(127.0.0.1:13306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:
   - Host: localhost:16379
     Type: node

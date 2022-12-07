@@ -6,7 +6,6 @@ import (
 )
 
 type Config struct {
-	Env string
 	rest.RestConf
 	Mysql struct {
 		DataSource string

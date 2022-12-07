@@ -82,7 +82,6 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 			l.Logger.Error(err)
 			return nil, err
 		}
-		l.Logger.Info("objects", objects)
 		object := &model.Object{}
 		for _, o := range objects {
 			ok, err2 := KeyMatch(req.URI, o.Key)

@@ -1,8 +1,12 @@
-Env: online
 Name: auth
+Mode: pro
 Host: 0.0.0.0
 Port: 8888
-NsqHost: 127.0.0.1:4150
+Log:
+  ServiceName: auth
+  Mode: file
+  Path: ./logs/auth
+  KeepDays: 3
 Etcd:
   Hosts:
     - 127.0.0.1:2379

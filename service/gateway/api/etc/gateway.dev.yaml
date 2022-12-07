@@ -1,7 +1,11 @@
-Env: dev
 Name: gateway
+Mode: dev
 Host: 0.0.0.0
 Port: 8000
+Log:
+  ServiceName: gateway
+  Mode: console
+  Path: ./logs/gateway
 UserCookieDomin: localhost
 Upstreams:
   auth: http://localhost:8888
