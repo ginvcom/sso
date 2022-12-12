@@ -3,6 +3,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import Home from '@/views/home.vue'
 import NotFound from '@/NotFound.vue'
+import ErrorOccurred from '@/ErrorOccurred.vue'
 import { SERVER_ROUTER_MENU_KEY } from '@/config'
 import { menus, Menu } from '@/api/auth'
 
@@ -36,6 +37,7 @@ router.beforeEach(async to => {
         asyncRouter = routers
       }
     } catch (err) {
+      NProgress.done(true)
       // 意料之外的错误，取消导航并把错误传给全局处理器
       // https://router.vuejs.org/zh/guide/advanced/navigation-guards.html#%E5%85%A8%E5%B1%80%E8%A7%A3%E6%9E%90%E5%AE%88%E5%8D%AB
       throw err
@@ -54,6 +56,14 @@ router.afterEach(() => {
   NProgress.done(asyncRouter)
 })
 
+const asyncImport = (path: string) => {
+  if (modules[`../views${path}.vue`]) {
+    return modules[`../views${path}.vue`]
+  } else {
+    return ErrorOccurred
+  }
+}
+
 const routerFormat = (routers: Array<Menu> | null) => {
   const records:RouteRecordRaw[] = []
   if (routers === null) {
@@ -63,7 +73,7 @@ const routerFormat = (routers: Array<Menu> | null) => {
     const { p: path, n: name } = item
     const meta = { ...item.m }
     const children = routerFormat(item.c)
-    const record: RouteRecordRaw = { path, name, meta, component: modules[`../views${path}.vue`], children }
+    const record: RouteRecordRaw = { path, name, meta, component: asyncImport(path), children }
     if (item.m.t == 3) {
       router.addRoute(record)
     } else {

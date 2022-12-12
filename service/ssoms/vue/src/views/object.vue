@@ -1,325 +1,327 @@
 <template>
-  <div class="content-header">
-    <div>
-      <h1>菜单 & 操作</h1>
-    </div>
-    <div class="content-header__actions">
-      <a-button type="primary" @click="initAddMenu()">
-        <template #icon><plus-outlined /></template>
-        添加菜单
-      </a-button>
-      <a-button @click="onExport">
-        <template #icon><download-outlined /></template>
-        导出菜单
-      </a-button>
-      <a-button @click="onImport">
-        <template #icon><upload-outlined /></template>
-        导入菜单
-      </a-button>
-    </div>
-  </div>
-  <div class="system-params">
-    <a-form :model="state.params" name="params">
-      <div class="object__form">
-        <div class="object__current-system">
-          <div class="object__current-value">
-            <a-image
-              :width="48"
-              :height="48"
-              :src="ossConfig.ginvdoc.domain + state.currentSystem.icon"
-              :preview="false"
-              fallback="data:image/png;base64,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"
-            />
-            <p class="object__current-system-name">{{state.currentSystem.name}}</p>
-          </div>
-          <a-button @click="initChangeSystem">
-            <template #icon><appstore-outlined /></template>
-            切换系统
-          </a-button>
-        </div>
-        <a-divider type="vertical" style="height: 48px;margin: 0 48px;" />
-        <div class="object__form-right">
-          <advanced-search :value="searchForm" :data="searchFormData" @change="onSearch" />
-        </div>
+  <layout>
+    <div class="content-header">
+      <div>
+        <h1>菜单 & 操作</h1>
       </div>
-    </a-form>
-  </div>
-  <a-table
-  :loading="state.loading"
-  rowKey="uuid"
-  :dataSource="respState.list"
-  :columns="columns"
-  v-model:expandedRowKeys="state.expandedRowKeys"
-  :pagination="false">
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.dataIndex === 'objectName'">
-        <template
-          v-for="(fragment, i) in record.objectName
-            .toString()
-            .split(new RegExp(`(?<=${searchForm.objectName})|(?=${searchForm.objectName})`, 'i'))"
-        >
-          <b
-            v-if="fragment.toLowerCase() === searchForm.objectName.toLowerCase()"
-            :key="i"
-            style="color: #f50"
-          >
-            {{ fragment }}
-          </b>
-          <template v-else>{{ fragment }}</template>
-        </template>
-      </template>
-      <template v-if="column.dataIndex === 'type'">
-        <template v-if="record.type == 2">
-        <span v-if="record.subType == 1">菜单</span>
-        <span v-else-if="record.subType == 2">菜单组</span>
-        <span v-else-if="record.subType == 3">隐藏菜单</span>
-        </template>
-        <template v-else-if="record.type == 3">
-          <span>操作</span>
-        </template>
-      </template>
-      <template v-if="column.dataIndex === 'key'">
-        <template v-if="record.type == 3">
-          <span v-if="record.subType == 1" class="method-get m-r-15">GET</span>
-          <span v-else-if="record.subType == 2" class="method-post m-r-5">POST</span>
-          <span v-else-if="record.subType == 3" class="method-put m-r-15">PUT</span>
-          <span v-else-if="record.subType == 4" class="method-patch m-r-15">PAT</span>
-          <span v-else-if="record.subType == 5" class="method-delete m-r-15">DEL</span>
-        </template>
-        <template
-          v-for="(fragment, i) in record.key
-            .toString()
-            .split(new RegExp(`(?<=${searchForm.key})|(?=${searchForm.key})`, 'i'))"
-        >
-          <b
-            v-if="fragment.toLowerCase() === searchForm.key.toLowerCase()"
-            :key="i"
-            style="color: #f50"
-          >
-            {{ fragment }}
-          </b>
-          <template v-else>{{ fragment }}</template>
-        </template>
-      </template>
-      <template v-if="column.dataIndex === 'status'">
-        <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
-        <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
-      </template>
-      <template v-if="column.dataIndex === 'actions'">
-        <a v-if="record.type == 3" disabled>+子菜单</a>
-        <a v-else @click="initAddMenu(record.uuid)">+子菜单</a>
-        <a-divider type="vertical" />
-        <a v-if="record.type == 3" disabled>+操作</a>
-        <a v-else  @click="initAddApi(record.uuid)">+操作</a>
-        <a-divider type="vertical" />
-        <a v-if="record.type == 2" @click="initEditMenu(record.uuid)">编辑</a>
-        <a v-else @click="initEditApi(record.uuid)">编辑</a>
-        <a-divider type="vertical" />
-        <a-popconfirm
-          title="确定要删除该对象吗?"
-          placement="topRight"
-          @confirm="onDelete(record.uuid)">
-          <a>删除</a>
-        </a-popconfirm>
-      </template>
-    </template>
-  </a-table>
-  <a-modal
-    width="720px"
-    v-model:visible="systemFormState.visible"
-    title="切换系统"
-    :footer="false"
-    @cancel="onSystemFormCancel">
-    <div class="object__select">
-      <a-row :gutter="24">
-        <a-col v-for="obj in state.systems" :key="obj.uuid" :span="8">
-          <div
-           class="object__current-value object__option"
-           :class="{ 'is-active': state.params.topKey == obj.key }"
-           @click="onChangeSystem(obj)"
-          >
-            <a-image
-              :width="48"
-              :height="48"
-              :src="ossConfig.ginvdoc.domain + obj.icon"
-              :preview="false"
-              fallback="data:image/png;base64,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"
-            />
-            <p class="object__current-system-name">{{obj.objectName}}</p>
-          </div>
-        </a-col>
-      </a-row>
+      <div class="content-header__actions">
+        <a-button type="primary" @click="initAddMenu()">
+          <template #icon><plus-outlined /></template>
+          添加菜单
+        </a-button>
+        <a-button @click="onExport">
+          <template #icon><download-outlined /></template>
+          导出菜单
+        </a-button>
+        <a-button @click="onImport">
+          <template #icon><upload-outlined /></template>
+          导入菜单
+        </a-button>
+      </div>
     </div>
-  </a-modal>
-  <a-modal
-    width="620px"
-    v-model:visible="formState.visible"
-    :loading="formState.loading"
-    :maskClosable="false"
-    :title="formState.type == 'add' ? '添加菜单' : '修改菜单'"
-    @cancel="onCancel"
-    @ok="onSubmit">
-    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-row :gutter="24">
-        <a-col :span="12">
-          <a-form-item label="菜单名" name="objectName" :rules="[{ required: true, message: '请输入菜单名' }]">
-            <a-input v-model:value="formState.form.objectName" placeholder="菜单名" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="菜单路径" name="key" :rules="[{ required: true, message: '请输入菜单路径' }]">
-            <a-input v-model:value="formState.form.key" placeholder="菜单路径" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="父级菜单" name="pUUID">
-            <a-tree-select
-              v-model:value="formState.form.pUUID"
-              show-search
-              style="width: 100%"
-              :height="400"
-              placeholder="请选择父级菜单"
-              allow-clear
-              :tree-line="{ showLeafIcon: false }"
-              tree-default-expand-all
-              :tree-data="state.menus"
+    <div class="system-params">
+      <a-form :model="state.params" name="params">
+        <div class="object__form">
+          <div class="object__current-system">
+            <div class="object__current-value">
+              <a-image
+                :width="48"
+                :height="48"
+                :src="ossConfig.ginvdoc.domain + state.currentSystem.icon"
+                :preview="false"
+                fallback="data:image/png;base64,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"
+              />
+              <p class="object__current-system-name">{{state.currentSystem.name}}</p>
+            </div>
+            <a-button @click="initChangeSystem">
+              <template #icon><appstore-outlined /></template>
+              切换系统
+            </a-button>
+          </div>
+          <a-divider type="vertical" style="height: 48px;margin: 0 48px;" />
+          <div class="object__form-right">
+            <advanced-search :value="searchForm" :data="searchFormData" @change="onSearch" />
+          </div>
+        </div>
+      </a-form>
+    </div>
+    <a-table
+    :loading="state.loading"
+    rowKey="uuid"
+    :dataSource="respState.list"
+    :columns="columns"
+    v-model:expandedRowKeys="state.expandedRowKeys"
+    :pagination="false">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'objectName'">
+          <template
+            v-for="(fragment, i) in record.objectName
+              .toString()
+              .split(new RegExp(`(?<=${searchForm.objectName})|(?=${searchForm.objectName})`, 'i'))"
+          >
+            <b
+              v-if="fragment.toLowerCase() === searchForm.objectName.toLowerCase()"
+              :key="i"
+              style="color: #f50"
             >
-            </a-tree-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="菜单类型" name="subType" :rules="[{ required: true, message: '请选择菜单类型' }]">
-            <a-radio-group v-model:value="formState.form.subType">
-              <a-radio :value="1">菜单</a-radio>
-              <a-radio :value="2">菜单组</a-radio>
-              <a-radio :value="3">隐藏菜单</a-radio>
-            </a-radio-group>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="标识符" name="identifier">
-            <a-input v-model:value="formState.form.identifier" placeholder="标识" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="icon图标" name="icon">
-            <a-input v-model:value="formState.form.icon" placeholder="icon图标" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="排序值" name="sort">
-            <a-input-number v-model:value="formState.form.sort" placeholder="排序值小的靠前" style="width: 100%" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
-            <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-modal>
-  <a-modal
-    width="720px"
-    v-model:visible="formState.apiVisible"
-    :loading="formState.loading"
-    :maskClosable="false"
-    :title="formState.type == 'add' ? '添加操作' : '修改操作'"
-    @cancel="onCancel"
-    @ok="onSubmit">
-    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-row :gutter="24">
-        <a-col :span="24">
-          <a-form-item label="操作请求" name="key" :rules="[{ required: true, message: '请输入操作请求' }]">
-            <a-input-group compact>
-            <a-select
-                v-model:value="formState.form.subType"
-                placeholder="select one country"
-                option-label-prop="children"
-                 style="width: 20%"
+              {{ fragment }}
+            </b>
+            <template v-else>{{ fragment }}</template>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'type'">
+          <template v-if="record.type == 2">
+          <span v-if="record.subType == 1">菜单</span>
+          <span v-else-if="record.subType == 2">菜单组</span>
+          <span v-else-if="record.subType == 3">隐藏菜单</span>
+          </template>
+          <template v-else-if="record.type == 3">
+            <span>操作</span>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'key'">
+          <template v-if="record.type == 3">
+            <span v-if="record.subType == 1" class="method-get m-r-15">GET</span>
+            <span v-else-if="record.subType == 2" class="method-post m-r-5">POST</span>
+            <span v-else-if="record.subType == 3" class="method-put m-r-15">PUT</span>
+            <span v-else-if="record.subType == 4" class="method-patch m-r-15">PAT</span>
+            <span v-else-if="record.subType == 5" class="method-delete m-r-15">DEL</span>
+          </template>
+          <template
+            v-for="(fragment, i) in record.key
+              .toString()
+              .split(new RegExp(`(?<=${searchForm.key})|(?=${searchForm.key})`, 'i'))"
+          >
+            <b
+              v-if="fragment.toLowerCase() === searchForm.key.toLowerCase()"
+              :key="i"
+              style="color: #f50"
+            >
+              {{ fragment }}
+            </b>
+            <template v-else>{{ fragment }}</template>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'status'">
+          <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
+          <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
+        </template>
+        <template v-if="column.dataIndex === 'actions'">
+          <a v-if="record.type == 3" disabled>+子菜单</a>
+          <a v-else @click="initAddMenu(record.uuid)">+子菜单</a>
+          <a-divider type="vertical" />
+          <a v-if="record.type == 3" disabled>+操作</a>
+          <a v-else  @click="initAddApi(record.uuid)">+操作</a>
+          <a-divider type="vertical" />
+          <a v-if="record.type == 2" @click="initEditMenu(record.uuid)">编辑</a>
+          <a v-else @click="initEditApi(record.uuid)">编辑</a>
+          <a-divider type="vertical" />
+          <a-popconfirm
+            title="确定要删除该对象吗?"
+            placement="topRight"
+            @confirm="onDelete(record.uuid)">
+            <a>删除</a>
+          </a-popconfirm>
+        </template>
+      </template>
+    </a-table>
+    <a-modal
+      width="720px"
+      v-model:visible="systemFormState.visible"
+      title="切换系统"
+      :footer="false"
+      @cancel="onSystemFormCancel">
+      <div class="object__select">
+        <a-row :gutter="24">
+          <a-col v-for="obj in state.systems" :key="obj.uuid" :span="8">
+            <div
+            class="object__current-value object__option"
+            :class="{ 'is-active': state.params.topKey == obj.key }"
+            @click="onChangeSystem(obj)"
+            >
+              <a-image
+                :width="48"
+                :height="48"
+                :src="ossConfig.ginvdoc.domain + obj.icon"
+                :preview="false"
+                fallback="data:image/png;base64,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"
+              />
+              <p class="object__current-system-name">{{obj.objectName}}</p>
+            </div>
+          </a-col>
+        </a-row>
+      </div>
+    </a-modal>
+    <a-modal
+      width="620px"
+      v-model:visible="formState.visible"
+      :loading="formState.loading"
+      :maskClosable="false"
+      :title="formState.type == 'add' ? '添加菜单' : '修改菜单'"
+      @cancel="onCancel"
+      @ok="onSubmit">
+      <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+        <a-row :gutter="24">
+          <a-col :span="12">
+            <a-form-item label="菜单名" name="objectName" :rules="[{ required: true, message: '请输入菜单名' }]">
+              <a-input v-model:value="formState.form.objectName" placeholder="菜单名" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="菜单路径" name="key" :rules="[{ required: true, message: '请输入菜单路径' }]">
+              <a-input v-model:value="formState.form.key" placeholder="菜单路径" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="父级菜单" name="pUUID">
+              <a-tree-select
+                v-model:value="formState.form.pUUID"
+                show-search
+                style="width: 100%"
+                :height="400"
+                placeholder="请选择父级菜单"
+                allow-clear
+                :tree-line="{ showLeafIcon: false }"
+                tree-default-expand-all
+                :tree-data="state.menus"
               >
-                <a-select-option :value="1" label="China">
-                  <span class="method-get">GET</span>
-                </a-select-option>
-                <a-select-option :value="2" label="USA">
-                  <span class="method-post">POST</span>
-                </a-select-option>
-                <a-select-option :value="3" label="Japan">
-                  <span class="method-put">PUT</span>
-                </a-select-option>
-                <a-select-option :value="4" label="Japan">
-                  <span class="method-patch">PATCH</span>
-                </a-select-option>
-                <a-select-option :value="5" label="Korea">
-                  <span class="method-delete">DELETE</span>
-                </a-select-option>
-              </a-select>
-              <a-input v-model:value="formState.form.key" style="width: 80%" placeholder="接口路径，“/”起始" />
-            </a-input-group>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="操作名" name="objectName" :rules="[{ required: true, message: '请输入操作名' }]">
-            <a-input v-model:value="formState.form.objectName" placeholder="操作名" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="所属菜单" name="pUUID" :rules="[{ required: true, message: '请选择所属菜单' }]">
-            <a-tree-select
-              v-model:value="formState.form.pUUID"
-              show-search
-              style="width: 100%"
-              :height="400"
-              placeholder="请选择所属菜单"
-              allow-clear
-              :tree-line="{ showLeafIcon: false }"
-              tree-default-expand-all
-              :tree-data="state.apiParentMenus"
-            >
-            </a-tree-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
-          <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
-            <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-modal>
-  <a-modal
-    v-model:visible="importState.visible"
-    :closable="importState.percent == 100"
-    :maskClosable="false"
-    :bodyStyle="{padding:0}"
-    title="导入菜单&操作"
-    :footer="null"
-    @cancel="onImportCancel"
-    >
-    <div class="import-log">
-      <a-progress style="padding:0 8px 0 20px" :percent="importState.percent" stroke-color="#52c41a" />
-      <div class="import-log__content" ref="importLogContentRef">
-        <div v-for="(item, i) in importState.data" :key="i">
-          导入 {{item.uuid}} {{item.objectName}}
-          <span v-if="item.status == 'ready'" class="import-ready">准备中<ellipsis-outlined /></span>
-          <span v-else-if="item.status == 'doing'" class="import-doing">进行中<line-outlined spin /></span>
-          <span v-else-if="item.status == 'success'" class="import-success">已成功<exclamation-outlined /></span>
-          <span v-else-if="item.status == 'ignore'" class="import-ignore">已忽略<exclamation-outlined /></span>
-          <span v-else-if="item.status == 'failed'" class="import-failed">已失败<exclamation-outlined /></span>
-          <span>{{item.msg}}</span>
+              </a-tree-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="菜单类型" name="subType" :rules="[{ required: true, message: '请选择菜单类型' }]">
+              <a-radio-group v-model:value="formState.form.subType">
+                <a-radio :value="1">菜单</a-radio>
+                <a-radio :value="2">菜单组</a-radio>
+                <a-radio :value="3">隐藏菜单</a-radio>
+              </a-radio-group>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="标识符" name="identifier">
+              <a-input v-model:value="formState.form.identifier" placeholder="标识" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="icon图标" name="icon">
+              <a-input v-model:value="formState.form.icon" placeholder="icon图标" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="排序值" name="sort">
+              <a-input-number v-model:value="formState.form.sort" placeholder="排序值小的靠前" style="width: 100%" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
+              <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-modal>
+    <a-modal
+      width="720px"
+      v-model:visible="formState.apiVisible"
+      :loading="formState.loading"
+      :maskClosable="false"
+      :title="formState.type == 'add' ? '添加操作' : '修改操作'"
+      @cancel="onCancel"
+      @ok="onSubmit">
+      <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+        <a-row :gutter="24">
+          <a-col :span="24">
+            <a-form-item label="操作请求" name="key" :rules="[{ required: true, message: '请输入操作请求' }]">
+              <a-input-group compact>
+              <a-select
+                  v-model:value="formState.form.subType"
+                  placeholder="select one country"
+                  option-label-prop="children"
+                  style="width: 20%"
+                >
+                  <a-select-option :value="1" label="China">
+                    <span class="method-get">GET</span>
+                  </a-select-option>
+                  <a-select-option :value="2" label="USA">
+                    <span class="method-post">POST</span>
+                  </a-select-option>
+                  <a-select-option :value="3" label="Japan">
+                    <span class="method-put">PUT</span>
+                  </a-select-option>
+                  <a-select-option :value="4" label="Japan">
+                    <span class="method-patch">PATCH</span>
+                  </a-select-option>
+                  <a-select-option :value="5" label="Korea">
+                    <span class="method-delete">DELETE</span>
+                  </a-select-option>
+                </a-select>
+                <a-input v-model:value="formState.form.key" style="width: 80%" placeholder="接口路径，“/”起始" />
+              </a-input-group>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="操作名" name="objectName" :rules="[{ required: true, message: '请输入操作名' }]">
+              <a-input v-model:value="formState.form.objectName" placeholder="操作名" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="所属菜单" name="pUUID" :rules="[{ required: true, message: '请选择所属菜单' }]">
+              <a-tree-select
+                v-model:value="formState.form.pUUID"
+                show-search
+                style="width: 100%"
+                :height="400"
+                placeholder="请选择所属菜单"
+                allow-clear
+                :tree-line="{ showLeafIcon: false }"
+                tree-default-expand-all
+                :tree-data="state.apiParentMenus"
+              >
+              </a-tree-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择菜单状态' }]">
+              <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-modal>
+    <a-modal
+      v-model:visible="importState.visible"
+      :closable="importState.percent == 100"
+      :maskClosable="false"
+      :bodyStyle="{padding:0}"
+      title="导入菜单&操作"
+      :footer="null"
+      @cancel="onImportCancel"
+      >
+      <div class="import-log">
+        <a-progress style="padding:0 8px 0 20px" :percent="importState.percent" stroke-color="#52c41a" />
+        <div class="import-log__content" ref="importLogContentRef">
+          <div v-for="(item, i) in importState.data" :key="i">
+            导入 {{item.uuid}} {{item.objectName}}
+            <span v-if="item.status == 'ready'" class="import-ready">准备中<ellipsis-outlined /></span>
+            <span v-else-if="item.status == 'doing'" class="import-doing">进行中<line-outlined spin /></span>
+            <span v-else-if="item.status == 'success'" class="import-success">已成功<exclamation-outlined /></span>
+            <span v-else-if="item.status == 'ignore'" class="import-ignore">已忽略<exclamation-outlined /></span>
+            <span v-else-if="item.status == 'failed'" class="import-failed">已失败<exclamation-outlined /></span>
+            <span>{{item.msg}}</span>
+          </div>
+        </div>
+        <div class="log__content_statistics">
+          <p>
+            结果: 共{{importState.total}}条, 已处理{{importState.data.filter(item => item.status != 'ready' && item.status != 'doing' ).length}}条,
+            成功<span class="import-success">{{importState.statistics.success}}</span>条,
+            忽略<span class="import-ignore">{{importState.statistics.ignore}}</span>条,
+            失败<span class="import-failed">{{importState.statistics.failed}}</span>条,
+            耗时{{importState.timeCount.toFixed(2)}}秒。
+          </p>
         </div>
       </div>
-      <div class="log__content_statistics">
-        <p>
-          结果: 共{{importState.total}}条, 已处理{{importState.data.filter(item => item.status != 'ready' && item.status != 'doing' ).length}}条,
-          成功<span class="import-success">{{importState.statistics.success}}</span>条,
-          忽略<span class="import-ignore">{{importState.statistics.ignore}}</span>条,
-          失败<span class="import-failed">{{importState.statistics.failed}}</span>条,
-          耗时{{importState.timeCount.toFixed(2)}}秒。
-        </p>
-      </div>
-    </div>
-  </a-modal>
+    </a-modal>
+  </layout>
 </template>
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref, createVNode, nextTick, onBeforeUnmount } from 'vue'

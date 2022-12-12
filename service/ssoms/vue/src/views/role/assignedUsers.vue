@@ -1,89 +1,91 @@
 <template>
-  <div class="content-header is-sticky">
-    <div>
-      <h1>角色“{{respState.roleName}}”分配用户列表</h1>
+  <layout>
+    <div class="content-header is-sticky">
+      <div>
+        <h1>角色“{{respState.roleName}}”分配用户列表</h1>
+      </div>
+      <div class="content-header__actions">
+        <a-button  @click="onBack"><template #icon><arrow-left-outlined /></template>返回列表</a-button>
+        <a-button type="primary" @click="initAssignUser"><template #icon><plus-outlined /></template>分配用户</a-button>
+      </div>
     </div>
-    <div class="content-header__actions">
-      <a-button  @click="onBack"><template #icon><arrow-left-outlined /></template>返回列表</a-button>
-      <a-button type="primary" @click="initAssignUser"><template #icon><plus-outlined /></template>分配用户</a-button>
-    </div>
-  </div>
-  <a-table
-  :loading="state.loading"
-  :dataSource="respState.list"
-  :columns="columns"
-  :pagination="{
-    total: respState.total,
-    current: state.params.page,
-    pageSize: state.params.pageSize,
-    showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
-  }"
-  @change="onTableChange">
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.dataIndex === 'name'">
-        <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
-          <template #icon><UserOutlined /></template>
-        </a-avatar>
-        <span style="margin-left: 10px">{{record.name}}</span>
-      </template>
-      <template v-if="column.dataIndex === 'gender'">
-        <span v-if="record.gender == 1">男</span>
-        <span v-else-if="record.gender == 2">女</span>
-        <span v-else-if="record.gender == 3">未知</span>
-      </template>
-      <template v-if="column.dataIndex === 'status'">
-        <span v-if="record.isDelete == 1" class="text-red"><a-badge status="success" /> 已删除</span>
-        <template v-else>
-          <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
-          <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
+    <a-table
+    :loading="state.loading"
+    :dataSource="respState.list"
+    :columns="columns"
+    :pagination="{
+      total: respState.total,
+      current: state.params.page,
+      pageSize: state.params.pageSize,
+      showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
+    }"
+    @change="onTableChange">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'name'">
+          <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
+            <template #icon><UserOutlined /></template>
+          </a-avatar>
+          <span style="margin-left: 10px">{{record.name}}</span>
+        </template>
+        <template v-if="column.dataIndex === 'gender'">
+          <span v-if="record.gender == 1">男</span>
+          <span v-else-if="record.gender == 2">女</span>
+          <span v-else-if="record.gender == 3">未知</span>
+        </template>
+        <template v-if="column.dataIndex === 'status'">
+          <span v-if="record.isDelete == 1" class="text-red"><a-badge status="success" /> 已删除</span>
+          <template v-else>
+            <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
+            <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
+          </template>
+        </template>
+        <template v-if="column.dataIndex === 'actions'">
+          <a-divider type="vertical" />
+          <a-popconfirm
+            title="确定要将该用户移出当前角色吗?"
+            placement="topRight"
+            @confirm="onDeassignUser(record.uuid)">
+            <a>移出角色</a>
+          </a-popconfirm>
         </template>
       </template>
-      <template v-if="column.dataIndex === 'actions'">
-        <a-divider type="vertical" />
-        <a-popconfirm
-          title="确定要将该用户移出当前角色吗?"
-          placement="topRight"
-          @confirm="onDeassignUser(record.uuid)">
-          <a>移出角色</a>
-        </a-popconfirm>
-      </template>
-    </template>
-  </a-table>
-  <a-modal
-    v-model:visible="formState.visible"
-    :title="`选择用户分配到角色“${respState.roleName}”`"
-    :maskClosable="false"
-    @cancel="onCancel"
-    @ok="onSubmit">
-    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-form-item name="userUUID" :rules="[{ required: true, message: '请选择用户' }]">
-        <a-select
-          v-model:value="formState.form.userUUID"
-          show-search
-          placeholder="输入用户姓名搜索用户"
-          optionLabelProp="label"
-          :default-active-first-option="false"
-          :show-arrow="false"
-          :filter-option="false"
-          @search="onUserOptionSearch"
-        >
-          <a-select-option v-for="option in userOptionState.options" :key="option.value" :value="option.value" :label="option.label">
-            <div>
-              <a-avatar :src="ossConfig.ginvdoc.domain + option.extra" style="color: #f56a00; background-color: #fde3cf">
-                <template #icon><UserOutlined /></template>
-              </a-avatar>
-              <span style="margin-left: 10px">{{option.label}}</span>
-            </div>
-          </a-select-option>
-          <template v-if="userOptionState.loading" #notFoundContent>
-            <div style="height: 78px;display:flex;align-items: center;justify-content: center;">
-              <a-spin size="small" />
-            </div>
-          </template>
-        </a-select>
-      </a-form-item>
-    </a-form>
-  </a-modal>
+    </a-table>
+    <a-modal
+      v-model:visible="formState.visible"
+      :title="`选择用户分配到角色“${respState.roleName}”`"
+      :maskClosable="false"
+      @cancel="onCancel"
+      @ok="onSubmit">
+      <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+        <a-form-item name="userUUID" :rules="[{ required: true, message: '请选择用户' }]">
+          <a-select
+            v-model:value="formState.form.userUUID"
+            show-search
+            placeholder="输入用户姓名搜索用户"
+            optionLabelProp="label"
+            :default-active-first-option="false"
+            :show-arrow="false"
+            :filter-option="false"
+            @search="onUserOptionSearch"
+          >
+            <a-select-option v-for="option in userOptionState.options" :key="option.value" :value="option.value" :label="option.label">
+              <div>
+                <a-avatar :src="ossConfig.ginvdoc.domain + option.extra" style="color: #f56a00; background-color: #fde3cf">
+                  <template #icon><UserOutlined /></template>
+                </a-avatar>
+                <span style="margin-left: 10px">{{option.label}}</span>
+              </div>
+            </a-select-option>
+            <template v-if="userOptionState.loading" #notFoundContent>
+              <div style="height: 78px;display:flex;align-items: center;justify-content: center;">
+                <a-spin size="small" />
+              </div>
+            </template>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+  </layout>
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'

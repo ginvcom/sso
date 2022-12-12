@@ -1,5 +1,5 @@
 <template>
-<div>
+<layout>
   <a-row :gutter="32">
     <a-col :span="16">
       <h1 class="home__header">菜单 & 操作统计</h1>
@@ -71,7 +71,7 @@
       </a-card>
     </a-col>
   </a-row>
-</div>
+</layout>
 </template>
 <script setup lang="ts">
 import { onBeforeMount, onMounted, reactive, ref } from 'vue'

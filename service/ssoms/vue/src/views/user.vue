@@ -1,186 +1,188 @@
 <template>
-  <div class="content-header is-sticky">
-    <div>
-      <h1>用户管理</h1>
+  <layout>
+    <div class="content-header is-sticky">
+      <div>
+        <h1>用户管理</h1>
+      </div>
+      <div class="content-header__actions">
+        <a-button type="primary" @click="initAdd"><template #icon><user-add-outlined /></template>添加用户</a-button>
+      </div>
     </div>
-    <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd"><template #icon><user-add-outlined /></template>添加用户</a-button>
-    </div>
-  </div>
-  <a-table
-  :loading="state.loading"
-  :dataSource="respState.list"
-  :columns="columns"
-  :pagination="{
-    total: respState.total,
-    current: state.params.page,
-    pageSize: state.params.pageSize,
-    showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
-  }"
-  @change="onTableChange">
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.dataIndex === 'name'">
-        <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
-          <template #icon><UserOutlined /></template>
-        </a-avatar>
-        <span style="margin-left: 10px">{{record.name}}</span>
+    <a-table
+    :loading="state.loading"
+    :dataSource="respState.list"
+    :columns="columns"
+    :pagination="{
+      total: respState.total,
+      current: state.params.page,
+      pageSize: state.params.pageSize,
+      showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
+    }"
+    @change="onTableChange">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'name'">
+          <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
+            <template #icon><UserOutlined /></template>
+          </a-avatar>
+          <span style="margin-left: 10px">{{record.name}}</span>
+        </template>
+        <template v-if="column.dataIndex === 'gender'">
+          <span v-if="record.gender == 1">男</span>
+          <span v-else-if="record.gender == 2">女</span>
+          <span v-else-if="record.gender == 3">未知</span>
+        </template>
+        <template v-if="column.dataIndex === 'status'">
+          <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
+          <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
+        </template>
+        <template v-if="column.dataIndex === 'roles'">
+          <span v-for="(role,i) in record.roles" :key="role.value">
+            <template v-if="i > 0">、</template>
+            <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: role.value } }">{{role.label}}</router-link>
+          </span>
+        </template>
+        <template v-if="column.dataIndex === 'actions'">
+          <a @click="initAssignRole(record.uuid)">分配角色</a>
+          <a-divider type="vertical" />
+          <a @click="initEdit(record.uuid)">编辑</a>
+          <a-divider type="vertical" />
+          <a-popconfirm
+            title="确定要删除该用户吗?"
+            placement="topRight"
+            @confirm="onDelete(record.uuid)">
+            <a>删除</a>
+          </a-popconfirm>
+        </template>
       </template>
-      <template v-if="column.dataIndex === 'gender'">
-        <span v-if="record.gender == 1">男</span>
-        <span v-else-if="record.gender == 2">女</span>
-        <span v-else-if="record.gender == 3">未知</span>
-      </template>
-      <template v-if="column.dataIndex === 'status'">
-        <span v-if="record.status == 1"><a-badge status="success" /> 启用</span>
-        <span v-else-if="record.status == 0"><a-badge status="error" />停用</span>
-      </template>
-      <template v-if="column.dataIndex === 'roles'">
-        <span v-for="(role,i) in record.roles" :key="role.value">
-          <template v-if="i > 0">、</template>
-          <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: role.value } }">{{role.label}}</router-link>
-        </span>
-      </template>
-      <template v-if="column.dataIndex === 'actions'">
-        <a @click="initAssignRole(record.uuid)">分配角色</a>
-        <a-divider type="vertical" />
-        <a @click="initEdit(record.uuid)">编辑</a>
-        <a-divider type="vertical" />
-        <a-popconfirm
-          title="确定要删除该用户吗?"
-          placement="topRight"
-          @confirm="onDelete(record.uuid)">
-          <a>删除</a>
-        </a-popconfirm>
-      </template>
-    </template>
-  </a-table>
-  <a-modal
-    width="694px"
-    v-model:visible="formState.visible"
-    :title="formState.type == 'add' ? '添加用户' : '修改用户'"
-    :loading="formState.loading"
-    :maskClosable="false"
-    @cancel="onCancel"
-    @ok="onSubmit">
-    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-row :gutter="24">
-        <a-col :span="8">
-          <a-form-item label="头像">
-            <template v-if="cropperState.visible">
-              <vue-cropper
-                ref="cropper"
-                :aspect-ratio="1 / 1"
-                :src="cropperState.imageUrl"
-                @keyup.enter="onCrop"
-              />
+    </a-table>
+    <a-modal
+      width="694px"
+      v-model:visible="formState.visible"
+      :title="formState.type == 'add' ? '添加用户' : '修改用户'"
+      :loading="formState.loading"
+      :maskClosable="false"
+      @cancel="onCancel"
+      @ok="onSubmit">
+      <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+        <a-row :gutter="24">
+          <a-col :span="8">
+            <a-form-item label="头像">
+              <template v-if="cropperState.visible">
+                <vue-cropper
+                  ref="cropper"
+                  :aspect-ratio="1 / 1"
+                  :src="cropperState.imageUrl"
+                  @keyup.enter="onCrop"
+                />
 
-            <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
-            </template>
-            <a-upload  v-else
-              v-model:file-list="uploadState.fileList"
-              list-type="picture-card"
-              class="avatar-uploader"
-              :show-upload-list="false"
-              :before-upload="beforeAvatarUpload"
-              @change="onAvatarChange"
-            >
-              <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
-              <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
-                <template #icon><UserOutlined /></template>
-              </a-avatar>
-              <div>
-                <loading-outlined v-if="uploadState.loading"></loading-outlined>
-                <plus-outlined v-else></plus-outlined>
-                <div class="ant-upload-text">上传</div>
-              </div>
-            </a-upload>
-          </a-form-item>
-        </a-col>
-        <a-col :span="16">
-          <a-row :gutter="24">
-          <a-col :span="12">
-            <a-form-item label="姓名" name="name" :rules="[{ required: true, message: '请输入用户姓名' }]">
-              <a-input v-model:value="formState.form.name" placeholder="姓名" />
+              <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
+              </template>
+              <a-upload  v-else
+                v-model:file-list="uploadState.fileList"
+                list-type="picture-card"
+                class="avatar-uploader"
+                :show-upload-list="false"
+                :before-upload="beforeAvatarUpload"
+                @change="onAvatarChange"
+              >
+                <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
+                <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
+                  <template #icon><UserOutlined /></template>
+                </a-avatar>
+                <div>
+                  <loading-outlined v-if="uploadState.loading"></loading-outlined>
+                  <plus-outlined v-else></plus-outlined>
+                  <div class="ant-upload-text">上传</div>
+                </div>
+              </a-upload>
             </a-form-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-item label="性别" name="gender" :rules="[{ required: true, message: '请选择性别' }]">
-              <a-radio-group v-model:value="formState.form.gender">
-                <a-radio :value="1">男</a-radio>
-                <a-radio :value="2">女</a-radio>
-                <a-radio :value="3">未知</a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="手机号" name="mobile" :rules="[{ required: true, message: '请输入用户手机号' }]">
-              <a-input v-model:value="formState.form.mobile" placeholder="13位手机号" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="密码" name="password">
-              <a-input v-model:value="formState.form.password" placeholder="6~8位密码" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="生日" name="birth" :rules="[{ required: true, message: '请输入用户出生日期' }]">
-              <a-date-picker style="width: 100%" valueFormat="YYYY-MM-DD" v-model:value="formState.form.birth" placeholder="出生日期"/>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择用户状态' }]">
-              <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
-            </a-form-item>
+          <a-col :span="16">
+            <a-row :gutter="24">
+            <a-col :span="12">
+              <a-form-item label="姓名" name="name" :rules="[{ required: true, message: '请输入用户姓名' }]">
+                <a-input v-model:value="formState.form.name" placeholder="姓名" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="性别" name="gender" :rules="[{ required: true, message: '请选择性别' }]">
+                <a-radio-group v-model:value="formState.form.gender">
+                  <a-radio :value="1">男</a-radio>
+                  <a-radio :value="2">女</a-radio>
+                  <a-radio :value="3">未知</a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="手机号" name="mobile" :rules="[{ required: true, message: '请输入用户手机号' }]">
+                <a-input v-model:value="formState.form.mobile" placeholder="13位手机号" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="密码" name="password">
+                <a-input v-model:value="formState.form.password" placeholder="6~8位密码" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="生日" name="birth" :rules="[{ required: true, message: '请输入用户出生日期' }]">
+                <a-date-picker style="width: 100%" valueFormat="YYYY-MM-DD" v-model:value="formState.form.birth" placeholder="出生日期"/>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="状态" name="status" :rules="[{ required: true, message: '请选择用户状态' }]">
+                <a-switch v-model:checked="formState.form.status" :checked-value="1" :unChecked-value="0" checked-children="启用" un-checked-children="停用" />
+              </a-form-item>
+            </a-col>
+          </a-row>
           </a-col>
         </a-row>
-        </a-col>
-      </a-row>
-      <a-form-item label="用户简介" name="summary">
-        <a-textarea v-model:value="formState.form.introduction" placeholder="填写职业技能、擅长的事情、喜欢的事情等" :rows="3" show-count :maxlength="100" />
-      </a-form-item>
-    </a-form>
-  </a-modal>
-  <a-modal
-    width="800px"
-    v-model:visible="assignFormState.visible"
-    :title="`用户“${assignFormState.name}”角色分配`"
-    :loading="assignFormState.loading"
-    :maskClosable="false"
-    @cancel="onCancel"
-    @ok="onAssignRole">
-    <a-form layout="vertical" ref="userAssignFormmRef" :model="formState.form">
-      <h3>已分配角色</h3>
-      <a-row :gutter="24">
-        <a-col v-for="role in assignFormState.assigned" :key="role.value" :span="8">
-          <div class="user-assign__item is-active" @click="removeAssignRole(role.value)">
-            <div>
-              <team-outlined />
-              <span style="margin-left: 10px">{{role.label}}</span>
+        <a-form-item label="用户简介" name="summary">
+          <a-textarea v-model:value="formState.form.introduction" placeholder="填写职业技能、擅长的事情、喜欢的事情等" :rows="3" show-count :maxlength="100" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal
+      width="800px"
+      v-model:visible="assignFormState.visible"
+      :title="`用户“${assignFormState.name}”角色分配`"
+      :loading="assignFormState.loading"
+      :maskClosable="false"
+      @cancel="onCancel"
+      @ok="onAssignRole">
+      <a-form layout="vertical" ref="userAssignFormmRef" :model="formState.form">
+        <h3>已分配角色</h3>
+        <a-row :gutter="24">
+          <a-col v-for="role in assignFormState.assigned" :key="role.value" :span="8">
+            <div class="user-assign__item is-active" @click="removeAssignRole(role.value)">
+              <div>
+                <team-outlined />
+                <span style="margin-left: 10px">{{role.label}}</span>
+              </div>
+              <p>{{role.extra}}</p>
             </div>
-            <p>{{role.extra}}</p>
-          </div>
-        </a-col>
-        <a-col v-if="assignFormState.assigned.length == 0" :span="8" :offset="8">
-          <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-        </a-col>
-      </a-row>
-      <h3 style="margin-top: 20px">可分配角色</h3>
-      <a-row :gutter="24">
-        <a-col v-for="role in assignFormState.options" :key="role.value" :span="8">
-          <div class="user-assign__item" @click="addAssignRole(role.value)">
-            <div>
-              <team-outlined />
-              <span style="margin-left: 10px">{{role.label}}</span>
+          </a-col>
+          <a-col v-if="assignFormState.assigned.length == 0" :span="8" :offset="8">
+            <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+          </a-col>
+        </a-row>
+        <h3 style="margin-top: 20px">可分配角色</h3>
+        <a-row :gutter="24">
+          <a-col v-for="role in assignFormState.options" :key="role.value" :span="8">
+            <div class="user-assign__item" @click="addAssignRole(role.value)">
+              <div>
+                <team-outlined />
+                <span style="margin-left: 10px">{{role.label}}</span>
+              </div>
+              <p>{{role.extra}}</p>
             </div>
-            <p>{{role.extra}}</p>
-          </div>
-        </a-col>
-        <a-col v-if="assignFormState.options.length == 0" :span="8" :offset="8">
-          <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
-        </a-col>
-      </a-row>
-    </a-form>
-  </a-modal>
+          </a-col>
+          <a-col v-if="assignFormState.options.length == 0" :span="8" :offset="8">
+            <a-empty :image="Empty.PRESENTED_IMAGE_SIMPLE" />
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-modal>
+  </layout>
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
