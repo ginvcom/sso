@@ -1,77 +1,79 @@
 <template>
-  <div>
-    <div class="content-header is-sticky">
-      <div>
-        <h1>个人中心</h1>
+  <layout>
+    <div>
+      <div class="content-header is-sticky">
+        <div>
+          <h1>个人中心</h1>
+        </div>
       </div>
-    </div>
-    <div class="profile__header">
-      <div class="profile__bg"></div>
-      <div class="profile__info" style="justify-content: space-between;">
-        <div class="pofile__avatar">
-          <a-tooltip placement="bottom">
-            <template #title>点击修改头像</template>
-            <div style="width:200px">
-            <template v-if="cropperState.visible">
-              <vue-cropper
-                ref="cropper"
-                :aspect-ratio="1 / 1"
-                :src="cropperState.imageUrl"
-                @keyup.enter="onCrop"
-              />
+      <div class="profile__header">
+        <div class="profile__bg"></div>
+        <div class="profile__info" style="justify-content: space-between;">
+          <div class="pofile__avatar">
+            <a-tooltip placement="bottom">
+              <template #title>点击修改头像</template>
+              <div style="width:200px">
+              <template v-if="cropperState.visible">
+                <vue-cropper
+                  ref="cropper"
+                  :aspect-ratio="1 / 1"
+                  :src="cropperState.imageUrl"
+                  @keyup.enter="onCrop"
+                />
 
-            <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
-            </template>
-            <a-upload v-else
-              v-model:file-list="uploadState.fileList"
-              list-type="picture-card"
-              class="avatar-uploader"
-              :show-upload-list="false"
-              :before-upload="beforeAvatarUpload"
-              @change="onAvatarChange"
-            >
-              <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
-              <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
-                <template #icon><UserOutlined /></template>
-              </a-avatar>
-              <div>
-                <loading-outlined v-if="uploadState.loading"></loading-outlined>
-                <plus-outlined v-else></plus-outlined>
-                <div class="ant-upload-text">上传头像</div>
+              <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
+              </template>
+              <a-upload v-else
+                v-model:file-list="uploadState.fileList"
+                list-type="picture-card"
+                class="avatar-uploader"
+                :show-upload-list="false"
+                :before-upload="beforeAvatarUpload"
+                @change="onAvatarChange"
+              >
+                <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
+                <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
+                  <template #icon><UserOutlined /></template>
+                </a-avatar>
+                <div>
+                  <loading-outlined v-if="uploadState.loading"></loading-outlined>
+                  <plus-outlined v-else></plus-outlined>
+                  <div class="ant-upload-text">上传头像</div>
+                </div>
+              </a-upload>
               </div>
-            </a-upload>
+            </a-tooltip>
+          </div>
+          <div  class="profile__profile">
+            <h1>{{profileData.info.name}}</h1>
+            <p>个人说明：{{profileData.info.introduction}}</p>
+          </div>
+          <div class="profile__basic">
+            <div>
+              <b>uuid：</b>
+              <span>{{profileData.info.uuid}}</span>
             </div>
-          </a-tooltip>
-        </div>
-        <div  class="profile__profile">
-          <h1>{{profileData.info.name}}</h1>
-          <p>个人说明：{{profileData.info.introduction}}</p>
-        </div>
-        <div class="profile__basic">
-          <div>
-            <b>uuid：</b>
-            <span>{{profileData.info.uuid}}</span>
-          </div>
-          <div>
-            <b>手机号：</b>
-            <span>{{profileData.info.mobile}}</span>
-          </div>
-          <div>
-            <b>生日：</b>
-            <span>{{profileData.info.birth}}</span>
-          </div>
-          <div>
-            <b>性别：</b>
-            <span>{{profileData.info.mobile}}</span>
+            <div>
+              <b>手机号：</b>
+              <span>{{profileData.info.mobile}}</span>
+            </div>
+            <div>
+              <b>生日：</b>
+              <span>{{profileData.info.birth}}</span>
+            </div>
+            <div>
+              <b>性别：</b>
+              <span>{{profileData.info.mobile}}</span>
+            </div>
           </div>
         </div>
       </div>
+      <a-tabs v-model:activeKey="activeKey" :tabBarStyle="{padding: '0 10px'}">
+        <a-tab-pane key="1" tab="基础设置"><profile-change v-bind="profileData.info" @change="onProfileChange" /></a-tab-pane>
+        <a-tab-pane key="2" tab="密码修改"><password-reset /></a-tab-pane>
+      </a-tabs>
     </div>
-    <a-tabs v-model:activeKey="activeKey" :tabBarStyle="{padding: '0 10px'}">
-      <a-tab-pane key="1" tab="基础设置"><profile-change v-bind="profileData.info" @change="onProfileChange" /></a-tab-pane>
-      <a-tab-pane key="2" tab="密码修改"><password-reset /></a-tab-pane>
-    </a-tabs>
-  </div>
+  </layout>
 </template>
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref } from 'vue'

@@ -1,73 +1,75 @@
 <template>
-  <div class="content-header is-sticky">
-    <div>
-      <h1>角色管理</h1>
+  <layout>
+    <div class="content-header is-sticky">
+      <div>
+        <h1>角色管理</h1>
+      </div>
+      <div class="content-header__actions">
+        <a-button type="primary" @click="initAdd"><template #icon><usergroup-add-outlined /></template>添加角色</a-button>
+      </div>
     </div>
-    <div class="content-header__actions">
-      <a-button type="primary" @click="initAdd"><template #icon><usergroup-add-outlined /></template>添加角色</a-button>
-    </div>
-  </div>
-  <a-table
-  :loading="state.loading"
-  :dataSource="respState.list"
-  :columns="columns"
-  :pagination="{
-    total: respState.total,
-    current: state.params.page,
-    pageSize: state.params.pageSize,
-    showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
-  }"
-  @change="onTableChange">
-    <template #bodyCell="{ column, record }">
-      <template v-if="column.dataIndex === 'roleName'">
-        <team-outlined />
-        <span style="margin-left: 10px">{{record.roleName}}</span>
+    <a-table
+    :loading="state.loading"
+    :dataSource="respState.list"
+    :columns="columns"
+    :pagination="{
+      total: respState.total,
+      current: state.params.page,
+      pageSize: state.params.pageSize,
+      showSizeChanger: true, showTotal: (total) => `共 ${total} 条`
+    }"
+    @change="onTableChange">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'roleName'">
+          <team-outlined />
+          <span style="margin-left: 10px">{{record.roleName}}</span>
+        </template>
+        <template v-if="column.dataIndex === 'summary'">
+          <div>{{record.summary}}</div>
+        </template>
+        <template v-if="column.dataIndex === 'usersAmount'">
+          <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: record.roleUUID } }">{{record.usersAmount}}</router-link>
+        </template>
+        <template v-if="column.dataIndex === 'actions'">
+          <router-link :to="{ path: 'permission', query: { roleUUID: record.roleUUID } }">授权</router-link>
+          <a-divider type="vertical" />
+          <a @click="initEdit(record.roleUUID)">编辑</a>
+          <a-divider type="vertical" />
+          <a-popconfirm
+            title="确定要删除该角色吗?"
+            placement="topRight"
+            @confirm="onDelete(record.roleUUID)">
+            <a>删除</a>
+          </a-popconfirm>
+        </template>
       </template>
-      <template v-if="column.dataIndex === 'summary'">
-        <div>{{record.summary}}</div>
-      </template>
-      <template v-if="column.dataIndex === 'usersAmount'">
-        <router-link :to="{ path: '/role/assignedUsers', query: { roleUUID: record.roleUUID } }">{{record.usersAmount}}</router-link>
-      </template>
-      <template v-if="column.dataIndex === 'actions'">
-        <router-link :to="{ path: 'permission', query: { roleUUID: record.roleUUID } }">授权</router-link>
-        <a-divider type="vertical" />
-        <a @click="initEdit(record.roleUUID)">编辑</a>
-        <a-divider type="vertical" />
-        <a-popconfirm
-          title="确定要删除该角色吗?"
-          placement="topRight"
-          @confirm="onDelete(record.roleUUID)">
-          <a>删除</a>
-        </a-popconfirm>
-      </template>
-    </template>
-  </a-table>
-  <a-modal
-    v-model:visible="formState.visible"
-    :title="formState.type == 'add' ? '添加角色' : '修改角色'"
-    :maskClosable="false"
-    @cancel="onCancel"
-    @ok="onSubmit">
-    <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
-      <a-row :gutter="24">
-      <a-col :span="24">
-        <a-form-item label="角色名" name="roleName" :rules="[{ required: true, message: '请输入角色名称' }]">
-          <a-input v-model:value="formState.form.roleName" placeholder="角色名称" />
-        </a-form-item>
-      </a-col>
-      <a-col :span="24">
-        <a-form-item label="概述" name="summary" :rules="[{ required: true, message: '请简单描述一下角色' }]">
-          <a-textarea
-            v-model:value="formState.form.summary"
-            placeholder="简单描述一下角色"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
-          />
-        </a-form-item>
-      </a-col>
-    </a-row>
-    </a-form>
-  </a-modal>
+    </a-table>
+    <a-modal
+      v-model:visible="formState.visible"
+      :title="formState.type == 'add' ? '添加角色' : '修改角色'"
+      :maskClosable="false"
+      @cancel="onCancel"
+      @ok="onSubmit">
+      <a-form layout="vertical" ref="modalFormRef" :model="formState.form">
+        <a-row :gutter="24">
+        <a-col :span="24">
+          <a-form-item label="角色名" name="roleName" :rules="[{ required: true, message: '请输入角色名称' }]">
+            <a-input v-model:value="formState.form.roleName" placeholder="角色名称" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="概述" name="summary" :rules="[{ required: true, message: '请简单描述一下角色' }]">
+            <a-textarea
+              v-model:value="formState.form.summary"
+              placeholder="简单描述一下角色"
+              :auto-size="{ minRows: 2, maxRows: 5 }"
+            />
+          </a-form-item>
+        </a-col>
+      </a-row>
+      </a-form>
+    </a-modal>
+  </layout>
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
