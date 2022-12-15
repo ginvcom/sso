@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -26,6 +27,10 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+
+	if err := c.RestConf.SetUp(); err != nil {
+		log.Fatalf("error: config set up error, %s", err.Error())
+	}
 
 	// 添加全局日志字段
 	serviceNameField := logx.LogField{
