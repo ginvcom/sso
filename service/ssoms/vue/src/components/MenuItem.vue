@@ -27,8 +27,8 @@
     </template>
     <a-menu-item-group :key="n" :title="m.n" v-else-if="m.t == 2">
       <template #icon v-if="m.i">
-          <icon-font :type="m.i" />
-        </template>
+        <icon-font :type="m.i" />
+      </template>
     </a-menu-item-group>
   </template>
 </template>
