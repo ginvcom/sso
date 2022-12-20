@@ -98,10 +98,13 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 		placeholder = append(placeholder, args.Status)
 	}
 
-	// 有type的是menuOptions请求，不会有TopKey参数
 	if args.Typ != 0 {
 		where +=" and `type` = ?"
 		placeholder = append(placeholder, args.Typ)
+		if args.TopKey != "" {
+			where +=" and top_key = ?"
+			placeholder = append(placeholder, args.TopKey)
+		}
 		if args.ExcludeHide {
 			where +=" and sub_type !=3"
 		}
@@ -128,7 +131,6 @@ func (m *defaultObjectModel) ListData(ctx context.Context, args *ObjectListArgs)
 	var placeholder []interface{}
 	where, placeholder := args.getListConditions()
 	query := fmt.Sprintf("select %s from %s where %s order by sort, create_time", objectRows, m.table, where)
-	fmt.Println(query)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err != nil {
 		return

@@ -309,7 +309,7 @@ const onTableChange = ({ current, pageSize }) => {
  * 删除用户
  */
 const onDelete = (uuid: string) => {
-  deleteUser({ uuid }).then(() => {
+  deleteUser({}, uuid).then(() => {
     message.success('删除用户操作成功')
     getList()
   })
@@ -366,7 +366,7 @@ const initAdd = () => {
  * @param uuid
  */
 const initEdit = (uuid: string) => {
-  userDetail({ uuid }).then((data) => {
+  userDetail({}, uuid).then((data) => {
     formState.form = data
     uploadState.imageName = data.avatar
     uploadState.imageUrl = ossConfig.ginvdoc.domain + data.avatar
@@ -391,7 +391,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateUser({ uuid: formState.form.uuid! }, formState.form).then(() => {
+      updateUser({}, formState.form, formState.form.uuid!).then(() => {
         message.success('修改用户成功')
         formState.visible = false
         modalFormRef.value?.resetFields()
@@ -427,7 +427,6 @@ const beforeAvatarUpload = (files: UploadProps) => {
   if (!files) {
     return
   }
-  // console.log('beforeAvatarUpload', files.length)
   // if (files.length > 1) {
   //   message.error('只能上传一张图片!')
   //   return
@@ -456,26 +455,6 @@ const beforeAvatarUpload = (files: UploadProps) => {
   return false
 }
 
-const ossUpload = async (options: any) => {
-  return
-  const { onSuccess, onError, file, data, onProgress } = options
-  const name = getFileName(file)
-  options.filename = name
-  console.log(state.aliOss)
-  if (state.aliOss) {
-    try {
-      const res = await state.aliOss.multipartUpload(name, file, {
-        progress: (progress: number, checkpoint: any) => {
-          onProgress({ percent: progress * 100 })  // 执行onProgress 并传入当前进度，使得上传组件正确显示进度条
-        },
-      })
-      onSuccess(res)
-    } catch (e) {
-      onError()
-    }
-  }
-}
-
 const getBase64 = (img: Blob, callback: (base64Url: string) => void) => {
   const reader = new FileReader()
   reader.addEventListener('load', () => callback(reader.result as string))
@@ -483,18 +462,12 @@ const getBase64 = (img: Blob, callback: (base64Url: string) => void) => {
 }
 
 const onAvatarChange = (info: UploadChangeParam) => {
-  console.log(info)
   if (info.file.status === 'uploading') {
     uploadState.loading = true
     return
   }
   if (info.file.status === 'done') {
     uploadState.imageUrl = ossConfig.ginvdoc.domain + info.file.response.name
-    // Get this url from response in real world.
-    // getBase64((info.file as any).originFileObj, (base64Url: string) => {
-    //   uploadState.imageUrl = base64Url
-    //   uploadState.loading = false
-    // })
   }
   if (info.file.status === 'error') {
     uploadState.loading = false
@@ -508,7 +481,6 @@ const cropperState = reactive({
 })
 
 const onCrop = () => {
-  console.log('onCrop', cropper.value.getCroppedCanvas())
   const canvas = cropper.value.getCroppedCanvas()
   const cropImg = canvas.toDataURL()
   uploadState.imageUrl = cropImg

@@ -153,7 +153,6 @@ const beforeAvatarUpload = (files: UploadProps) => {
   if (!files) {
     return
   }
-  // console.log('beforeAvatarUpload', files.length)
   // if (files.length > 1) {
   //   message.error('只能上传一张图片!')
   //   return
@@ -164,7 +163,6 @@ const beforeAvatarUpload = (files: UploadProps) => {
   if (!isPic) {
     message.error('You can only upload JPG file!')
   }
-  console.log(44)
   const isLt2M = file.size! / 1024 / 1024 < 2
   if (!isLt2M) {
     message.error('Image must smaller than 2MB!')
@@ -189,18 +187,12 @@ const getBase64 = (img: Blob, callback: (base64Url: string) => void) => {
 }
 
 const onAvatarChange = (info: UploadChangeParam) => {
-  console.log(info)
   if (info.file.status === 'uploading') {
     uploadState.loading = true
     return
   }
   if (info.file.status === 'done') {
     uploadState.imageUrl = ossConfig.ginvdoc.domain + info.file.response.name
-    // Get this url from response in real world.
-    // getBase64((info.file as any).originFileObj, (base64Url: string) => {
-    //   uploadState.imageUrl = base64Url
-    //   uploadState.loading = false
-    // })
   }
   if (info.file.status === 'error') {
     uploadState.loading = false
@@ -234,7 +226,6 @@ const doUpload = async (blob: Blob) => {
           // onProgress({ percent: progress * 100 })  // 执行onProgress 并传入当前进度，使得上传组件正确显示进度条
         },
       })
-      console.log(res)
       uploadState.loading = false
       uploadState.imageUrl = ossConfig.ginvdoc.domain + res.name
       profileData.info.avatar = res.name

@@ -3,11 +3,12 @@ package object
 import (
 	"net/http"
 
-	"github.com/ginvcom/util"
-	"github.com/zeromicro/go-zero/rest/httpx"
 	"sso/service/ssoms/api/internal/logic/object"
 	"sso/service/ssoms/api/internal/svc"
 	"sso/service/ssoms/api/internal/types"
+
+	"github.com/ginvcom/util"
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func DeleteObjectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

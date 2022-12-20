@@ -366,7 +366,8 @@ type ObjectOption struct {
 }
 
 type MenuOptionsReq struct {
-	ExcludeHide bool `form:"excludeHide"` // 是否排查隐藏菜单
+	TopKey      string `form:"topKey"`
+	ExcludeHide bool   `form:"excludeHide"` // 是否排查隐藏菜单
 }
 
 type MenuOption struct {

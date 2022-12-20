@@ -173,7 +173,7 @@ const getList = () => {
 }
 
 const getPermissions = () => {
-  rolePermissions(state.params).then((data) => {
+  rolePermissions(state.params, state.params.roleUUID).then((data) => {
     formState.form.menuUUIDArray = data.menuUUIDArray
     formState.form.actionUUIDArray = data.actionUUIDArray
     state.roleName = data.roleName
@@ -256,7 +256,7 @@ const isAllApiChecked = (record: ObjectOption[]) => {
 }
 
 const onGrant = () => {
-  grant({ roleUUID: state.params.roleUUID }, formState.form).then(() => {
+  grant({}, formState.form, state.params.roleUUID).then(() => {
     message.success('授权操作成功')
   })
 }

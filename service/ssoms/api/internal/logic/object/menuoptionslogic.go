@@ -26,6 +26,7 @@ func NewMenuOptionsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MenuO
 
 func (l *MenuOptionsLogic) MenuOptions(req *types.MenuOptionsReq) (resp *types.MenuOptionsReply, err error) {
 	args := &model.ObjectListArgs{
+		TopKey:      req.TopKey,
 		Typ:         2,
 		Status:      1,
 		ExcludeHide: req.ExcludeHide,
