@@ -31,7 +31,6 @@ export interface StatisticReply {
 
 export interface UserListReq {
 }
-
 export interface UserListReqParams {
 	name: string
 	mobile: string
@@ -72,9 +71,7 @@ export interface AddUserReply {
 
 export interface UserDetailReq {
 }
-
 export interface UserDetailReqParams {
-	uuid: string
 }
 
 export interface UpdateUserReq {
@@ -87,9 +84,7 @@ export interface UpdateUserReq {
 	introduction: string
 	status: number
 }
-
 export interface UpdateUserReqParams {
-	uuid: string
 }
 
 export interface UpdateUserReply {
@@ -98,9 +93,7 @@ export interface UpdateUserReply {
 
 export interface DeleteUserReq {
 }
-
 export interface DeleteUserReqParams {
-	uuid: string
 }
 
 export interface DeleteUserReply {
@@ -109,7 +102,6 @@ export interface DeleteUserReply {
 
 export interface UserFilterOptionsReq {
 }
-
 export interface UserFilterOptionsReqParams {
 	name: string
 }
@@ -120,7 +112,6 @@ export interface UserFilterOptionsReply {
 
 export interface AssignedRolesReq {
 }
-
 export interface AssignedRolesReqParams {
 	uuid: string
 }
@@ -178,7 +169,6 @@ export interface PasswordResetReply {
 
 export interface RoleListReq {
 }
-
 export interface RoleListReqParams {
 	roleName: string
 	page: number
@@ -210,18 +200,14 @@ export interface AddRoleReply {
 
 export interface RoleDetailReq {
 }
-
 export interface RoleDetailReqParams {
-	roleUUID: string
 }
 
 export interface UpdateRoleReq {
 	roleName: string
 	summary: string
 }
-
 export interface UpdateRoleReqParams {
-	roleUUID: string
 }
 
 export interface UpdateRoleReply {
@@ -230,9 +216,7 @@ export interface UpdateRoleReply {
 
 export interface DeleteRoleReq {
 }
-
 export interface DeleteRoleReqParams {
-	roleUUID: string
 }
 
 export interface DeleteRoleReply {
@@ -245,7 +229,6 @@ export interface OptionsReply {
 
 export interface AssignedUsersReq {
 }
-
 export interface AssignedUsersReqParams {
 	roleUUID: string
 	page: number
@@ -271,9 +254,7 @@ export interface AssignedUsersReply {
 export interface AssignUserReq {
 	userUUID: string
 }
-
 export interface AssignUserReqParams {
-	roleUUID: string
 }
 
 export interface AssignUserReply {
@@ -283,9 +264,7 @@ export interface AssignUserReply {
 export interface DeassignUserReq {
 	userUUID: string
 }
-
 export interface DeassignUserReqParams {
-	roleUUID: string
 }
 
 export interface DeassignUserReply {
@@ -294,9 +273,7 @@ export interface DeassignUserReply {
 
 export interface InheritancesReq {
 }
-
 export interface InheritancesReqParams {
-	roleUUID: string
 }
 
 export interface InheritancesReply {
@@ -306,9 +283,7 @@ export interface InheritancesReply {
 export interface AddInheritanceReq {
 	extendedRoleUUIDArray: Array<string>
 }
-
 export interface AddInheritanceReqParams {
-	roleUUID: string
 }
 
 export interface AddInheritanceReply {
@@ -317,7 +292,6 @@ export interface AddInheritanceReply {
 
 export interface SystemListReq {
 }
-
 export interface SystemListReqParams {
 	systemCode: string
 	systemName: string
@@ -356,9 +330,7 @@ export interface AddSystemReply {
 
 export interface SystemDetailReq {
 }
-
 export interface SystemDetailReqParams {
-	uuid: string
 }
 
 export interface UpdateSystemReq {
@@ -370,9 +342,7 @@ export interface UpdateSystemReq {
 	icon: string // 图标
 	status: number
 }
-
 export interface UpdateSystemReqParams {
-	uuid: string
 }
 
 export interface UpdateSystemReply {
@@ -381,9 +351,7 @@ export interface UpdateSystemReply {
 
 export interface DeleteSystemReq {
 }
-
 export interface DeleteSystemReqParams {
-	uuid: string
 }
 
 export interface DeleteSystemReply {
@@ -392,7 +360,6 @@ export interface DeleteSystemReply {
 
 export interface ObjectListReq {
 }
-
 export interface ObjectListReqParams {
 	topKey: string // 传systemCode
 	objectName: string
@@ -426,8 +393,8 @@ export interface ObjectOption {
 
 export interface MenuOptionsReq {
 }
-
 export interface MenuOptionsReqParams {
+	topKey: string
 	excludeHide: boolean // 是否排查隐藏菜单
 }
 
@@ -487,9 +454,7 @@ export interface ImportObjectReply {
 
 export interface ObjectDetailReq {
 }
-
 export interface ObjectDetailReqParams {
-	uuid: string
 }
 
 export interface UpdateObjectReq {
@@ -505,9 +470,7 @@ export interface UpdateObjectReq {
 	pUUID?: string
 	topKey?: string // 更新时无法修改该值, 但是更新前需要使用该值校验对象是否已存在
 }
-
 export interface UpdateObjectReqParams {
-	uuid: string
 }
 
 export interface UpdateObjectReply {
@@ -516,9 +479,7 @@ export interface UpdateObjectReply {
 
 export interface DeleteObjectReq {
 }
-
 export interface DeleteObjectReqParams {
-	uuid: string
 }
 
 export interface DeleteObjectReply {
@@ -527,7 +488,6 @@ export interface DeleteObjectReply {
 
 export interface RoleOperationsReq {
 }
-
 export interface RoleOperationsReqParams {
 	topKey: string // 传systemCode
 }
@@ -538,9 +498,7 @@ export interface RoleOperationsReply {
 
 export interface RolePermissionsReq {
 }
-
 export interface RolePermissionsReqParams {
-	roleUUID: string
 	topKey: string
 }
 
@@ -555,9 +513,7 @@ export interface GrantReq {
 	menuUUIDArray: Array<string>
 	actionUUIDArray: Array<string>
 }
-
 export interface GrantReqParams {
-	roleUUID: string
 }
 
 export interface GrantReply {

@@ -33,6 +33,8 @@ export interface VerifyRequestReq {
 	systemCode: string
 	serviceCode: string
 	uri: string
+	method: string
+	menuURI: string
 }
 
 export interface VerifyRequestReply {
@@ -41,6 +43,8 @@ export interface VerifyRequestReply {
 }
 
 export interface SessionMenusReq {
+}
+export interface SessionMenusReqParams {
 	token: string
 	systemCode: string
 }
@@ -50,6 +54,7 @@ export interface Meta {
 	i: string // 菜单icon
 	u: string // 唯一标识符
 	t: number // 菜单类型，1菜单，2菜单组, 3隐藏菜单
+	p: Array<string> // 所有父级菜单uuid
 }
 
 export interface Menu {

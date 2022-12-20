@@ -280,7 +280,7 @@ const getList = () => {
  * 删除后台系统
  */
 const onDelete = (uuid: string) => {
-  deleteSystem({ uuid }).then(() => {
+  deleteSystem({}, uuid).then(() => {
     message.success('删除后台系统操作成功')
     getList()
   })
@@ -333,7 +333,7 @@ const initAdd = () => {
  * @param uuid
  */
 const initEdit = (uuid: string) => {
-  systemDetail({ uuid }).then((data: SystemForm) => {
+  systemDetail({}, uuid).then((data: SystemForm) => {
     formState.form = data
     formState.type = 'edit'
     formState.visible = true
@@ -356,7 +356,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateSystem({ uuid: formState.form.uuid! }, formState.form).then(() => {
+      updateSystem({}, formState.form, formState.form.uuid!).then(() => {
         message.success('修改后台系统成功')
         formState.visible = false
         modalFormRef.value?.resetFields()

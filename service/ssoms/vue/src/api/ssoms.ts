@@ -6,7 +6,7 @@ export * from "./ssomsComponents"
  * @description "首页统计数据"
  */
 export function homeStatistic() {
-	return ssoms.get<components.StatisticReply>("/home/statistic")
+	return ssoms.get<components.StatisticReply>(`/home/statistic`)
 }
 
 /**
@@ -14,7 +14,7 @@ export function homeStatistic() {
  * @param params
  */
 export function userList(params: components.UserListReqParams) {
-	return ssoms.get<components.UserListReply>("/user", params)
+	return ssoms.get<components.UserListReply>(`/user`, params)
 }
 
 /**
@@ -22,15 +22,15 @@ export function userList(params: components.UserListReqParams) {
  * @param req
  */
 export function addUser(req: components.UserForm) {
-	return ssoms.post<components.AddUserReply>("/user", req)
+	return ssoms.post<components.AddUserReply>(`/user`, req)
 }
 
 /**
  * @description "用户详情"
  * @param params
  */
-export function userDetail(params: components.UserDetailReqParams) {
-	return ssoms.get<components.UserForm>("/user/:uuid", params)
+export function userDetail(params: components.UserDetailReqParams, uuid: string) {
+	return ssoms.get<components.UserForm>(`/user/${uuid}`, params)
 }
 
 /**
@@ -38,16 +38,16 @@ export function userDetail(params: components.UserDetailReqParams) {
  * @param params
  * @param req
  */
-export function updateUser(params: components.UpdateUserReqParams, req: components.UpdateUserReq) {
-	return ssoms.put<components.UpdateUserReply>("/user/:uuid", params, req)
+export function updateUser(params: components.UpdateUserReqParams, req: components.UpdateUserReq, uuid: string) {
+	return ssoms.put<components.UpdateUserReply>(`/user/${uuid}`, params, req)
 }
 
 /**
  * @description "删除用户"
  * @param params
  */
-export function deleteUser(params: components.DeleteUserReqParams) {
-	return ssoms.delete<components.DeleteUserReply>("/user/:uuid", params)
+export function deleteUser(params: components.DeleteUserReqParams, uuid: string) {
+	return ssoms.delete<components.DeleteUserReply>(`/user/${uuid}`, params)
 }
 
 /**
@@ -55,7 +55,7 @@ export function deleteUser(params: components.DeleteUserReqParams) {
  * @param params
  */
 export function userFilterOptions(params: components.UserFilterOptionsReqParams) {
-	return ssoms.get<components.UserFilterOptionsReply>("/filterOptions", params)
+	return ssoms.get<components.UserFilterOptionsReply>(`/filterOptions`, params)
 }
 
 /**
@@ -63,7 +63,7 @@ export function userFilterOptions(params: components.UserFilterOptionsReqParams)
  * @param params
  */
 export function assignedRoles(params: components.AssignedRolesReqParams) {
-	return ssoms.get<components.AssignedRolesReply>("/assignedRoles", params)
+	return ssoms.get<components.AssignedRolesReply>(`/assignedRoles`, params)
 }
 
 /**
@@ -71,7 +71,7 @@ export function assignedRoles(params: components.AssignedRolesReqParams) {
  * @param req
  */
 export function assignRole(req: components.AssignRoleReq) {
-	return ssoms.post<components.AssignRoleReply>("/assignRole", req)
+	return ssoms.post<components.AssignRoleReply>(`/assignRole`, req)
 }
 
 /**
@@ -79,14 +79,14 @@ export function assignRole(req: components.AssignRoleReq) {
  * @param req
  */
 export function userPermissions(req: components.UserPermissionsReq) {
-	return ssoms.get<components.UserPermissionsReply>("/permissions", req)
+	return ssoms.get<components.UserPermissionsReply>(`/permissions`, req)
 }
 
 /**
  * @description "个人中心用户信息"
  */
 export function profile() {
-	return ssoms.get<components.UserForm>("/user/profile")
+	return ssoms.get<components.UserForm>(`/user/profile`)
 }
 
 /**
@@ -94,7 +94,7 @@ export function profile() {
  * @param req
  */
 export function avatarUpload(req: components.AvatarUploadReq) {
-	return ssoms.post<components.AvatarUploadReply>("/user/avatarUpload", req)
+	return ssoms.post<components.AvatarUploadReply>(`/user/avatarUpload`, req)
 }
 
 /**
@@ -102,7 +102,7 @@ export function avatarUpload(req: components.AvatarUploadReq) {
  * @param req
  */
 export function infoEdit(req: components.InfoEditReq) {
-	return ssoms.post<components.InfoEditReply>("/user/infoEdit", req)
+	return ssoms.post<components.InfoEditReply>(`/user/infoEdit`, req)
 }
 
 /**
@@ -110,7 +110,7 @@ export function infoEdit(req: components.InfoEditReq) {
  * @param req
  */
 export function passwordReset(req: components.PasswordResetReq) {
-	return ssoms.post<components.PasswordResetReply>("/user/passwordReset", req)
+	return ssoms.post<components.PasswordResetReply>(`/user/passwordReset`, req)
 }
 
 /**
@@ -118,7 +118,7 @@ export function passwordReset(req: components.PasswordResetReq) {
  * @param params
  */
 export function roleList(params: components.RoleListReqParams) {
-	return ssoms.get<components.RoleListReply>("/role", params)
+	return ssoms.get<components.RoleListReply>(`/role`, params)
 }
 
 /**
@@ -126,15 +126,15 @@ export function roleList(params: components.RoleListReqParams) {
  * @param req
  */
 export function addRole(req: components.RoleForm) {
-	return ssoms.post<components.AddRoleReply>("/role", req)
+	return ssoms.post<components.AddRoleReply>(`/role`, req)
 }
 
 /**
  * @description "角色详情"
  * @param params
  */
-export function roleDetail(params: components.RoleDetailReqParams) {
-	return ssoms.get<components.RoleForm>("/role/:roleUUID", params)
+export function roleDetail(params: components.RoleDetailReqParams, roleUUID: string) {
+	return ssoms.get<components.RoleForm>(`/role/${roleUUID}`, params)
 }
 
 /**
@@ -142,23 +142,23 @@ export function roleDetail(params: components.RoleDetailReqParams) {
  * @param params
  * @param req
  */
-export function updateRole(params: components.UpdateRoleReqParams, req: components.UpdateRoleReq) {
-	return ssoms.put<components.UpdateRoleReply>("/role/:roleUUID", params, req)
+export function updateRole(params: components.UpdateRoleReqParams, req: components.UpdateRoleReq, roleUUID: string) {
+	return ssoms.put<components.UpdateRoleReply>(`/role/${roleUUID}`, params, req)
 }
 
 /**
  * @description "删除角色"
  * @param params
  */
-export function deleteRole(params: components.DeleteRoleReqParams) {
-	return ssoms.delete<components.DeleteRoleReply>("/role/:roleUUID", params)
+export function deleteRole(params: components.DeleteRoleReqParams, roleUUID: string) {
+	return ssoms.delete<components.DeleteRoleReply>(`/role/${roleUUID}`, params)
 }
 
 /**
  * @description "角色已拥有的用户"
  */
 export function roleOptions() {
-	return ssoms.get<components.OptionsReply>("/role/options")
+	return ssoms.get<components.OptionsReply>(`/role/options`)
 }
 
 /**
@@ -166,7 +166,7 @@ export function roleOptions() {
  * @param params
  */
 export function assignedUsers(params: components.AssignedUsersReqParams) {
-	return ssoms.get<components.AssignedUsersReply>("/assignedUsers", params)
+	return ssoms.get<components.AssignedUsersReply>(`/assignedUsers`, params)
 }
 
 /**
@@ -174,8 +174,8 @@ export function assignedUsers(params: components.AssignedUsersReqParams) {
  * @param params
  * @param req
  */
-export function assignUser(params: components.AssignUserReqParams, req: components.AssignUserReq) {
-	return ssoms.patch<components.AssignUserReply>("/role/:roleUUID/assignUser", params, req)
+export function assignUser(params: components.AssignUserReqParams, req: components.AssignUserReq, roleUUID: string) {
+	return ssoms.patch<components.AssignUserReply>(`/role/${roleUUID}/assignUser`, params, req)
 }
 
 /**
@@ -183,16 +183,16 @@ export function assignUser(params: components.AssignUserReqParams, req: componen
  * @param params
  * @param req
  */
-export function deassignUser(params: components.DeassignUserReqParams, req: components.DeassignUserReq) {
-	return ssoms.patch<components.DeassignUserReply>("/role/:roleUUID/deassignUser", params, req)
+export function deassignUser(params: components.DeassignUserReqParams, req: components.DeassignUserReq, roleUUID: string) {
+	return ssoms.patch<components.DeassignUserReply>(`/role/${roleUUID}/deassignUser`, params, req)
 }
 
 /**
  * @description "角色已继承的角色"
  * @param params
  */
-export function inheritances(params: components.InheritancesReqParams) {
-	return ssoms.get<components.InheritancesReply>("/role/:roleUUID/inheritances", params)
+export function inheritances(params: components.InheritancesReqParams, roleUUID: string) {
+	return ssoms.get<components.InheritancesReply>(`/role/${roleUUID}/inheritances`, params)
 }
 
 /**
@@ -200,8 +200,8 @@ export function inheritances(params: components.InheritancesReqParams) {
  * @param params
  * @param req
  */
-export function extendRole(params: components.AddInheritanceReqParams, req: components.AddInheritanceReq) {
-	return ssoms.patch<components.AddInheritanceReply>("/role/:roleUUID/addInheritance", params, req)
+export function extendRole(params: components.AddInheritanceReqParams, req: components.AddInheritanceReq, roleUUID: string) {
+	return ssoms.patch<components.AddInheritanceReply>(`/role/${roleUUID}/addInheritance`, params, req)
 }
 
 /**
@@ -209,7 +209,7 @@ export function extendRole(params: components.AddInheritanceReqParams, req: comp
  * @param params
  */
 export function systemList(params: components.SystemListReqParams) {
-	return ssoms.get<components.SystemListReply>("/system", params)
+	return ssoms.get<components.SystemListReply>(`/system`, params)
 }
 
 /**
@@ -217,15 +217,15 @@ export function systemList(params: components.SystemListReqParams) {
  * @param req
  */
 export function addSystem(req: components.SystemForm) {
-	return ssoms.post<components.AddSystemReply>("/system", req)
+	return ssoms.post<components.AddSystemReply>(`/system`, req)
 }
 
 /**
  * @description "系统详情"
  * @param params
  */
-export function systemDetail(params: components.SystemDetailReqParams) {
-	return ssoms.get<components.SystemForm>("/system/:uuid", params)
+export function systemDetail(params: components.SystemDetailReqParams, uuid: string) {
+	return ssoms.get<components.SystemForm>(`/system/${uuid}`, params)
 }
 
 /**
@@ -233,16 +233,16 @@ export function systemDetail(params: components.SystemDetailReqParams) {
  * @param params
  * @param req
  */
-export function updateSystem(params: components.UpdateSystemReqParams, req: components.UpdateSystemReq) {
-	return ssoms.put<components.UpdateSystemReply>("/system/:uuid", params, req)
+export function updateSystem(params: components.UpdateSystemReqParams, req: components.UpdateSystemReq, uuid: string) {
+	return ssoms.put<components.UpdateSystemReply>(`/system/${uuid}`, params, req)
 }
 
 /**
  * @description "删除系统"
  * @param params
  */
-export function deleteSystem(params: components.DeleteSystemReqParams) {
-	return ssoms.delete<components.DeleteSystemReply>("/system/:uuid", params)
+export function deleteSystem(params: components.DeleteSystemReqParams, uuid: string) {
+	return ssoms.delete<components.DeleteSystemReply>(`/system/${uuid}`, params)
 }
 
 /**
@@ -250,7 +250,7 @@ export function deleteSystem(params: components.DeleteSystemReqParams) {
  * @param params
  */
 export function objectList(params: components.ObjectListReqParams) {
-	return ssoms.get<components.ObjectListReply>("/object", params)
+	return ssoms.get<components.ObjectListReply>(`/object`, params)
 }
 
 /**
@@ -258,15 +258,15 @@ export function objectList(params: components.ObjectListReqParams) {
  * @param req
  */
 export function addObject(req: components.ObjectForm) {
-	return ssoms.post<components.AddObjectReply>("/object", req)
+	return ssoms.post<components.AddObjectReply>(`/object`, req)
 }
 
 /**
  * @description "操作对象详情"
  * @param params
  */
-export function objectDetail(params: components.ObjectDetailReqParams) {
-	return ssoms.get<components.ObjectForm>("/object/:uuid", params)
+export function objectDetail(params: components.ObjectDetailReqParams, uuid: string) {
+	return ssoms.get<components.ObjectForm>(`/object/${uuid}`, params)
 }
 
 /**
@@ -274,7 +274,7 @@ export function objectDetail(params: components.ObjectDetailReqParams) {
  * @param req
  */
 export function importObject(req: components.ImportObjectReq) {
-	return ssoms.post<components.ImportObjectReply>("/object/import", req)
+	return ssoms.post<components.ImportObjectReply>(`/object/import`, req)
 }
 
 /**
@@ -282,16 +282,16 @@ export function importObject(req: components.ImportObjectReq) {
  * @param params
  * @param req
  */
-export function updateObject(params: components.UpdateObjectReqParams, req: components.UpdateObjectReq) {
-	return ssoms.put<components.UpdateObjectReply>("/object/:uuid", params, req)
+export function updateObject(params: components.UpdateObjectReqParams, req: components.UpdateObjectReq, uuid: string) {
+	return ssoms.put<components.UpdateObjectReply>(`/object/${uuid}`, params, req)
 }
 
 /**
  * @description "删除操作对象"
  * @param params
  */
-export function deleteObject(params: components.DeleteObjectReqParams) {
-	return ssoms.delete<components.DeleteObjectReply>("/object/:uuid", params)
+export function deleteObject(params: components.DeleteObjectReqParams, uuid: string) {
+	return ssoms.delete<components.DeleteObjectReply>(`/object/${uuid}`, params)
 }
 
 /**
@@ -299,7 +299,7 @@ export function deleteObject(params: components.DeleteObjectReqParams) {
  * @param params
  */
 export function menuOptions(params: components.MenuOptionsReqParams) {
-	return ssoms.get<components.MenuOptionsReply>("/object/menuOptions", params)
+	return ssoms.get<components.MenuOptionsReply>(`/object/menuOptions`, params)
 }
 
 /**
@@ -307,15 +307,15 @@ export function menuOptions(params: components.MenuOptionsReqParams) {
  * @param params
  */
 export function roleOperations(params: components.RoleOperationsReqParams) {
-	return ssoms.get<components.RoleOperationsReply>("/object/roleOperations", params)
+	return ssoms.get<components.RoleOperationsReply>(`/object/roleOperations`, params)
 }
 
 /**
  * @description "角色已分配的权限"
  * @param params
  */
-export function rolePermissions(params: components.RolePermissionsReqParams) {
-	return ssoms.get<components.RolePermissionsReply>("/permission/role/:roleUUID/Permissions", params)
+export function rolePermissions(params: components.RolePermissionsReqParams, roleUUID: string) {
+	return ssoms.get<components.RolePermissionsReply>(`/permission/role/${roleUUID}/Permissions`, params)
 }
 
 /**
@@ -323,6 +323,6 @@ export function rolePermissions(params: components.RolePermissionsReqParams) {
  * @param params
  * @param req
  */
-export function grant(params: components.GrantReqParams, req: components.GrantReq) {
-	return ssoms.put<components.GrantReply>("/permission/role/:roleUUID/grant", params, req)
+export function grant(params: components.GrantReqParams, req: components.GrantReq, roleUUID: string) {
+	return ssoms.put<components.GrantReply>(`/permission/role/${roleUUID}/grant`, params, req)
 }

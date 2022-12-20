@@ -7,7 +7,7 @@ export * from "./authComponents"
  * @param req
  */
 export function signIn(req: components.SignInReq) {
-	return auth.post<components.SignInReply>("/sign-in", req)
+	return auth.post<components.SignInReply>(`/sign-in`, req)
 }
 
 /**
@@ -15,20 +15,20 @@ export function signIn(req: components.SignInReq) {
  * @param req
  */
 export function verify(req: components.VerifyRequestReq) {
-	return auth.post<components.VerifyRequestReply>("/verify-request", req)
+	return auth.post<components.VerifyRequestReply>(`/verify-request`, req)
 }
 
 /**
  * @description "当前作用的角色分配的菜单权限"
- * @param req
+ * @param params
  */
-export function menus() {
-	return auth.get<components.SessionMenusReply>("/session-menus")
+export function menus(params: components.SessionMenusReqParams) {
+	return auth.get<components.SessionMenusReply>(`/session-menus`, params)
 }
 
 /**
  * @description "退出登录"
  */
 export function signOut() {
-	return auth.post<components.SignOutReply>("/sign-out")
+	return auth.post<components.SignOutReply>(`/sign-out`)
 }

@@ -166,7 +166,7 @@ const onTableChange = ({ current, pageSize }) => {
  * 删除角色
  */
 const onDelete = (roleUUID: string) => {
-  deleteRole({ roleUUID }).then(() => {
+  deleteRole({}, roleUUID).then(() => {
     message.success('删除角色操作成功')
     getList()
   })
@@ -208,7 +208,7 @@ const initAdd = () => {
  * @param roleUUID
  */
 const initEdit = (roleUUID: string) => {
-  roleDetail({ roleUUID }).then((data: RoleForm) => {
+  roleDetail({}, roleUUID).then((data: RoleForm) => {
     formState.type = 'edit'
     formState.form = data
     formState.visible = true
@@ -231,7 +231,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateRole({ roleUUID: formState.form.roleUUID! }, formState.form).then(() => {
+      updateRole({}, formState.form, formState.form.roleUUID!).then(() => {
         message.success('修改角色成功')
         formState.visible = false
         modalFormRef.value?.resetFields()

@@ -326,7 +326,7 @@
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref, createVNode, nextTick, onBeforeUnmount } from 'vue'
 import AdvancedSearch from '@/components/AdvancedSearch.vue'
-import { DownloadOutlined, ExclamationCircleOutlined, EllipsisOutlined, ExclamationOutlined, LineOutlined, CloseOutlined, UploadOutlined, PlusOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
+import { DownloadOutlined, ExclamationCircleOutlined, EllipsisOutlined, ExclamationOutlined, LineOutlined, UploadOutlined, PlusOutlined, AppstoreOutlined } from '@ant-design/icons-vue'
 // Object 是js的关键字, 别名处理一下
 import {
   objectList,
@@ -334,7 +334,6 @@ import {
   addObject,
   importObject,
   menuOptions,
-  MenuOptionsReply,
   MenuOption,
   updateObject,
   deleteObject,
@@ -501,7 +500,7 @@ const getList = () => {
  * 删除对象
  */
 const onDelete = (uuid: string) => {
-  deleteObject({ uuid }).then(() => {
+  deleteObject({}, uuid).then(() => {
     message.success('删除对象操作成功')
     getList()
   })
@@ -540,7 +539,7 @@ const formState = reactive<Form>({
 })
 
 const initAddMenu = (pUUID?: string) => {
-  menuOptions({ excludeHide: true }).then(data => {
+  menuOptions({ topKey: state.params.topKey, excludeHide: true }).then(data => {
     state.menus = data.list
     formState.form = {
       uuid: '',
@@ -565,8 +564,8 @@ const initAddMenu = (pUUID?: string) => {
  * @param uuid
  */
 const initEditMenu = (uuid: string) => {
-  objectDetail({ uuid }).then(data => {
-    menuOptions({ excludeHide: true }).then(menudata => {
+  objectDetail({}, uuid).then(data => {
+    menuOptions({ topKey: state.params.topKey, excludeHide: true }).then(menudata => {
       state.menus = menudata.list
       formState.form = data
       formState.type = 'edit'
@@ -576,8 +575,8 @@ const initEditMenu = (uuid: string) => {
 }
 
 const initEditApi = (uuid: string) => {
-  objectDetail({ uuid }).then(data => {
-    menuOptions({ excludeHide: false }).then(menudata => {
+  objectDetail({}, uuid).then(data => {
+    menuOptions({ topKey: state.params.topKey, excludeHide: false }).then(menudata => {
       state.apiParentMenus = menudata.list
       formState.form = data
       formState.type = 'edit'
@@ -587,7 +586,7 @@ const initEditApi = (uuid: string) => {
 }
 
 const initAddApi = (pUUID?: string) => {
-  menuOptions({ excludeHide: false }).then(data => {
+  menuOptions({ topKey: state.params.topKey, excludeHide: false }).then(data => {
     state.apiParentMenus = data.list
     formState.form = {
       uuid: '',
@@ -625,7 +624,7 @@ const onSubmit = () =>{
         formState.loading = false
       })
     } else {
-      updateObject({ uuid: formState.form.uuid! }, formState.form).then(() => {
+      updateObject({}, formState.form, formState.form.uuid!).then(() => {
         message.success('修改菜单成功')
         formState.visible = false
         formState.apiVisible = false
