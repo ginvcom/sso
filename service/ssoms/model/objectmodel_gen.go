@@ -98,10 +98,13 @@ func (args *ObjectListArgs) getListConditions () (where string, placeholder []in
 		placeholder = append(placeholder, args.Status)
 	}
 
-	// 有type的是menuOptions请求，不会有TopKey参数
 	if args.Typ != 0 {
 		where +=" and `type` = ?"
 		placeholder = append(placeholder, args.Typ)
+		if args.TopKey != "" {
+			where +=" and top_key = ?"
+			placeholder = append(placeholder, args.TopKey)
+		}
 		if args.ExcludeHide {
 			where +=" and sub_type !=3"
 		}
