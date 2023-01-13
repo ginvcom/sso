@@ -9,4 +9,5 @@ cd model
 goctl model mysql ddl -src ./sql/*.sql -dir .
 
 cd auth/api
-goctl api ts -api auth.api -dir ../../ssoms/vue/src/api -caller auth -webapi @/config -unwrap 
+goctl api ts -api auth.api -dir ../../ssoms/vue/src/api -caller auth -webapi @/config -unwrap
+goctl api go -api auth.api -dir .
