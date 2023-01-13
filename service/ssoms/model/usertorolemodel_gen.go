@@ -186,7 +186,6 @@ func (m *defaultUserToRoleModel) FindOne(ctx context.Context, userUuid string, r
 	}
 	resp = new(UserToRole)
 	err = stmt.QueryRowCtx(ctx, resp, userUuid, roleUuid)
-	fmt.Println(err, err == sqlc.ErrNotFound)
 	if err == sqlc.ErrNotFound {
 		err = ErrNotFound
 	}
@@ -256,7 +255,6 @@ func (m *defaultUserToRoleModel) TransAddRoleUUIDArrayByUserUUID(ctx context.Con
 	}
 	
 	query := fmt.Sprintf("insert into %s(%s) values %s on duplicate key update `is_delete`= 0", m.table, userToRoleInsertFeilds, fields)
-	fmt.Println(query, placeholder)
 	stmt, err:= session.PrepareCtx(ctx, query)
 	if err != nil{
 		return

@@ -94,7 +94,6 @@ func (m *defaultPermissionModel) Update(ctx context.Context, data *Permission) e
 
 func (m *defaultPermissionModel) PermissionByRoleUUID(ctx context.Context, roleUuid, topKey string) (resp *[]Permission, err error) {
 	query := fmt.Sprintf("select %s from %s where `is_delete` = 0 and `role_uuid` = ? and `top_key` = ?", permissionRows, m.table)
-	fmt.Println(query)
 	stmt, err:= m.conn.PrepareCtx(ctx, query)
 	if err != nil {
 		return

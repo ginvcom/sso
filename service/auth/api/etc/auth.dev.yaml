@@ -5,7 +5,7 @@ Port: 8888
 Log:
   ServiceName: auth
   Mode: console
-  Path: ./logs/auth
+  Path: ./logs/auth/api
 Etcd:
   Hosts:
     - 127.0.0.1:2379

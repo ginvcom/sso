@@ -5,7 +5,7 @@ Port: 8888
 Log:
   ServiceName: auth
   Mode: file
-  Path: ./logs/auth
+  Path: ./logs/auth/api
   KeepDays: 3
 Etcd:
   Hosts:

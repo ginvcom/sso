@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -36,7 +35,6 @@ func GetMeta(r *http.Request) (c Meta, err error) {
 	c.SystemCode = r.Header.Get("x-client-system")
 	c.ServiceCode = r.Header.Get("x-client-service")
 	c.URI = r.URL.RequestURI()
-	fmt.Println("c.URI", c.URI)
 	if strings.Contains(destination, "text/html") {
 		c.SystemCode = r.URL.Query().Get("system")
 		if c.SystemCode == "" {

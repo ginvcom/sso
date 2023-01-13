@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package auth.rpc;
+
+option go_package = "./auth";
+
+message TokenReq{
+  string token = 1;
+}
+
+message UserInfoReply{
+  string uuid = 1;
+  string name = 2;
+  string mobile = 3;
+  string avatar = 4;
+  int64 gender = 5;
+  string birth = 6;
+  string introduction = 7;
+  int64 status = 8;
+}
+
+service auth {
+  rpc getUser(TokenReq) returns(UserInfoReply);
+}

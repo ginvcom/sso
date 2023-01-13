@@ -1,0 +1,21 @@
+Name: auth.rpc
+ListenOn: 0.0.0.0:8080
+Log:
+  ServiceName: auth.rpc
+  Mode: file
+  Path: ./logs/auth/rpc
+  KeepDays: 3
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: auth.rpc
+Mysql:
+  DataSource: root:123456@tcp(127.0.0.1:13306)/sso?parseTime=true&loc=Asia%2FShanghai
+CacheRedis:
+  - Host: localhost:16379
+    Type: node
+JwtAuth:
+  AccessSecret: ginv123456
+  AccessExpire: 86400
+  RememberAccessExpire: 604800
+
