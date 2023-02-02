@@ -22,7 +22,7 @@
     @change="onTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'name'">
-          <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
+          <a-avatar :src="ossConfig.doc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
             <template #icon><UserOutlined /></template>
           </a-avatar>
           <span style="margin-left: 10px">{{record.name}}</span>
@@ -70,7 +70,7 @@
           >
             <a-select-option v-for="option in userOptionState.options" :key="option.value" :value="option.value" :label="option.label">
               <div>
-                <a-avatar :src="ossConfig.ginvdoc.domain + option.extra" style="color: #f56a00; background-color: #fde3cf">
+                <a-avatar :src="ossConfig.doc.domain + option.extra" style="color: #f56a00; background-color: #fde3cf">
                   <template #icon><UserOutlined /></template>
                 </a-avatar>
                 <span style="margin-left: 10px">{{option.label}}</span>
