@@ -10,4 +10,5 @@ UserCookieDomin: localhost
 Upstreams:
   auth: http://localhost:8888
   ssoms: http://localhost:8889
-  docms: http://localhost:8890
+  oss: http://localhost:8890
+  docms: http://localhost:8891
