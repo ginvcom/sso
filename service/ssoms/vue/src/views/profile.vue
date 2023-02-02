@@ -128,7 +128,7 @@ onBeforeMount(() => {
   profile().then(data => {
     profileData.info = data
     uploadState.imageName = data.avatar
-    uploadState.imageUrl = ossConfig.ginvdoc.domain + data.avatar
+    uploadState.imageUrl = ossConfig.doc.domain + data.avatar
   })
 })
 
@@ -192,7 +192,7 @@ const onAvatarChange = (info: UploadChangeParam) => {
     return
   }
   if (info.file.status === 'done') {
-    uploadState.imageUrl = ossConfig.ginvdoc.domain + info.file.response.name
+    uploadState.imageUrl = ossConfig.doc.domain + info.file.response.name
   }
   if (info.file.status === 'error') {
     uploadState.loading = false
@@ -227,7 +227,7 @@ const doUpload = async (blob: Blob) => {
         },
       })
       uploadState.loading = false
-      uploadState.imageUrl = ossConfig.ginvdoc.domain + res.name
+      uploadState.imageUrl = ossConfig.doc.domain + res.name
       profileData.info.avatar = res.name
     } catch (e) {
       // onError()
