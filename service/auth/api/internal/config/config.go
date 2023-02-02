@@ -21,8 +21,20 @@ type Config struct {
 	// NoAuthUrls是一个无需权限校验白名单
 	// map的key是页面菜单的key, 数组元素是无需校验权限的请求(匹配请求方式和请求path)
 	// 有条件的做成配置中心配置这个无需权限校验白名单
-	NoAuthUrls map[string][]struct {
-		Path   string
-		Method string
-	}
+	NoAuthUrls []ServiceNoAuthData
+}
+
+type ServiceNoAuthData struct {
+	SystemCode string // 服务的ServiceCode
+	NoAuthData []NoAuthItem
+}
+
+type NoAuthItem struct {
+	Menu string
+	Urls []NoAuthUrl
+}
+
+type NoAuthUrl struct {
+	Method string
+	Path   string
 }

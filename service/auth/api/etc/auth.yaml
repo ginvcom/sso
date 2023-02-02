@@ -21,24 +21,63 @@ Auth:
   AccessExpire: 86400
   RememberAccessExpire: 604800
 NoAuthUrls:
-  /:
-    - Path: /home/statistic
-      Method: GET
-    - Path: /object
-      Method: GET
-  /user:
-    - Path: /assignedRoles
-      Method: GET
-  /object:
-    - Path: /object/menuOptions
-      Method: GET
-  /permission:
-    - Path: /object/roleOperations
-      Method: GET
-    - Path: /permission/role/:roleUUID/Permissions
-      Method: GET
-  /profile:
-    - Path: /user/profile
-      Method: GET
-    - Path: /user/infoEdit
-      Method: POST
+  - systemCode: ssoms
+    noAuthData:
+      - menu: /
+        urls:
+          - Path: /home/statistic
+            Method: GET
+          - Path: /object
+            Method: GET
+      - menu: '/user'
+        urls:
+          - Path: /assignedRoles
+            Method: GET
+          - Path: /aliyun/sts
+            Method: GET
+      - menu: '/system'
+        urls:
+          - Path: /aliyun/sts
+            Method: GET
+      - menu: '/object'
+        urls:
+          - Path: /object/menuOptions
+            Method: GET
+      - menu: '/permission'
+        urls:
+          - Path: /object/roleOperations
+            Method: GET
+          - Path: /permission/role/:roleUUID/Permissions
+            Method: GET
+      - menu: '/profile'
+        urls:
+          - Path: /user/profile
+            Method: GET
+          - Path: /user/infoEdit
+            Method: POST
+  - systemCode: 'docms'
+    noAuthData:
+      - menu: /
+        urls:
+          - Path: /book
+            Method: GET
+          - Path: /book
+            Method: POST
+      - menu: /book/read
+        urls:
+          - Path: /book/:bookUUID/docs
+            Method: GET
+          - Path: /doc/:docUUID/rename
+            Method: PATCH
+          - Path: /doc
+            Method: POST
+          - Path: /doc/:docUUID/detial
+            Method: GET
+          - Path: /doc/:docUUID/content
+            Method: GET
+          - Path: /doc/:docUUID/content
+            Method: PUT
+          - Path: /doc/:docUUID
+            Method: DELETE
+          - Path: /bookDocsSort
+            Method: POST
