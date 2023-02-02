@@ -1,37 +1,54 @@
 import OSS from 'ali-oss'
-import { getFileName } from './file'
-import Ajax from './ajax'
-import type { UploadFile } from 'ant-design-vue'
+import { UnwrapNestedRefs, toRefs } from 'vue'
+import type { UploadProps, UploadFile } from 'ant-design-vue'
 import { UploadFileStatus } from 'ant-design-vue/lib/upload/interface'
 
-class AliyunOSS implements UploadFile {
+export interface StsInfo {
+  bucket: string
+  accessKeyId: string
+  accessKeySecret: string
+  endpoint: string
+  stsToken: string
+}
+export default class AliyunOSS implements UploadFile {
   public uid: string = ''
   public name: string = ''
   public file?: File
   public size?: number | undefined
   public percent?: number | undefined
   public status?: UploadFileStatus | undefined
-  private accessKeyId: string
-  private accessKeySecret: string
+  public store?: OSS
   private bucket: string
-  private endpoint: string
-  private store?: OSS
+  private stsInfo: StsInfo
   private retryMax: number = 3
   private abortCheckpoint: any // 用于存放中断点
+  private storagePrefix = 'aliyun.oss.'
+  private refreshSTSToken: () => Promise<StsInfo>
+  private uploadState: UnwrapNestedRefs<UploadProps>
 
-  constructor (bucket: string, accessKeyId: string, accessKeySecret: string, endpoint: string) {
+  constructor (bucket: string, refreshSTSToken: () => Promise<StsInfo>, uploadState: UnwrapNestedRefs<UploadProps>) {
     this.bucket = bucket
-    this.accessKeyId = accessKeyId
-    this.accessKeySecret = accessKeySecret
-    this.endpoint = endpoint
-    this.uid = ''
+    this.refreshSTSToken = refreshSTSToken
+    this.uploadState = uploadState
+    const key = this.storagePrefix + bucket
+    const basicInfo = localStorage.getItem(key)
+    this.stsInfo = { bucket: '', accessKeyId: '', accessKeySecret: '', endpoint: '', stsToken: '' }
+    if (basicInfo === null) {
+      this.refreshSTSToken().then(stsRes => {
+        this.stsInfo = stsRes
+        this.initRequest()
+      })
+    } else {
+      const { bucket: realBucket, accessKeyId, accessKeySecret, endpoint, stsToken } = JSON.parse(basicInfo)
+      this.stsInfo = { bucket: realBucket, accessKeyId, accessKeySecret, endpoint, stsToken }
+      this.initRequest()
+    }
   }
 
   // Starts the upload process.
-  xhr () {
-    this.initRequest()
-    return this.sendRequest()
-  }
+  // xhr () {
+  //   return this.sendRequest()
+  // }
 
   // 中断分片上次
   abort () {
@@ -40,56 +57,40 @@ class AliyunOSS implements UploadFile {
     }
   }
 
-  // Initializes the XMLHttpRequest object using the URL passed to the constructor.
   private initRequest () {
     this.store = new OSS({
-      accessKeyId: this.accessKeyId,
-      accessKeySecret: this.accessKeySecret,
-      bucket: this.bucket,
-      endpoint: this.endpoint,
+      accessKeyId: this.stsInfo.accessKeyId || 'yourAccessKeyId',
+      accessKeySecret: this.stsInfo.accessKeySecret || 'yourAccessKeySecret',
+      bucket: this.stsInfo.bucket,
+      endpoint: this.stsInfo.endpoint,
+      stsToken: this.stsInfo.stsToken,
       refreshSTSToken: async () => {
-        const ajax = new Ajax('','')
-        const info = await ajax.get('aliyun/sts', { bucket: 'doc' }) as any
-        return {
-          accessKeyId: info.accessKeyId,
-          accessKeySecret: info.accessKeySecret,
-          stsToken: info.stsToken
-        }
+        const stsRes = await this.refreshSTSToken()
+        const key = this.storagePrefix + this.bucket
+        localStorage.setItem(key, JSON.stringify(stsRes))
+        return { accessKeyId: stsRes.accessKeyId, accessKeySecret: stsRes.accessKeySecret, stsToken: stsRes.stsToken }
       },
       refreshSTSTokenInterval: 300000
     })
   }
 
-  private async sendRequest () {
-    // const data = new FormData()
-    // data.append('upload', file)
-    // this.xhr.send(data)
-    console.log(this.store)
-    if (!this.store || !this.file) {
-      return
-    }
-    for (let i = 0; i <= this.retryMax; i++) {
+  public async sendRequest (file: UploadFile) {
+    if (this.store && this.uploadState.fileList) {
+      const index = this.uploadState.fileList.findIndex(f => f.uid === file.uid)
+      if (index < 0) {
+        return
+      }
       try {
-        // object表示上传到OSS的文件名称。
-        // file表示浏览器中需要上传的文件，支持HTML5 file和Blob类型。
-        this.name = getFileName(this.file)
-        const result = await this.store.multipartUpload(this.name, this.file, {
-          progress: (p: any, cpt: any, res: any) => {
-            // 为中断点赋值。
-            this.abortCheckpoint = cpt
-            // 获取上传进度。
-            console.log(cpt, res)
-            this.status = 'uploading'
-            // // this.loader.uploadedPercent = p
-            this.percent = p
-          }
+        await this.store.multipartUpload(file.name, file, {
+          progress: (progress: number, checkpoint: any) => {
+            this.uploadState.fileList![index].status = 'uploading'
+            this.uploadState.fileList![index].percent = progress * 100
+          },
         })
-        this.percent = 100
-        this.status = 'success'
-        return Promise.resolve({ default: (result.res as any).requestUrls[0] })
+        this.uploadState.fileList[index].status = 'success'
+        this.uploadState.fileList[index].name = file.name
       } catch (e) {
-        this.status = 'error'
-        return Promise.reject((e as Error).message)
+        this.uploadState.fileList[index].status = 'error'
       }
     }
   }

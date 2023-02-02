@@ -21,7 +21,7 @@
     @change="onTableChange">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'name'">
-          <a-avatar :src="ossConfig.ginvdoc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
+          <a-avatar :src="ossConfig.doc.domain + record.avatar" style="color: #f56a00; background-color: #fde3cf">
             <template #icon><UserOutlined /></template>
           </a-avatar>
           <span style="margin-left: 10px">{{record.name}}</span>
@@ -86,11 +86,16 @@
                 @change="onAvatarChange"
               >
                 <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
-                <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
+                <a-avatar
+                  v-if="uploadState.fileList && uploadState.fileList.length > 0"
+                  class="avatar-uploader__img" :size="200" shape="square"
+                  :src="ossConfig.doc.domain + uploadState.fileList[0].name"
+                  style="color: #f56a00; background-color: #fde3cf"
+                >
                   <template #icon><UserOutlined /></template>
                 </a-avatar>
                 <div>
-                  <loading-outlined v-if="uploadState.loading"></loading-outlined>
+                  <loading-outlined v-if="uploadState.fileList && uploadState.fileList.length > 0 && uploadState.fileList[0].status === 'uploading'"></loading-outlined>
                   <plus-outlined v-else></plus-outlined>
                   <div class="ant-upload-text">上传</div>
                 </div>
@@ -201,12 +206,12 @@ import {
   Option,
 assignRole
 } from '@/api/ssoms'
-import { sts } from '../api/aliOss'
-import type { FormInstance, UploadChangeParam, UploadProps } from 'ant-design-vue'
+import { sts } from '@/api/oss'
+import type { FormInstance, UploadChangeParam, UploadProps, UploadFile } from 'ant-design-vue'
 import { message, Empty } from 'ant-design-vue'
 import { UserOutlined, PlusOutlined, LoadingOutlined, UserAddOutlined, TeamOutlined } from '@ant-design/icons-vue'
-import OSS from 'ali-oss'
-import { getFileName } from '@/utils/file'
+import AliyunOSS, { StsInfo } from '@/utils/aliyunOSS'
+import { getFileName, getBase64 } from '@/utils/file'
 import { ossConfig } from '@/config'
 
 /**
@@ -268,21 +273,20 @@ const state = reactive<State>({
 /**
  * 这是列表响应
  */
-// //ginvdoc.oss-cn-shenzhen.aliyuncs.com/1165839836329658.png
 const respState = reactive<UserListReply>({
   total: 0,
   list: []
 })
 
+const refreshSTSToken = async (bucket: string) => {
+  const res = await sts({ bucket })
+  return Promise.resolve(res as StsInfo)
+}
+
+const uploadState = reactive<UploadProps>({ fileList: [] })
+
 onMounted(() => {
-  state.aliOss = new OSS({
-    ...ossConfig.ginvdoc,
-    refreshSTSToken: async () => {
-      const info = await sts({ bucket: 'doc' })
-      return info
-    },
-    refreshSTSTokenInterval: 300000
-  })
+  state.aliOss = new AliyunOSS(ossConfig.doc.bucket, () => refreshSTSToken(ossConfig.doc.bucket), uploadState)
   getList()
 })
 
@@ -354,8 +358,6 @@ const initAdd = () => {
     status: 1,
     introduction: ''
   }
-  uploadState.imageName = ''
-  uploadState.imageUrl = ''
   formState.type = 'add'
   formState.visible = true
 }
@@ -368,8 +370,7 @@ const initAdd = () => {
 const initEdit = (uuid: string) => {
   userDetail({}, uuid).then((data) => {
     formState.form = data
-    uploadState.imageName = data.avatar
-    uploadState.imageUrl = ossConfig.ginvdoc.domain + data.avatar
+    uploadState.fileList = [{ uid: '', name: data.avatar, url: ossConfig.doc.domain + data.avatar }]
     formState.type = 'edit'
     formState.visible = true
   })
@@ -378,7 +379,10 @@ const initEdit = (uuid: string) => {
 /**
  * 新增或修改用户
  */
-const onSubmit = () =>{
+const onSubmit = () => {
+  if (uploadState.fileList && uploadState.fileList.length > 0) {
+    formState.form.avatar = uploadState.fileList[0].name
+  }
   modalFormRef.value?.validate().then(() => {
     formState.loading = true
     if (formState.type === 'add') {
@@ -414,101 +418,67 @@ const onCancel = () => {
 
 const cropper = ref()
 
-const uploadState = reactive({
-  fileList: [],
-  imageUrl: '',
-  imageName: '',
-  fileType: '',
-  loading: false
-})
-
-const beforeAvatarUpload = (files: UploadProps) => {
-  console.log('beforeAvatarUpload', files)
-  if (!files) {
-    return
+const beforeAvatarUpload = (file: UploadFile) => {
+  uploadState.fileList = []
+  if (!file) {
+    return true
   }
-  // if (files.length > 1) {
-  //   message.error('只能上传一张图片!')
-  //   return
-  // }
-  const file = files as File
-  uploadState.fileType = file.type
   const isPic = file.type === 'image/jpeg' || file.type === 'image/png'
   if (!isPic) {
-    message.error('You can only upload JPG file!')
+    message.error('头像仅支持png、jpg格式的图片!')
+    return true
   }
-  console.log(44)
-  const isLt2M = file.size! / 1024 / 1024 < 2
+  const isLt2M = file.size! / 1024 / 1024 < 10
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!')
+    message.error('图片最大不能超过10MB!')
+    return true
   }
   if (isPic && isLt2M) {
-    uploadState.imageName = getFileName(file)
-    getBase64((file as any), (base64Url: string) => {
-      cropperState.visible = true
-      cropperState.imageUrl = base64Url
-      uploadState.loading = false
-      return false
-    })
     return false
   }
   return false
 }
 
-const getBase64 = (img: Blob, callback: (base64Url: string) => void) => {
-  const reader = new FileReader()
-  reader.addEventListener('load', () => callback(reader.result as string))
-  reader.readAsDataURL(img)
-}
-
 const onAvatarChange = (info: UploadChangeParam) => {
-  if (info.file.status === 'uploading') {
-    uploadState.loading = true
-    return
-  }
-  if (info.file.status === 'done') {
-    uploadState.imageUrl = ossConfig.ginvdoc.domain + info.file.response.name
-  }
-  if (info.file.status === 'error') {
-    uploadState.loading = false
-    message.error('upload error')
-  }
+  // getBase64((info.file as any), (base64Url: string) => {
+  //   doUpload(info.file, base64Url)
+  // })
+  onUpload(info.file)
 }
 
 const cropperState = reactive({
   visible: false, // 1 是否开启裁剪
-  imageUrl: ''
+  imageUrl: '',
+  uid: ''
 })
 
 const onCrop = () => {
   const canvas = cropper.value.getCroppedCanvas()
-  const cropImg = canvas.toDataURL()
-  uploadState.imageUrl = cropImg
+  // const cropImg = canvas.toDataURL()
+  // uploadState.imageUrl = cropImg
   cropperState.visible = false
   canvas.toBlob((blob: Blob) => {
-    // send the blob to server etc.
-    doUpload(blob)
-  }, uploadState.fileType, 1)
+    let key = Math.floor(Math.random() * 10).toFixed()
+    key += Math.floor(new Date().getTime() / 1000).toFixed()
+    for (let i = 0; i < 5; i++) {
+      key += Math.floor(Math.random() * 10).toFixed()
+    }
+    const filename = key + '.png'
+    const file = new File([blob], filename, { type: "image/png", lastModified: Date.now() })
+    file['uid'] = cropperState.uid
+    state.aliOss.sendRequest(file as unknown as UploadFile)
+  })
 }
 
-const doUpload = async (blob: Blob) => {
-  if (state.aliOss) {
-    try {
-      const res = await state.aliOss.multipartUpload(uploadState.imageName, blob, {
-        progress: (progress: number, checkpoint: any) => {
-          uploadState.loading = true
-          // onProgress({ percent: progress * 100 })  // 执行onProgress 并传入当前进度，使得上传组件正确显示进度条
-        },
-      })
-      console.log(res)
-      uploadState.loading = false
-      uploadState.imageUrl = ossConfig.ginvdoc.domain + res.name
-      formState.form.avatar = res.name
-    } catch (e) {
-      // onError()
-      message.error((e as Error).message)
-    }
-  }
+const onUpload = async (file: UploadFile) => {
+  const reader = new FileReader()
+  reader.addEventListener('load', () => {
+    cropperState.visible = true
+    cropperState.imageUrl = reader.result as string
+    cropperState.uid = file.uid
+    return false
+  })
+  reader.readAsDataURL(file as unknown as File)
 }
 
 interface AssignFormState {

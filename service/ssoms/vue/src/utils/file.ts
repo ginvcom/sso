@@ -1,4 +1,6 @@
-export function getFileName (file: File): string {
+import { UploadFile } from 'ant-design-vue'
+
+export function getFileName (file: UploadFile): string {
   let key = Math.floor(Math.random() * 10).toFixed()
   key += Math.floor(new Date().getTime() / 1000).toFixed()
   for (let i = 0; i < 5; i++) {
@@ -8,7 +10,7 @@ export function getFileName (file: File): string {
   return key
 }
 
-export function getExt (file: File) {
+export function getExt (file: UploadFile) {
   const dot = file.name.lastIndexOf('.')
   const ext = file.name.substring(dot)
   if (file.type === 'image/jpeg') {
@@ -23,4 +25,10 @@ export function getExt (file: File) {
       return '.mp4'
   }
   return ext.toLowerCase()
+}
+
+export function getBase64 (file: Blob, callback: (base64Url: string) => void) {
+  const reader = new FileReader()
+  reader.addEventListener('load', () => callback(reader.result as string))
+  reader.readAsDataURL(file)
 }

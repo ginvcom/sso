@@ -7,7 +7,7 @@ require (
 	github.com/ginvcom/util v1.0.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/pkg/errors v0.9.1
-	github.com/zeromicro/go-zero v1.4.3
+	github.com/zeromicro/go-zero v1.4.4
 	go.etcd.io/etcd/client/v3 v3.5.5
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
@@ -61,6 +61,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/zipkin v1.11.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.0 // indirect
 	go.opentelemetry.io/otel/trace v1.11.0 // indirect

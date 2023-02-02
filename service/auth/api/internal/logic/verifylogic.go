@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"sso/service/auth/api/internal/config"
 	"sso/service/auth/api/internal/svc"
 	"sso/service/auth/api/internal/types"
 	"sso/service/auth/model"
@@ -118,13 +119,22 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 
 // 当前url是否需要授权验证
 func (l *VerifyLogic) urlNoAuth(req *types.VerifyRequestReq) bool {
-	l.Logger.Info(l.svcCtx.Config.NoAuthUrls, req.MenuURI)
-	menuNoAuthPaths, ok := l.svcCtx.Config.NoAuthUrls[req.MenuURI]
-	if !ok {
-		return false
+	var menuNoAuthUrls []config.NoAuthUrl
+	l.Logger.Info("req info", req.SystemCode, req.MenuURI)
+	for _, item := range l.svcCtx.Config.NoAuthUrls {
+		if item.SystemCode == req.SystemCode {
+			for _, noAuthItem := range item.NoAuthData {
+				if noAuthItem.Menu == req.MenuURI {
+					menuNoAuthUrls = noAuthItem.Urls
+					break
+				}
+			}
+			break
+		}
 	}
 
-	for _, p := range menuNoAuthPaths {
+	for _, p := range menuNoAuthUrls {
+		l.Logger.Info("uri show", p.Path, req.URI, p.Method)
 		if req.Method == p.Method {
 			ok, err := KeyMatch(req.URI, p.Path)
 			if err != nil {

@@ -18,7 +18,7 @@ func (svcCtx *ServiceContext) Request(body []byte) (status int, resp []byte, err
 	// requestURL := svcCtx.Meta.URI
 	serviceAddress, ok := svcCtx.Config.Upstreams[svcCtx.Meta.ServiceCode]
 	if !ok {
-		err = errors.New(ErrServiceNotExits)
+		err = errors.New(ErrServiceNotExits + ", serviceCode: " + svcCtx.Meta.ServiceCode)
 		return
 	}
 
