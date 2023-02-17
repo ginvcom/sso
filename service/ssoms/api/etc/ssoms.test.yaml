@@ -7,7 +7,7 @@ Log:
   Mode: file
   Path: ./logs/ssoms
 Mysql:
-  DataSource: root:123456@tcp(localhost:13306)/sso?parseTime=true&loc=Asia%2FShanghai
+  DataSource: root:123456@tcp(192.167.0.2:3306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:
   - Host: localhost:16379
     Type: node
