@@ -8,7 +8,8 @@ Log:
   Path: ./logs/gateway
 UserCookieDomin: localhost
 Upstreams:
-  auth: http://localhost:8888
-  ssoms: http://localhost:8889
-  oss: http://localhost:8890
-  docms: http://localhost:8891
+  auth: http://192.167.0.102:8888
+  ssoms: http://192.167.0.103:8889
+  oss: http://192.167.0.104:8890
+  conf: http://192.167.0.104:8891
+  docms: http://192.167.0.105:8892
