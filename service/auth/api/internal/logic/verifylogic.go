@@ -84,6 +84,7 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 			return nil, err
 		}
 		object := &model.Object{}
+
 		for _, o := range objects {
 			ok, err2 := KeyMatch(req.URI, o.Key)
 			if err2 != nil {
@@ -120,7 +121,6 @@ func (l *VerifyLogic) Verify(req *types.VerifyRequestReq) (resp *types.VerifyReq
 // 当前url是否需要授权验证
 func (l *VerifyLogic) urlNoAuth(req *types.VerifyRequestReq) bool {
 	var menuNoAuthUrls []config.NoAuthUrl
-	l.Logger.Info("req info", req.SystemCode, req.MenuURI)
 	for _, item := range l.svcCtx.Config.NoAuthUrls {
 		if item.SystemCode == req.SystemCode {
 			for _, noAuthItem := range item.NoAuthData {
@@ -181,7 +181,9 @@ func KeyMatch(key1 string, key2 string) (bool, error) {
 	re := regexp.MustCompile(`:[^/]+`)
 	key2 = re.ReplaceAllString(key2, "$1[^/]+$2")
 
-	res, err := regexp.MatchString(key2, key1)
+	key := "^" + key2 + "$"
+	res, err := regexp.MatchString(key, key1)
+
 	if err != nil {
 		return false, err
 	}
