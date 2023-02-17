@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"sso/service/auth/api/internal/config"
 	"sso/service/auth/api/internal/svc"
 	"sso/service/auth/api/internal/types"
 
@@ -26,20 +27,20 @@ func NewMenusLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MenusLogic 
 	}
 }
 
-func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenusReply, err error) {
-	if req.SystemCode == "" {
-		err = errors.New("params SystemCode is required")
+func (l *MenusLogic) Menus() (resp *types.SessionMenusReply, err error) {
+	token := l.ctx.Value(config.Token).(string)
+
+	SystemCode := l.ctx.Value(config.SystemCode).(string)
+	if SystemCode == "" {
+		l.Logger.Info("missing user info")
+		err = errors.New("missing user info")
 		return
 	}
 
-	l.Logger.Info(req.SystemCode)
-	uuid, err := l.isPass(req)
+	uuid, err := l.isPass(token)
 	if err != nil {
 		l.Logger.Errorf("authorization:%s, realRequestPath:%s", uuid)
-		return
 	}
-
-	l.Logger.Info(uuid)
 
 	roleUUIDArray, err := l.svcCtx.UserToRoleModel.FindRoleUUIDArrByUserUuid(l.ctx, uuid)
 	if err != nil {
@@ -48,7 +49,7 @@ func (l *MenusLogic) Menus(req *types.SessionMenusReq) (resp *types.SessionMenus
 
 	l.Logger.Info(roleUUIDArray)
 
-	listData, err := l.svcCtx.ObjectModel.FindMenusInRoleUUIDArray(l.ctx, req.SystemCode, roleUUIDArray)
+	listData, err := l.svcCtx.ObjectModel.FindMenusInRoleUUIDArray(l.ctx, SystemCode, roleUUIDArray)
 
 	if err != nil {
 		l.Logger.Error(err)
@@ -96,8 +97,8 @@ func makeTree(obs []*types.Menu, puuid string) []*types.Menu {
 	return tree
 }
 
-func (l *MenusLogic) isPass(req *types.SessionMenusReq) (uuid string, err error) {
-	tok, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
+func (l *MenusLogic) isPass(token string) (uuid string, err error) {
+	tok, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

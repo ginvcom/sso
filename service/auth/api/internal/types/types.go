@@ -43,11 +43,6 @@ type VerifyRequestReply struct {
 	Name string `json:"name"`
 }
 
-type SessionMenusReq struct {
-	Token      string `form:"token"`
-	SystemCode string `form:"systemCode"`
-}
-
 type Meta struct {
 	Name       string   `json:"n"` // 菜单名
 	Icon       string   `json:"i"` // 菜单icon

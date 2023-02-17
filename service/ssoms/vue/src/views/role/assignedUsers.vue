@@ -207,7 +207,7 @@ const onTableChange = ({ current, pageSize }) => {
  * 将用户移出角色
  */
 const onDeassignUser = (userUUID: string) => {
-  deassignUser({ roleUUID: state.params.roleUUID }, { userUUID }).then(() => {
+  deassignUser({}, { userUUID }, state.params.roleUUID).then(() => {
     message.success('用户移出角色操作成功')
     getList()
   })
@@ -263,7 +263,7 @@ const initAssignUser = () => {
 const onSubmit = () =>{
   modalFormRef.value?.validate().then(() => {
     formState.loading = true
-    assignUser({ roleUUID: state.params.roleUUID }, formState.form).then(() => {
+    assignUser({}, formState.form, state.params.roleUUID).then(() => {
       message.success('选择用户分配到角色操作成功')
       formState.visible = false
       modalFormRef.value?.resetFields()

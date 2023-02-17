@@ -11,7 +11,7 @@ Etcd:
     - 127.0.0.1:2379
   Key: /sso/api/wihtelist
 Mysql:
-  DataSource: root:123456@tcp(127.0.0.1:13306)/sso?parseTime=true&loc=Asia%2FShanghai
+  DataSource: root:123456@tcp(192.167.0.2:3306)/sso?parseTime=true&loc=Asia%2FShanghai
 CacheRedis:
   - Host: localhost:16379
     Type: node
@@ -50,6 +50,8 @@ NoAuthUrls:
             Method: GET
       - menu: '/profile'
         urls:
+          - Path: /aliyun/sts
+            Method: GET
           - Path: /user/profile
             Method: GET
           - Path: /user/infoEdit
@@ -62,8 +64,12 @@ NoAuthUrls:
             Method: GET
           - Path: /book
             Method: POST
+          - Path: /aliyun/sts
+            Method: GET
       - menu: /book/read
         urls:
+          - Path: /aliyun/sts
+            Method: GET
           - Path: /book/:bookUUID/docs
             Method: GET
           - Path: /doc/:docUUID/rename
