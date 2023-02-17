@@ -42,13 +42,6 @@ export interface VerifyRequestReply {
 	name: string
 }
 
-export interface SessionMenusReq {
-}
-export interface SessionMenusReqParams {
-	token: string
-	systemCode: string
-}
-
 export interface Meta {
 	n: string // 菜单名
 	i: string // 菜单icon

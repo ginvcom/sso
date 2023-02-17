@@ -20,10 +20,9 @@ export function verify(req: components.VerifyRequestReq) {
 
 /**
  * @description "当前作用的角色分配的菜单权限"
- * @param params
  */
-export function menus(params: components.SessionMenusReqParams) {
-	return auth.get<components.SessionMenusReply>(`/session-menus`, params)
+export function menus() {
+	return auth.get<components.SessionMenusReply>(`/session-menus`)
 }
 
 /**

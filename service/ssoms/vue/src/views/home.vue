@@ -38,7 +38,7 @@
         <a-col :span="12">
           <a-statistic class="home__statistic" title="操作" :value="statisticState.data.actionAmount">
             <template #suffix>
-              <calculator-outlined class="orange" />
+              <calculator-outlined class="text-info" />
             </template>
           </a-statistic>
         </a-col>
@@ -168,7 +168,7 @@ const initChart = () => {
   const column = new Column(barChartContainer.value, {
     data: statisticState.data.statistics,
     theme: {
-      colors10: ['#1890ff', '#fa541c']
+      colors10: ['#1890ff', '#91d5ff']
     },
     maxColumnWidth: 15,
     xField: 'month',

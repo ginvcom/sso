@@ -57,7 +57,12 @@ func (svcCtx *ServiceContext) Request(body []byte) (status int, resp []byte, err
 	req.Header.Set("x-origin-uri", svcCtx.Meta.URI)
 	req.Header.Set("x-origin-uuid", svcCtx.Meta.UUID)
 	req.Header.Set("x-origin-name", svcCtx.Meta.Name)
-	req.Header.Set("Authorization", svcCtx.Meta.Token)
+	req.Header.Set("x-origin-system", svcCtx.Meta.SystemCode)
+
+	if svcCtx.Meta.Action == ActionSessionMenus || svcCtx.Meta.Action == ActionSessionMenuActions {
+		req.Header.Set("x-origin-token", svcCtx.Meta.Token)
+	}
+
 	// req = req.WithContext(ctx)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {

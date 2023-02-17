@@ -12,4 +12,5 @@ Upstreams:
   auth: http://localhost:8888
   ssoms: http://localhost:8889
   oss: http://localhost:8890
-  docms: http://localhost:8891
+  conf: http://localhost:8891
+  docms: http://localhost:8892

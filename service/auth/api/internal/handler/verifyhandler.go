@@ -3,12 +3,11 @@ package handler
 import (
 	"net/http"
 
+	"github.com/ginvcom/util"
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"sso/service/auth/api/internal/logic"
 	"sso/service/auth/api/internal/svc"
 	"sso/service/auth/api/internal/types"
-
-	"github.com/ginvcom/util"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func verifyHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {

@@ -38,3 +38,10 @@ type NoAuthUrl struct {
 	Method string
 	Path   string
 }
+
+type BasicContext string
+
+const Token BasicContext = "token"
+const UUID BasicContext = "uuid"
+const Name BasicContext = "name"
+const SystemCode BasicContext = "systemCode"

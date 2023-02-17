@@ -40,12 +40,6 @@ type VerifyRequestReply {
 	Name string `json:"name"`
 }
 
-type SessionMenusReq {
-	Token      string `form:"token"`
-	SystemCode string `form:"systemCode"`
-	// SessionRoleUUID string `json:"sessionRoleUUID"`
-}
-
 type Meta {
 	Name       string   `json:"n"` // 菜单名
 	Icon       string   `json:"i"` // 菜单icon
@@ -77,7 +71,7 @@ service auth {
 	
 	@doc "当前作用的角色分配的菜单权限"
 	@handler menus
-	get /session-menus (SessionMenusReq) returns (SessionMenusReply)
+	get /session-menus returns (SessionMenusReply)
 	
 	// @doc "当前作用的角色某个菜单下分配的操作权限"
 	// @handler actions
