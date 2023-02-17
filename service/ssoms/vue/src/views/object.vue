@@ -169,7 +169,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="菜单路径" name="key" :rules="[{ required: true, message: '请输入菜单路径' }]">
-              <a-input v-model:value="formState.form.key" placeholder="菜单路径" />
+              <a-input v-model:value.trim="formState.form.key" placeholder="菜单路径" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -199,7 +199,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="标识符" name="identifier">
-              <a-input v-model:value="formState.form.identifier" placeholder="标识" />
+              <a-input v-model:value.trim="formState.form.identifier" placeholder="标识" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
