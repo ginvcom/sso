@@ -197,6 +197,10 @@ const columns = [
     dataIndex: 'systemName'
   },
   {
+    title: '域名',
+    dataIndex: 'domain'
+  },
+  {
     title: 'logo',
     dataIndex: 'icon'
   },

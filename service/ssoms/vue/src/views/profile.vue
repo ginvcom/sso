@@ -12,35 +12,40 @@
           <div class="pofile__avatar">
             <a-tooltip placement="bottom">
               <template #title>点击修改头像</template>
-              <div style="width:200px">
-              <template v-if="cropperState.visible">
-                <vue-cropper
-                  ref="cropper"
-                  :aspect-ratio="1 / 1"
-                  :src="cropperState.imageUrl"
-                  @keyup.enter="onCrop"
-                />
+                <div style="width:200px">
+                  <template v-if="cropperState.visible">
+                  <vue-cropper
+                    ref="cropper"
+                    :aspect-ratio="1 / 1"
+                    :src="cropperState.imageUrl"
+                    @keyup.enter="onCrop"
+                  />
 
-              <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
-              </template>
-              <a-upload v-else
-                v-model:file-list="uploadState.fileList"
-                list-type="picture-card"
-                class="avatar-uploader"
-                :show-upload-list="false"
-                :before-upload="beforeAvatarUpload"
-                @change="onAvatarChange"
-              >
-                <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
-                <a-avatar v-if="uploadState.imageUrl" class="avatar-uploader__img" :size="200" shape="square" :src="uploadState.imageUrl" style="color: #f56a00; background-color: #fde3cf">
-                  <template #icon><UserOutlined /></template>
-                </a-avatar>
-                <div>
-                  <loading-outlined v-if="uploadState.loading"></loading-outlined>
-                  <plus-outlined v-else></plus-outlined>
-                  <div class="ant-upload-text">上传头像</div>
-                </div>
-              </a-upload>
+                <a-button block style="margin-top: 16px;width: 200px;" @click="onCrop">完成裁剪并上传</a-button>
+                </template>
+                <a-upload  v-else
+                  v-model:file-list="uploadState.fileList"
+                  list-type="picture-card"
+                  class="avatar-uploader"
+                  :show-upload-list="false"
+                  :before-upload="beforeAvatarUpload"
+                  @change="onAvatarChange"
+                >
+                  <!-- <img class="avatar-uploader__img" v-if="uploadState.imageUrl" :src="uploadState.imageUrl" alt="avatar" /> -->
+                  <a-avatar
+                    v-if="uploadState.fileList && uploadState.fileList.length > 0"
+                    class="avatar-uploader__img" :size="200" shape="square"
+                    :src="ossConfig.doc.domain + uploadState.fileList[0].name"
+                    style="color: #f56a00; background-color: #fde3cf"
+                  >
+                    <template #icon><UserOutlined /></template>
+                  </a-avatar>
+                  <div>
+                    <loading-outlined v-if="uploadState.fileList && uploadState.fileList.length > 0 && uploadState.fileList[0].status === 'uploading'"></loading-outlined>
+                    <plus-outlined v-else></plus-outlined>
+                    <div class="ant-upload-text">上传</div>
+                  </div>
+                </a-upload>
               </div>
             </a-tooltip>
           </div>
@@ -78,10 +83,10 @@
 <script setup lang="ts">
 import { onBeforeMount, reactive, ref } from 'vue'
 import VueCropper from 'vue-cropperjs'
-import { message } from 'ant-design-vue'
+import { sts } from '@/api/oss'
+import { message, UploadChangeParam, UploadFile, UploadProps } from 'ant-design-vue'
 import { UserOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
-import type { UploadChangeParam, UploadProps } from 'ant-design-vue'
-import { getFileName } from '@/utils/file'
+import AliyunOSS, { StsInfo } from '@/utils/aliyunOSS'
 import { ossConfig } from '@/config'
 import PasswordReset from '@/components/PasswordReset.vue'
 import ProfileChange from '@/components/ProfileChange.vue'
@@ -124,11 +129,16 @@ const profileData = reactive<ProfileInfo>({
   }
 })
 
+const refreshSTSToken = async (bucket: string) => {
+  const res = await sts({ bucket })
+  return Promise.resolve(res as StsInfo)
+}
+
 onBeforeMount(() => {
+  state.aliOss = new AliyunOSS(ossConfig.doc.bucket, () => refreshSTSToken(ossConfig.doc.bucket), uploadState)
   profile().then(data => {
     profileData.info = data
-    uploadState.imageName = data.avatar
-    uploadState.imageUrl = ossConfig.doc.domain + data.avatar
+    uploadState.fileList = [{ uid: '', name: data.avatar, url: ossConfig.doc.domain + data.avatar }]
   })
 })
 
@@ -140,99 +150,65 @@ const activeKey = ref('1')
 
 const cropper = ref()
 
-const uploadState = reactive({
-  fileList: [],
-  imageUrl: '',
-  imageName: '',
-  fileType: '',
-  loading: false
-})
+const uploadState = reactive<UploadProps>({ fileList: [] })
 
-const beforeAvatarUpload = (files: UploadProps) => {
-  console.log('beforeAvatarUpload', files)
-  if (!files) {
-    return
+const beforeAvatarUpload = (file: UploadFile) => {
+  uploadState.fileList = []
+  if (!file) {
+    return true
   }
-  // if (files.length > 1) {
-  //   message.error('只能上传一张图片!')
-  //   return
-  // }
-  const file = files as File
-  uploadState.fileType = file.type
   const isPic = file.type === 'image/jpeg' || file.type === 'image/png'
   if (!isPic) {
-    message.error('You can only upload JPG file!')
+    message.error('头像仅支持png、jpg格式的图片!')
+    return true
   }
-  const isLt2M = file.size! / 1024 / 1024 < 2
+  const isLt2M = file.size! / 1024 / 1024 < 10
   if (!isLt2M) {
-    message.error('Image must smaller than 2MB!')
+    message.error('图片最大不能超过10MB!')
+    return true
   }
   if (isPic && isLt2M) {
-    uploadState.imageName = getFileName(file)
-    getBase64((file as any), (base64Url: string) => {
-      cropperState.visible = true
-      cropperState.imageUrl = base64Url
-      uploadState.loading = false
-      return false
-    })
     return false
   }
   return false
 }
 
-const getBase64 = (img: Blob, callback: (base64Url: string) => void) => {
-  const reader = new FileReader()
-  reader.addEventListener('load', () => callback(reader.result as string))
-  reader.readAsDataURL(img)
-}
-
 const onAvatarChange = (info: UploadChangeParam) => {
-  if (info.file.status === 'uploading') {
-    uploadState.loading = true
-    return
-  }
-  if (info.file.status === 'done') {
-    uploadState.imageUrl = ossConfig.doc.domain + info.file.response.name
-  }
-  if (info.file.status === 'error') {
-    uploadState.loading = false
-    message.error('upload error')
-  }
+  onUpload(info.file)
 }
 
 const cropperState = reactive({
   visible: false, // 1 是否开启裁剪
-  imageUrl: ''
+  imageUrl: '',
+  uid: ''
 })
 
 const onCrop = () => {
-  console.log('onCrop', cropper.value.getCroppedCanvas())
   const canvas = cropper.value.getCroppedCanvas()
-  const cropImg = canvas.toDataURL()
-  uploadState.imageUrl = cropImg
+  // const cropImg = canvas.toDataURL()
+  // uploadState.imageUrl = cropImg
   cropperState.visible = false
   canvas.toBlob((blob: Blob) => {
-    // send the blob to server etc.
-    doUpload(blob)
-  }, uploadState.fileType, 1)
+    let key = Math.floor(Math.random() * 10).toFixed()
+    key += Math.floor(new Date().getTime() / 1000).toFixed()
+    for (let i = 0; i < 5; i++) {
+      key += Math.floor(Math.random() * 10).toFixed()
+    }
+    const filename = key + '.png'
+    const file = new File([blob], filename, { type: "image/png", lastModified: Date.now() })
+    file['uid'] = cropperState.uid
+    state.aliOss.sendRequest(file as unknown as UploadFile)
+  })
 }
 
-const doUpload = async (blob: Blob) => {
-  if (state.aliOss) {
-    try {
-      const res = await state.aliOss.multipartUpload(uploadState.imageName, blob, {
-        progress: (progress: number, checkpoint: any) => {
-          uploadState.loading = true
-          // onProgress({ percent: progress * 100 })  // 执行onProgress 并传入当前进度，使得上传组件正确显示进度条
-        },
-      })
-      uploadState.loading = false
-      uploadState.imageUrl = ossConfig.doc.domain + res.name
-      profileData.info.avatar = res.name
-    } catch (e) {
-      // onError()
-      message.error((e as Error).message)
-    }
-  }
+const onUpload = async (file: UploadFile) => {
+  const reader = new FileReader()
+  reader.addEventListener('load', () => {
+    cropperState.visible = true
+    cropperState.imageUrl = reader.result as string
+    cropperState.uid = file.uid
+    return false
+  })
+  reader.readAsDataURL(file as unknown as File)
 }
 </script>

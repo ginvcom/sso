@@ -51,6 +51,10 @@
     color: #ff4d4f;
 }
 
+.text-info{
+    color: #91d5ff;
+}
+
 .header__bar.ant-layout-header {
     height: 48px;
     padding: 0 24px;
